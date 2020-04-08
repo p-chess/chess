@@ -1,0 +1,60 @@
+{
+    "name": "p-chess/chess",
+    "type": "library",
+    "description": "A PHP chess library that is used for chess move generation/validation, piece placement/movement, and check/checkmate/stalemate detection",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ryan hs",
+            "email": "mr.ryansilalahi@gmail.com"
+        },
+        {
+            "name": "Arkadiusz Kondas",
+            "email": "arkadiusz.kondas@gmail.com"
+        },
+        {
+            "name": "Massimiliano Arione",
+            "email": "garakkio@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.14",
+        "johnkary/phpunit-speedtrap": "^3.0",
+        "phpbench/phpbench": "^0.15.0",
+        "phpstan/phpstan": "^0.11.1",
+        "phpunit/phpunit": "^8.5"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "PChess\\Chess\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PChess\\Chess\\Test\\": "tests/",
+            "PChess\\Chess\\Benchmark\\": "benchmarks/"
+        }
+    },
+    "minimum-stability": "stable",
+    "scripts": {
+        "benchmark": "./vendor/bin/phpbench run benchmarks/ --report=aggregate --retry-threshold=2",
+        "build": [
+            "@check-cs",
+            "@phpstan",
+            "@test"
+        ],
+        "check-cs": "./vendor/bin/php-cs-fixer fix --dry-run",
+        "fix-cs": "./vendor/bin/php-cs-fixer fix",
+        "phpstan": "./vendor/bin/phpstan analyze src tests benchmarks --level 3 --configuration phpstan.neon",
+        "test": "./vendor/bin/phpunit"
+    }
+}
