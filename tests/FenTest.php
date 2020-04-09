@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PChess\Chess\Test;
 
 use PChess\Chess\Chess;
+use PChess\Chess\Validation;
 use PHPUnit\Framework\TestCase;
 
 class FenTest extends TestCase
@@ -36,7 +37,7 @@ class FenTest extends TestCase
         ];
         
         foreach ($positions as $position) {
-            $load = Chess::validateFen($position['fen']);
+            $load = Validation::validateFen($position['fen']);
             //~ echo $position['fen'] . ' => ' . ($load['valid'] ? 'T' : 'F') . PHP_EOL;
             $this->assertEquals($load['valid'], $position['should_pass']);
         }
@@ -234,7 +235,7 @@ class FenTest extends TestCase
         ];
         
         foreach ($positions as $position) {
-            $load = Chess::validateFen($position['fen']);
+            $load = Validation::validateFen($position['fen']);
             //~ echo $position['fen'] . ' => ' . ($load['valid'] ? 'T' : 'F') . PHP_EOL;
             $this->assertEquals($load['valid'], $position['should_pass']);
         }

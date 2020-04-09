@@ -40,4 +40,36 @@ class Move
         $this->captured = $captured;
         $this->promotion = $promotion;
     }
+
+    // here, we add first parameter turn, to make this really static method
+    // because in chess.js var turn got from outside scope,
+    // maybe need a little fix in chess.js or maybe i am :-p
+    public static function buildMove(
+        string $turn,
+        array $board,
+        int $from,
+        int $to,
+        int $flags,
+        ?string $promotion = null
+    ): self {
+        $captured = null;
+        if ($board[$to] !== null) {
+            $captured = $board[$to]->type;
+        } elseif ($flags & Board::BITS['EP_CAPTURE']) {
+            $captured = Piece::PAWN;
+        }
+        if ($promotion !== null) {
+            $flags |= Board::BITS['PROMOTION'];
+        }
+
+        return new self(
+            $turn,
+            $flags,
+            $board[$from]->type,
+            $from,
+            $to,
+            $captured,
+            $promotion
+        );
+    }
 }

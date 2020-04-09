@@ -14,12 +14,7 @@ class ChessPublicator extends Chess
     {
         return $this->board;
     }
-    
-    public function getHistory()
-    {
-        return $this->history;
-    }
-    
+
     public function getLastHistory()
     {
         return $this->history[count($this->history) - 1];
@@ -35,9 +30,9 @@ class ChessPublicator extends Chess
         return $this->generateMoves($options);
     }
     
-    public static function buildMovePublic($turn, $board, $from, $to, $flags, $promotion = null)
+    public static function buildMovePublic($turn, $board, $from, $to, $flags, $promotion = null): Move
     {
-        return self::buildMove($turn, $board, $from, $to, $flags, $promotion);
+        return Move::buildMove($turn, $board, $from, $to, $flags, $promotion);
     }
     
     public function makeMovePublic($move): void
@@ -53,10 +48,5 @@ class ChessPublicator extends Chess
     public function moveToSANPublic(?Move $move): string
     {
         return $this->moveToSAN($move);
-    }
-    
-    public function moveFromSANPublic($san): ?Move
-    {
-        return $this->moveFromSAN($san);
     }
 }
