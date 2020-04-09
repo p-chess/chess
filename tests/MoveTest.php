@@ -407,6 +407,47 @@ class MoveTest extends TestCase
         $this->assertContains('h5', $moves);
     }
     
+    public function testMoveFromSAN(): void
+    {
+        $chess = new ChessPublicator();
+        $chess->reset();
+        $this->assertSame($chess->moveToSANPublic($chess->moveFromSANPublic('Nf3?!+#')), 'Nf3');
+        
+        $chess->reset();
+        $this->assertSame($chess->moveToSANPublic($chess->moveFromSANPublic('e4')), 'e4');
+        
+        $chess->reset();
+        $this->assertSame($chess->moveToSANPublic($chess->moveFromSANPublic('Nf3')), 'Nf3');
+        
+        // really heavy function, if this is not a test, then it have to be refactored
+        $moveWrapper = static function (string $san) use ($chess) {
+            $move = $chess->moveFromSANPublic($san);
+            $sanRepaired = $chess->moveToSANPublic($move);
+            $chess->makeMovePublic($move);
+
+            return $sanRepaired;
+        };
+        $chess->reset();
+        $this->assertSame($moveWrapper('e4'), 'e4');
+        $this->assertSame($moveWrapper('d5'), 'd5');
+        $this->assertSame($moveWrapper('exd5'), 'exd5');
+        $this->assertSame($moveWrapper('c6??'), 'c6');
+        $this->assertSame($moveWrapper('dxc6!'), 'dxc6');
+        $this->assertSame($moveWrapper('Qd5?'), 'Qd5');
+        $this->assertSame($moveWrapper('cxb7!!'), 'cxb7');
+        $this->assertSame($moveWrapper('Nh6'), 'Nh6');
+        $this->assertSame($moveWrapper('bxa8=Q'), 'bxa8=Q');
+        $this->assertSame($moveWrapper('Bd7'), 'Bd7');
+        $this->assertSame($moveWrapper('Qxb8+'), 'Qxb8+');
+        $this->assertSame($moveWrapper('Bc8'), 'Bc8');
+        $this->assertSame($moveWrapper('Qxc8'), 'Qxc8+');
+        $this->assertSame($moveWrapper('Qd8+#'), 'Qd8');
+        $this->assertSame($moveWrapper('Bb5#'), 'Bb5#');
+        
+        $chess->reset();
+        $this->assertSame($chess->moveToSANPublic($chess->moveFromSANPublic('e4=Q')), 'e4');
+    }
+    
     public function testSANMove(): void
     {
         // Ruy Lopez (C70)
