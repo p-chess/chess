@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PChess\Chess\Test;
 
 use PChess\Chess\Chess;
+use PChess\Chess\Validation;
 use PHPUnit\Framework\TestCase;
 
 class PgnTest extends TestCase
@@ -86,13 +87,13 @@ class PgnTest extends TestCase
     {
         $chess = new ChessPublicator();
         
-        $parsed = Chess::parsePgn('1.e4 e5 2.Nf3');
+        $parsed = Validation::parsePgn('1.e4 e5 2.Nf3');
         $this->assertContains('e4', $parsed['moves']);
         $this->assertContains('e5', $parsed['moves']);
         $this->assertContains('Nf3', $parsed['moves']);
         
         
-        $parsed = Chess::parsePgn(
+        $parsed = Validation::parsePgn(
             <<<EOD
 [Event "Earl tourn"]
 [Site "?"]
@@ -114,11 +115,11 @@ EOD
         $chess = new ChessPublicator();
         
         
-        $parsed = Chess::validatePgn('1.e4 e5some failed string 2.Nf3');
+        $parsed = Validation::validatePgn('1.e4 e5some failed string 2.Nf3');
         $this->assertFalse($parsed);
         
         
-        $parsed = $chess->validatePgn(
+        $parsed = Validation::validatePgn(
             <<<EOD
 [Event "Earl tourn"]
 [Site "?"]
@@ -128,7 +129,7 @@ EOD
         $this->assertFalse($parsed);
         
         
-        $parsed = Chess::validatePgn(
+        $parsed = Validation::validatePgn(
             <<<EOD
 [Event "Earl tourn"]
 oke failed here
@@ -139,7 +140,7 @@ EOD
         $this->assertFalse($parsed);
         
         
-        $parsed = Chess::validatePgn(
+        $parsed = Validation::validatePgn(
             <<<EOD
 [Event "Earl tourn"]
 [Site "?"]
@@ -148,7 +149,7 @@ EOD
         );
         $this->assertTrue($parsed);
         
-        $parsed = Chess::validatePgn(
+        $parsed = Validation::validatePgn(
             <<<EOD
 [Event "Earl tourn"]
 [Site "?"]
@@ -158,14 +159,14 @@ EOD
         $this->assertTrue($parsed);
         
         
-        $parsed = Chess::validatePgn('1.e4 e5 2.Nf3', ['verbose' => true]);
+        $parsed = Validation::validatePgn('1.e4 e5 2.Nf3', ['verbose' => true]);
         $this->assertContains('e4', $parsed['moves']);
         $this->assertContains('e5', $parsed['moves']);
         $this->assertContains('Nf3', $parsed['moves']);
         $this->assertSame($parsed['game']->fen(), 'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2');
                 
         
-        $parsed = Chess::validatePgn(<<<EOD
+        $parsed = Validation::validatePgn(<<<EOD
 [Event "Earl tourn"]
 [Site "?"]
 1.e4 e5 2.Nf3
@@ -177,23 +178,5 @@ EOD
         $this->assertContains('e5', $parsed['moves']);
         $this->assertContains('Nf3', $parsed['moves']);
         $this->assertSame($parsed['game']->fen(), 'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2');
-    }
-    
-    /**
-     * @depends testParsePgn
-     * @depends testValidatePgn
-     */
-    public function testLoadPgn(): void
-    {
-        $chess = new ChessPublicator();
-        
-        $return = $chess->loadPgn('1.e4 e5 2.Nf3');
-        $this->assertSame($chess->fen(), 'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2');
-        
-        $return = $chess->loadPgn('1.e4 e5 2.e4');
-        $this->assertFalse($return);
-        
-        $return = $chess->loadPgn('1.e4 e5 make it invalid 2.Nf3');
-        $this->assertFalse($return);
     }
 }
