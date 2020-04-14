@@ -37,7 +37,7 @@ class Chess
     protected $halfMoves;
     /** @var int */
     protected $moveNumber;
-    /** @var array */
+    /** @var array<int, History> */
     protected $history;
     /** @var array */
     protected $header;
@@ -309,10 +309,10 @@ class Chess
         $verbose = !empty($options['verbose']) ? $options['verbose'] : false;
 
         foreach ($this->history as $history) {
-            $moveTmp['to'] = self::algebraic($history['move']->to);
-            $moveTmp['from'] = self::algebraic($history['move']->from);
-            if ($history['move']->flags & Board::BITS['PROMOTION']) {
-                $moveTmp['promotion'] = $history['move']->promotion;
+            $moveTmp['to'] = self::algebraic($history->move->to);
+            $moveTmp['from'] = self::algebraic($history->move->from);
+            if ($history->move->flags & Board::BITS['PROMOTION']) {
+                $moveTmp['promotion'] = $history->move->promotion;
             }
 
             $turn = $gameTmp->turn();
@@ -390,7 +390,7 @@ class Chess
 
     protected function makeMove(Move $move): void
     {
-        $us = $this->turn();
+        $us = $this->turn;
         $them = self::swapColor($us);
         $historyKey = $this->recordMove($move);
 
@@ -477,7 +477,7 @@ class Chess
         $this->turn = $them;
 
         $this->boardHash = json_encode($this->board);
-        $this->history[$historyKey]['position'] = $this->boardHash;
+        $this->history[$historyKey]->position = $this->boardHash;
     }
 
     protected function push(Move $move): int
@@ -488,15 +488,15 @@ class Chess
 
     protected function recordMove(Move $move): int
     {
-        $this->history[] = [
-            'move' => $move,
-            'kings' => [Piece::WHITE => $this->kings[Piece::WHITE], Piece::BLACK => $this->kings[Piece::BLACK]],
-            'turn' => $this->turn(),
-            'castling' => [Piece::WHITE => $this->castling[Piece::WHITE], Piece::BLACK => $this->castling[Piece::BLACK]],
-            'epSquare' => $this->epSquare,
-            'halfMoves' => $this->halfMoves,
-            'moveNumber' => $this->moveNumber,
-        ];
+        $this->history[] = new History(
+            $move,
+            [Piece::WHITE => $this->kings[Piece::WHITE], Piece::BLACK => $this->kings[Piece::BLACK]],
+            $this->turn,
+            [Piece::WHITE => $this->castling[Piece::WHITE], Piece::BLACK => $this->castling[Piece::BLACK]],
+            $this->epSquare,
+            $this->halfMoves,
+            $this->moveNumber
+        );
 
         end($this->history);
 
@@ -510,13 +510,13 @@ class Chess
             return null;
         }
 
-        $move = $old['move'];
-        $this->kings = $old['kings'];
-        $this->turn = $old['turn'];
-        $this->castling = $old['castling'];
-        $this->epSquare = $old['epSquare'];
-        $this->halfMoves = $old['halfMoves'];
-        $this->moveNumber = $old['moveNumber'];
+        $move = $old->move;
+        $this->kings = $old->kings;
+        $this->turn = $old->turn;
+        $this->castling = $old->castling;
+        $this->epSquare = $old->epSquare;
+        $this->halfMoves = $old->halfMoves;
+        $this->moveNumber = $old->moveNumber;
 
         $us = $this->turn;
         $them = self::swapColor($us);
@@ -569,7 +569,7 @@ class Chess
         }
 
         $moves = [];
-        $us = $this->turn();
+        $us = $this->turn;
         $them = self::swapColor($us);
         $secondRank = [Piece::BLACK => self::RANK_7, Piece::WHITE => self::RANK_2];
 
@@ -912,13 +912,13 @@ class Chess
     {
         $hash = [];
         foreach ($this->history as $history) {
-            if (isset($hash[$history['position']])) {
-                ++$hash[$history['position']];
+            if (isset($hash[$history->position])) {
+                ++$hash[$history->position];
             } else {
-                $hash[$history['position']] = 1;
+                $hash[$history->position] = 1;
             }
 
-            if ($hash[$history['position']] >= 3) {
+            if ($hash[$history->position] >= 3) {
                 return true;
             }
         }
@@ -1141,7 +1141,7 @@ class Chess
         $checkmates = 0;
 
         $moves = $this->generateMoves(['legal' => false]);
-        $color = $this->turn();
+        $color = $this->turn;
         foreach ($moves as $iValue) {
             $this->makeMove($iValue);
 

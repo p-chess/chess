@@ -55,14 +55,14 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         
         $lastHistory = $chess->getLastHistory();
-        $this->assertSame($lastHistory['move'], $move);
-        $this->assertSame($lastHistory['turn'], Piece::WHITE);
-        $this->assertSame($lastHistory['kings'][Piece::WHITE], Board::SQUARES['e7']);
-        $this->assertSame($lastHistory['kings'][Piece::BLACK], Board::SQUARES['a7']);
-        $this->assertEquals($lastHistory['castling'][Piece::WHITE], 0);
-        $this->assertEquals($lastHistory['castling'][Piece::BLACK], 0);
-        $this->assertSame($lastHistory['halfMoves'], 0);
-        $this->assertSame($lastHistory['moveNumber'], 1);
+        $this->assertSame($lastHistory->move, $move);
+        $this->assertSame($lastHistory->turn, Piece::WHITE);
+        $this->assertSame($lastHistory->kings[Piece::WHITE], Board::SQUARES['e7']);
+        $this->assertSame($lastHistory->kings[Piece::BLACK], Board::SQUARES['a7']);
+        $this->assertEquals($lastHistory->castling[Piece::WHITE], 0);
+        $this->assertEquals($lastHistory->castling[Piece::BLACK], 0);
+        $this->assertSame($lastHistory->halfMoves, 0);
+        $this->assertSame($lastHistory->moveNumber, 1);
         
         // promotions
         $chess->load('8/P7/8/8/8/8/8/K6k w - - 0 1');
