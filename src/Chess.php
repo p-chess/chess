@@ -23,7 +23,7 @@ class Chess
     private const RANK_7 = 1;
     private const RANK_8 = 0;
 
-    /** @var array TODO refactor to Board */
+    /** @var Board */
     public $board;
     /** @var array */
     protected $kings;
@@ -50,8 +50,7 @@ class Chess
 
     public function __construct(?string $fen = null)
     {
-        #$this->board = new Board();
-        $this->board = [];
+        $this->board = new Board();
         $this->clear();
 
         if ((string) $fen !== '') {
@@ -93,7 +92,7 @@ class Chess
         }
     }
 
-    private static function addMove(string $turn, array $board, array &$moves, int $from, int $to, int $flags): void
+    private static function addMove(string $turn, Board $board, array &$moves, int $from, int $to, int $flags): void
     {
         // if pawn promotion
         if (

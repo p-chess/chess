@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PChess\Chess;
 
-class Board implements \ArrayAccess
+class Board implements \ArrayAccess, \JsonSerializable
 {
     public const SQUARES = [
         'a8' => 0, 'b8' => 1, 'c8' => 2, 'd8' => 3, 'e8' => 4, 'f8' => 5, 'g8' => 6, 'h8' => 7,
@@ -91,5 +91,10 @@ class Board implements \ArrayAccess
     public function offsetUnset($offset): void
     {
         unset($this->squares[$offset]);
+    }
+
+    public function jsonSerialize()
+    {
+        return json_encode($this->squares);
     }
 }
