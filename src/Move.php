@@ -46,7 +46,7 @@ class Move
     // maybe need a little fix in chess.js or maybe i am :-p
     public static function buildMove(
         string $turn,
-        array $board,
+        Board $board,
         int $from,
         int $to,
         int $flags,
