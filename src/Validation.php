@@ -66,16 +66,16 @@ class Validation
             $sumFields = 0;
             $previousWasNumber = false;
             for ($k = 0, $kMax = strlen($row); $k < $kMax; ++$k) {
-                if (ctype_digit($row{$k})) {
+                if (ctype_digit($row[$k])) {
                     // 8th criterion: every row is valid
                     if ($previousWasNumber) {
                         return ['valid' => false, 'error_number' => 8, 'error' => $errors[8]];
                     }
-                    $sumFields += (int) $row{$k};
+                    $sumFields += (int) $row[$k];
                     $previousWasNumber = true;
                 } else {
                     // 9th criterion: check symbols of piece
-                    if (strpos(Piece::SYMBOLS, $row{$k}) === false) {
+                    if (strpos(Piece::SYMBOLS, $row[$k]) === false) {
                         return ['valid' => false, 'error_number' => 9, 'error' => $errors[9]];
                     }
                     ++$sumFields;
@@ -90,8 +90,8 @@ class Validation
 
         // 11th criterion: en-passant if last is black's move, then its must be white turn
         if (strlen($tokens[3]) > 1) {
-            if (($tokens[3]{1} == '3' && $tokens[1] === 'w') ||
-                ($tokens[3]{1} == '6' && $tokens[1] === 'b')) {
+            if (($tokens[3][1] == '3' && $tokens[1] === 'w') ||
+                ($tokens[3][1] == '6' && $tokens[1] === 'b')) {
                 return ['valid' => false, 'error_number' => 11, 'error' => $errors[11]];
             }
         }
