@@ -1040,6 +1040,8 @@ class Chess
     {
         $cacheKey = json_encode($move).$this->boardHash;
         if (isset($this->sanMoveCache[$cacheKey])) {
+            $move->san = $this->sanMoveCache[$cacheKey];
+
             return;
         }
 
