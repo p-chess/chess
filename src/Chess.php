@@ -11,7 +11,7 @@ class Chess
     /** @var array<string, ?int> */
     protected $kings;
     /** @var string */
-    protected $turn;
+    public $turn;
     /** @var array<string, int> */
     protected $castling;
     /** @var int|null */
@@ -156,7 +156,7 @@ class Chess
         // move number
         $this->moveNumber = (int) $tokens[5];
 
-        $this->updateSetup($this->generateFen());
+        $this->updateSetup($this->fen());
 
         return true;
     }
@@ -217,80 +217,6 @@ class Chess
         return implode(' ', [$fen, $this->turn, $cFlags, $epFlags, $this->halfMoves, $this->moveNumber]);
     }
 
-    // just an alias
-    public function generateFen(): string
-    {
-        return $this->fen();
-    }
-
-    // TODO move to external class
-
-    /**
-     * using the specification from http://www.chessclub.com/help/PGN-spec
-     * example for html usage: $chess->pgn({ 'max_width' => 72, 'newline_char' => "<br />" ]);
-     * this is a custom implementation, not really a port from chess.js
-     *
-     * @param array<string, mixed> $options
-     */
-    public function pgn(array $options = []): string
-    {
-        $newline = !empty($options['newline_char']) ? $options['newline_char'] : "\n";
-        $maxWidth = !empty($options['max_width']) ? $options['max_width'] : 0;
-
-        // process header
-        $o = '';
-        foreach ($this->header as $k => $v) {
-            $v = addslashes($v);
-            $o .= "[{$k} \"{$v}\"]".$newline;
-        }
-
-        if ($o !== '') {
-            $o .= $newline;
-        } // if header presented, add new empty line
-
-        // process movements
-        $currentWidth = 0;
-        $i = 1;
-        foreach ($this->history(['verbose' => true]) as $history) {
-            if ($i === 1 && $history->turn === Piece::BLACK) {
-                $tmp = $i.'. ... ';
-                ++$i;
-            } else {
-                $tmp = ($i % 2 === 1 ? ceil($i / 2).'. ' : '');
-            }
-            $tmp .= $history->san.' ';
-
-            $currentWidth += strlen($tmp);
-            if ($currentWidth > $maxWidth && $maxWidth > 0) {
-                $tmp = $newline.$tmp;
-                $currentWidth = 0;
-            }
-
-            $o .= $tmp;
-            ++$i;
-        }
-        if ($i > 1) {
-            $o = substr($o, 0, -1);
-        } // remove last space
-
-        return $o;
-    }
-
-    public function export(): object
-    {
-        return (object) [
-            'board' => $this->board,
-            'kings' => $this->kings,
-            'turn' => $this->turn,
-            'castling' => $this->castling,
-            'epSquare' => $this->epSquare,
-            'halfMoves' => $this->halfMoves,
-            'moveNumber' => $this->moveNumber,
-            'history' => $this->history,
-            'header' => $this->header,
-        ];
-    }
-
     /**
      * @param array<string, mixed> $options
      *
@@ -301,7 +227,7 @@ class Chess
         $moveHistory = [];
         $gameTmp = !empty($this->header['SetUp']) ? new self($this->header['FEN']) : new self();
         $moveTmp = [];
-        $verbose = !empty($options['verbose']) ? $options['verbose'] : false;
+        $verbose = $options['verbose'] ?? false;
 
         foreach ($this->history as $history) {
             $moveTmp['to'] = $history->move->to;
@@ -310,7 +236,7 @@ class Chess
                 $moveTmp['promotion'] = $history->move->promotion;
             }
 
-            $turn = $gameTmp->turn();
+            $turn = $gameTmp->turn;
             $moveObj = $gameTmp->move($moveTmp);
 
             if (null !== $moveObj) {
@@ -344,7 +270,7 @@ class Chess
             $this->kings[$piece->color] = null;
         }
 
-        $this->updateSetup($this->generateFen());
+        $this->updateSetup($this->fen());
 
         return true;
     }
@@ -378,7 +304,7 @@ class Chess
             $this->kings[$piece->color] = $sq;
         }
 
-        $this->updateSetup($this->generateFen());
+        $this->updateSetup($this->fen());
 
         return true;
     }
@@ -779,11 +705,6 @@ class Chess
         return $moves;
     }
 
-    public function turn(): string
-    {
-        return $this->turn;
-    }
-
     protected function attacked(string $color, int $square): bool
     {
         for ($i = Board::SQUARES['a8']; $i <= Board::SQUARES['h1']; ++$i) {
@@ -1080,5 +1001,13 @@ class Chess
     public function getHistory(): array
     {
         return $this->history;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getHeader(): array
+    {
+        return $this->header;
     }
 }
