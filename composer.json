@@ -54,7 +54,7 @@
         ],
         "check-cs": "./vendor/bin/php-cs-fixer fix --dry-run",
         "fix-cs": "./vendor/bin/php-cs-fixer fix",
-        "phpstan": "./vendor/bin/phpstan analyze src tests benchmarks --level 2 --configuration phpstan.neon",
+        "phpstan": "./vendor/bin/phpstan analyze src tests benchmarks --level 5 --configuration phpstan.neon",
         "test": "./vendor/bin/phpunit"
     }
 }

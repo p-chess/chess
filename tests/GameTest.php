@@ -21,9 +21,9 @@ class GameTest extends TestCase
             }
 
             $moves = $chess->moves();
-            $moveRandom = $moves[mt_rand(0, count($moves) - 1)];
-            
-            $move = $chess->move($moveRandom);
+            $rnd = random_int(0, count($moves) - 1);
+            $moveRandom = $moves[$rnd];
+            $move = $chess->move(['from' => $moveRandom->from, 'to' => $moveRandom->to]);
             $this->assertNotNull($move);
         }
         

@@ -6,6 +6,7 @@ namespace PChess\Chess\Test;
 
 use PChess\Chess\Board;
 use PChess\Chess\Chess;
+use PChess\Chess\Move;
 use PChess\Chess\Piece;
 use PHPUnit\Framework\TestCase;
 
@@ -29,8 +30,10 @@ class MoveTest extends TestCase
         
         $this->assertSame($move->piece, Piece::PAWN);
         $this->assertSame($move->turn, $chess->turn());
-        $this->assertSame($move->from, Board::SQUARES['a2']);
-        $this->assertSame($move->to, Board::SQUARES['a4']);
+        $this->assertSame($move->fromSquare, Board::SQUARES['a2']);
+        $this->assertSame($move->toSquare, Board::SQUARES['a4']);
+        $this->assertSame($move->from, 'a2');
+        $this->assertSame($move->to, 'a4');
         $this->assertSame($move->flags, Board::BITS['NORMAL']);
     }
     
@@ -391,20 +394,23 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
         $this->assertSame($undo->san, 'Rxd6');
-        
+
         // generate moves test
         $chess->load('8/ppp2P2/pkp5/ppp5/5PPP/5PKP/5PPP/8 w - - 0 1');
         $moves = $chess->generateMovesPublic();
-        array_walk($moves, function (&$move) use ($chess): void {
-            $move = $chess->moveToSANPublic($move);
+        array_walk($moves, static function (Move $move) use ($chess): void {
+            $chess->moveToSANPublic($move);
         });
-        $this->assertContains('f8=Q', $moves);
-        $this->assertContains('f8=R', $moves);
-        $this->assertContains('f8=B', $moves);
-        $this->assertContains('f8=N', $moves);
-        $this->assertContains('f5', $moves);
-        $this->assertContains('g5', $moves);
-        $this->assertContains('h5', $moves);
+        $sans = array_map(static function (Move $move): string {
+            return $move->san;
+        }, $moves);
+        $this->assertContains('f8=Q', $sans);
+        $this->assertContains('f8=R', $sans);
+        $this->assertContains('f8=B', $sans);
+        $this->assertContains('f8=N', $sans);
+        $this->assertContains('f5', $sans);
+        $this->assertContains('g5', $sans);
+        $this->assertContains('h5', $sans);
     }
     
     public function testSANMove(): void
@@ -459,15 +465,9 @@ class MoveTest extends TestCase
             $this->assertNotNull($chess->move($move), $move);
         }
         $this->assertSame($chess->fen(), 'r5k1/p1p1qp1p/1r2bp2/2p5/Q1BpP3/3NbP2/PPP3PP/1K1R3R w - - 6 18');
-        
-        
-        
-        
+
         return; // somehow it have to be turn off, just for faster unit testing, but if you want just comment this line
-        
-        
-        
-        
+
         $chess->reset();
         /* [Event "Earl tourn"]
          * [Site "?"]
