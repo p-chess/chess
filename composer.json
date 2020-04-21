@@ -22,11 +22,11 @@
         "ext-json": "*"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.14",
-        "johnkary/phpunit-speedtrap": "^3.0",
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "johnkary/phpunit-speedtrap": "^3.2",
         "phpbench/phpbench": "^0.15.0",
-        "phpstan/phpstan": "^0.11.1",
-        "phpunit/phpunit": "^8.5"
+        "phpstan/phpstan": "^0.12",
+        "phpunit/phpunit": "^8.5 || ^9.0"
     },
     "extra": {
         "branch-alias": {
@@ -54,7 +54,7 @@
         ],
         "check-cs": "./vendor/bin/php-cs-fixer fix --dry-run",
         "fix-cs": "./vendor/bin/php-cs-fixer fix",
-        "phpstan": "./vendor/bin/phpstan analyze src tests benchmarks --level 5 --configuration phpstan.neon",
+        "phpstan": "./vendor/bin/phpstan analyze src tests benchmarks --level 6 --configuration phpstan.neon",
         "test": "./vendor/bin/phpunit"
     }
 }

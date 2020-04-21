@@ -46,7 +46,7 @@ class Piece
     /** @var string */
     public $color;
 
-    /** @var array */
+    /** @var array<string> */
     private static $types = [
         self::PAWN,
         self::KNIGHT,
@@ -56,9 +56,10 @@ class Piece
         self::KING,
     ];
 
-    /** @var array */
+    /** @var array<string> */
     private static $colors = [Piece::BLACK, self::WHITE];
 
+    /** @var array<string, string[]> */
     private static $pieces = [
         self::BLACK => [
             self::PAWN => '♟',
@@ -93,5 +94,10 @@ class Piece
     public function __toString(): string
     {
         return self::$pieces[$this->color][$this->type];
+    }
+
+    public function toAscii(): string
+    {
+        return $this->color === self::BLACK ? \strtoupper($this->type) : $this->type;
     }
 }

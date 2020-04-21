@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace PChess\Chess\Test;
 
 use PChess\Chess\Board;
-use PChess\Chess\Chess;
 use PChess\Chess\Piece;
 use PHPUnit\Framework\TestCase;
 
@@ -16,17 +15,17 @@ class AttackTest extends TestCase
         $chess = new ChessPublicator();
         $chess->clear();
         $chess->put(new Piece(Piece::PAWN, Piece::WHITE), 'e4');
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e3']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']), false);
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e3']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']));
         
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']), false);
-        //~ $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e4']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']), false);
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']));
+        //~ $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e4']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']));
         
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e5']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']), true);
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e5']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']));
     }
     
     public function testAttackedKnight(): void
@@ -34,24 +33,24 @@ class AttackTest extends TestCase
         $chess = new ChessPublicator();
         $chess->clear();
         $chess->put(new Piece(Piece::KNIGHT, Piece::WHITE), 'e4');
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d2']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d6']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f2']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f6']), true);
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d2']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d6']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f2']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f6']));
+
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d1']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d7']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d8']));
         
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d1']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d7']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d8']), false);
-        
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f1']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f7']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f8']), false);
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f1']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f7']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f8']));
     }
     
     public function testAttackedBishop(): void
@@ -59,15 +58,15 @@ class AttackTest extends TestCase
         $chess = new ChessPublicator();
         $chess->clear();
         $chess->put(new Piece(Piece::BISHOP, Piece::WHITE), 'e4');
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']), true);
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']));
         
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e3']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e5']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']), false);
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e3']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e5']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']));
     }
     
     public function testAttackedRook(): void
@@ -75,17 +74,17 @@ class AttackTest extends TestCase
         $chess = new ChessPublicator();
         $chess->clear();
         $chess->put(new Piece(Piece::ROOK, Piece::WHITE), 'e4');
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f7']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f8']), false);
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f7']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f8']));
 
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e3']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e5']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']), true);
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e3']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e5']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']));
     }
     
     public function testAttackedQueen(): void
@@ -93,15 +92,15 @@ class AttackTest extends TestCase
         $chess = new ChessPublicator();
         $chess->clear();
         $chess->put(new Piece(Piece::QUEEN, Piece::WHITE), 'e4');
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e3']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e4']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e5']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']), true);
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e3']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e4']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e5']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']));
     }
     
     public function testAttackedKing(): void
@@ -109,15 +108,15 @@ class AttackTest extends TestCase
         $chess = new ChessPublicator();
         $chess->clear();
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e4');
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e3']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e4']), false);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e5']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']), true);
-        $this->assertSame($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']), true);
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e3']));
+        $this->assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e4']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e5']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']));
+        $this->assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']));
     }
     
     public function testInCheck(): void
@@ -126,71 +125,71 @@ class AttackTest extends TestCase
         $chess->clear();
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e7');
         $chess->put(new Piece(Piece::QUEEN, Piece::BLACK), 'e4');
-        $this->assertSame($chess->turn(), Piece::WHITE);
-        $this->assertSame($chess->inCheck(), true);
+        $this->assertSame($chess->turn, Piece::WHITE);
+        $this->assertTrue($chess->inCheck());
         
         $chess->remove('e7');
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'f7');
-        $this->assertSame($chess->inCheck(), false);
+        $this->assertFalse($chess->inCheck());
     }
     
     public function testInCheckmate(): void
     {
         $chess = new ChessPublicator();
-        $this->assertSame($chess->inCheckmate(), false);
+        $this->assertFalse($chess->inCheckmate());
         
         $chess->load('r1bqk1nr/pppp1Qpp/2n5/2b1p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4');
-        $this->assertSame($chess->inCheckmate(), true);
+        $this->assertTrue($chess->inCheckmate());
     }
     
     public function testInStalemate(): void
     {
         $chess = new ChessPublicator();
-        $this->assertSame($chess->inStalemate(), false);
+        $this->assertFalse($chess->inStalemate());
         
         // fen source: https://www.redhotpawn.com/forum/only-chess/interesting-stalemate-position.152109
         // start fen : 3b3k/p6p/1p5P/3q4/8/n7/PP6/K4Q2 w - - 0 1
         $chess->load('7k/p6p/1p3b1P/3q4/8/n7/PP6/K7 w - - 0 2');
-        $this->assertSame($chess->inStalemate(), true);
+        $this->assertTrue($chess->inStalemate());
     }
     
     public function testInsufficientMaterial(): void
     {
         $chess = new ChessPublicator();
-        $this->assertSame($chess->insufficientMaterial(), false);
+        $this->assertFalse($chess->insufficientMaterial());
         
         // k vs k
         $chess->clear();
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
-        $this->assertSame($chess->insufficientMaterial(), true);
+        $this->assertTrue($chess->insufficientMaterial());
         
         // k vs kn
         $chess->clear();
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
         $chess->put(new Piece(Piece::KNIGHT, Piece::WHITE), 'e4');
-        $this->assertSame($chess->insufficientMaterial(), true);
+        $this->assertTrue($chess->insufficientMaterial());
         
         // k vs kb
         $chess->clear();
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
         $chess->put(new Piece(Piece::BISHOP, Piece::WHITE), 'e4');
-        $this->assertSame($chess->insufficientMaterial(), true);
+        $this->assertTrue($chess->insufficientMaterial());
         
         // k vs k(b){0,} << bishop(s) in same color
         $chess->clear();
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
         $chess->put(new Piece(Piece::BISHOP, Piece::BLACK), 'e5');
-        $this->assertSame($chess->insufficientMaterial(), true);
+        $this->assertTrue($chess->insufficientMaterial());
         $chess->put(new Piece(Piece::BISHOP, Piece::BLACK), 'd6');
-        $this->assertSame($chess->insufficientMaterial(), true);
+        $this->assertTrue($chess->insufficientMaterial());
         $chess->put(new Piece(Piece::BISHOP, Piece::BLACK), 'c7');
-        $this->assertSame($chess->insufficientMaterial(), true);
+        $this->assertTrue($chess->insufficientMaterial());
         $chess->put(new Piece(Piece::BISHOP, Piece::BLACK), 'b8');
-        $this->assertSame($chess->insufficientMaterial(), true);
+        $this->assertTrue($chess->insufficientMaterial());
     }
     
     public function testinThreefoldRepetition(): void
@@ -225,6 +224,6 @@ class AttackTest extends TestCase
             $this->assertNotNull($chess->move($move), $move);
         }
         
-        $this->assertSame($chess->inThreefoldRepetition(), true);
+        $this->assertTrue($chess->inThreefoldRepetition());
     }
 }
