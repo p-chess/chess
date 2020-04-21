@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace PChess\Chess\Test;
 
-use PChess\Chess\Chess;
 use PChess\Chess\Validation;
 use PHPUnit\Framework\TestCase;
 
