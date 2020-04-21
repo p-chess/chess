@@ -28,15 +28,16 @@ The code below plays a complete game of chess ... randomly.
 
 require 'vendor/autoload.php';
 use \PChess\Chess\Chess;
+use \PChess\Chess\Output\UnicodeOutput;
 
 $chess = new Chess();
 while (!$chess->gameOver()) {
     $moves = $chess->moves();
-    $move = $moves[mt_rand(0, count($moves) - 1)];
+    $move = $moves[random_int(0, count($moves) - 1)];
     $chess->move($move);
 }
 
-echo $chess->ascii() . PHP_EOL;
+echo (new UnicodeOutput())->render($chess) . PHP_EOL;
 ```
 
 ```

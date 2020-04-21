@@ -466,8 +466,6 @@ class MoveTest extends TestCase
         }
         $this->assertSame($chess->fen(), 'r5k1/p1p1qp1p/1r2bp2/2p5/Q1BpP3/3NbP2/PPP3PP/1K1R3R w - - 6 18');
 
-        return; // somehow it have to be turn off, just for faster unit testing, but if you want just comment this line
-
         $chess->reset();
         /* [Event "Earl tourn"]
          * [Site "?"]

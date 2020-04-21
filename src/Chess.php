@@ -6,14 +6,7 @@ namespace PChess\Chess;
 
 class Chess
 {
-    public const DEFAULT_POSITION = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-
-    private const RANK_1 = 7;
-    private const RANK_2 = 6;
-    private const RANK_7 = 1;
-    private const RANK_8 = 0;
-
-    /** @var Board */
+    /** @var Board&\ArrayAccess<int, ?Piece> */
     public $board;
     /** @var array<string, ?int> */
     protected $kings;
@@ -74,7 +67,7 @@ class Chess
         if (count($this->history) > 0) {
             return;
         }
-        if ($fen !== self::DEFAULT_POSITION) {
+        if ($fen !== Board::DEFAULT_POSITION) {
             $this->header['SetUp'] = '1';
             $this->header['FEN'] = $fen;
         } else {
@@ -82,12 +75,15 @@ class Chess
         }
     }
 
+    /**
+     * @param array<Move> $moves
+     */
     private static function addMove(string $turn, Board $board, array &$moves, int $from, int $to, int $flags): void
     {
         // if pawn promotion
         if (
             $board[$from]->type === Piece::PAWN &&
-            (self::rank($to) === self::RANK_8 || self::rank($to) === self::RANK_1)
+            (Board::rank($to) === Board::RANK_8 || Board::rank($to) === Board::RANK_1)
         ) {
             $promotionPieces = [Piece::QUEEN, Piece::ROOK, Piece::BISHOP, Piece::KNIGHT];
             foreach ($promotionPieces as $promotionPiece) {
@@ -129,7 +125,7 @@ class Chess
                 $square += (int) $piece;
             } else {
                 $color = (ord($piece) < ord('a')) ? Piece::WHITE : Piece::BLACK;
-                $this->put(new Piece(strtolower($piece), $color), self::algebraic($square));
+                $this->put(new Piece(strtolower($piece), $color), Board::algebraic($square));
                 ++$square;
             }
         }
@@ -167,7 +163,7 @@ class Chess
 
     public function reset(): bool
     {
-        return $this->load(self::DEFAULT_POSITION);
+        return $this->load(Board::DEFAULT_POSITION);
     }
 
     public function fen(): string
@@ -216,7 +212,7 @@ class Chess
             $cFlags = '-';
         }
 
-        $epFlags = $this->epSquare === null ? '-' : self::algebraic($this->epSquare);
+        $epFlags = $this->epSquare === null ? '-' : Board::algebraic($this->epSquare);
 
         return implode(' ', [$fen, $this->turn, $cFlags, $epFlags, $this->halfMoves, $this->moveNumber]);
     }
@@ -229,12 +225,14 @@ class Chess
 
     // TODO move to external class
 
-    /* using the specification from http://www.chessclub.com/help/PGN-spec
+    /**
+     * using the specification from http://www.chessclub.com/help/PGN-spec
      * example for html usage: $chess->pgn({ 'max_width' => 72, 'newline_char' => "<br />" ]);
-     *
      * this is a custom implementation, not really a port from chess.js
+     *
+     * @param array<string, mixed> $options
      */
-    public function pgn(array $options = [])
+    public function pgn(array $options = []): string
     {
         $newline = !empty($options['newline_char']) ? $options['newline_char'] : "\n";
         $maxWidth = !empty($options['max_width']) ? $options['max_width'] : 0;
@@ -293,6 +291,11 @@ class Chess
         ];
     }
 
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return array<Move>
+     */
     public function history(array $options = []): array
     {
         $moveHistory = [];
@@ -559,6 +562,8 @@ class Chess
     }
 
     /**
+     * @param array<string, mixed> $options
+     *
      * @return array<int, Move>
      */
     protected function generateMoves(array $options = []): array
@@ -573,7 +578,7 @@ class Chess
         $moves = [];
         $us = $this->turn;
         $them = self::swapColor($us);
-        $secondRank = [Piece::BLACK => self::RANK_7, Piece::WHITE => self::RANK_2];
+        $secondRank = [Piece::BLACK => Board::RANK_7, Piece::WHITE => Board::RANK_2];
 
         if (!empty($options['square'])) {
             $firstSquare = $lastSquare = $options['square'];
@@ -606,7 +611,7 @@ class Chess
 
                     // double square
                     $square = $i + Piece::PAWN_OFFSETS[$us][1];
-                    if ($secondRank[$us] === self::rank($i) && $this->board[$square] === null) {
+                    if ($secondRank[$us] === Board::rank($i) && $this->board[$square] === null) {
                         self::addMove($us, $this->board, $moves, $i, $square, Board::BITS['BIG_PAWN']);
                     }
                 }
@@ -715,7 +720,7 @@ class Chess
     /**
      * Move with SAN string (case-sensitive) or array.
      *
-     * @param string|array $sanOrArray E.g. "Nxb7" or ['from' => 'h7', 'to' => 'h8', 'promotion' => 'q']
+     * @param string|array<string, string> $sanOrArray E.g. "Nxb7" or ['from' => 'h7', 'to' => 'h8', 'promotion' => 'q']
      */
     public function move($sanOrArray): ?Move
     {
@@ -954,24 +959,6 @@ class Chess
         return $this->inDraw() || $this->inCheckmate();
     }
 
-    protected static function rank(int $i): int
-    {
-        return $i >> 4;
-    }
-
-    protected static function file(int $i): int
-    {
-        return $i & 15;
-    }
-
-    protected static function algebraic(int $i): string
-    {
-        $file = self::file($i);
-        $rank = self::rank($i);
-
-        return substr('abcdefgh', $file, 1).substr('87654321', $rank, 1);
-    }
-
     protected static function swapColor(string $color): string
     {
         return $color === Piece::WHITE ? Piece::BLACK : Piece::WHITE;
@@ -1004,10 +991,10 @@ class Chess
                 $to === $ambiguityTo
             ) {
                 ++$ambiguities;
-                if (self::rank($from) === self::rank($ambiguityFrom)) {
+                if (Board::rank($from) === Board::rank($ambiguityFrom)) {
                     ++$sameRank;
                 }
-                if (self::file($from) === self::file($ambiguityFrom)) {
+                if (Board::file($from) === Board::file($ambiguityFrom)) {
                     ++$sameFile;
                 }
             }
@@ -1018,18 +1005,18 @@ class Chess
              * the move in question, use the square as the disambiguator
              */
             if ($sameRank > 0 && $sameFile > 0) {
-                return self::algebraic($from);
+                return Board::algebraic($from);
             }
 
             /* if the moving piece rests on the same file, use the rank symbol as the
              * disambiguator
              */
             if ($sameFile > 0) {
-                return substr(self::algebraic($from), 1, 1);
+                return substr(Board::algebraic($from), 1, 1);
             }
 
             // else use the file symbol
-            return substr(self::algebraic($from), 0, 1);
+            return substr(Board::algebraic($from), 0, 1);
         }
 
         return '';
@@ -1087,78 +1074,9 @@ class Chess
         $move->san = $output;
     }
 
-    public function __toString(): string
-    {
-        return $this->ascii();
-    }
-
-    public function ascii(): string
-    {
-        $line = '   +---+---+---+---+---+---+---+---+'.PHP_EOL;
-        $output = $line;
-        for ($i = Board::SQUARES['a8']; $i <= Board::SQUARES['h1']; ++$i) {
-            // display the rank
-            if (self::file($i) === 0) {
-                $output .= ' '.substr('87654321', self::rank($i), 1).' |';
-            }
-
-            if ($this->board[$i] === null) {
-                $output .= '   |';
-            } else {
-                $output .= ' '.$this->board[$i].' |';
-            }
-
-            if (($i + 1) & 0x88) {
-                $output .= ' '.PHP_EOL;
-                $output .= $line;
-                $i += 8;
-            }
-        }
-        $output .= '     a   b   c   d   e   f   g   h'.PHP_EOL;
-
-        return $output;
-    }
-
-    // really need to think about full perft test
-    public function perft(int $depth, bool $full = false)
-    {
-        $nodes = 0;
-        $captures = 0;
-        $enPassants = 0;
-        $castles = 0;
-        $promotions = 0;
-        $checks = 0;
-        $checkmates = 0;
-
-        $moves = $this->generateMoves(['legal' => false]);
-        $color = $this->turn;
-        foreach ($moves as $iValue) {
-            $this->makeMove($iValue);
-
-            if (!$this->kingAttacked($color)) {
-                if ($depth - 1 > 0) {
-                    $childs = $this->perft($depth - 1, true);
-                    $nodes += $childs['nodes'];
-                    $captures += $childs['captures'];
-                    $enPassants += $childs['enPassants'];
-                    $castles += $childs['castles'];
-                    $promotions += $childs['promotions'];
-                    $checks += $childs['checks'];
-                    $checkmates += $childs['checkmates'];
-                } else {
-                    ++$nodes;
-                }
-            }
-            $this->undoMove();
-        }
-
-        if ($full === false) {
-            return $nodes;
-        }
-
-        return compact('nodes', 'captures', 'enPassants', 'castles', 'promotions', 'checks', 'checkmates');
-    }
-
+    /**
+     * @return array<int, History>
+     */
     public function getHistory(): array
     {
         return $this->history;

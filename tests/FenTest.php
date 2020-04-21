@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PChess\Chess\Test;
 
+use PChess\Chess\Board;
 use PChess\Chess\Chess;
 use PChess\Chess\Validation;
 use PHPUnit\Framework\TestCase;
@@ -244,7 +245,7 @@ class FenTest extends TestCase
     public function testGeneration(): void
     {
         $positions = [
-            ['fen' => Chess::DEFAULT_POSITION, 'error_number' => 0, 'should_pass' => true],
+            ['fen' => Board::DEFAULT_POSITION, 'error_number' => 0, 'should_pass' => true],
             ['fen' => 'rnbqkb1r/ppp2ppp/3p1n2/4N3/4P3/8/PPPP1PPP/RNBQKB1R w KQkq - 0 4', 'error_number' => 0, 'should_pass' => true],
             ['fen' => '3r1rk1/Qpp2p1p/7q/1P2P1p1/2B1Rn2/6NP/P4P1P/5RK1 b - - 0 22', 'error_number' => 0, 'should_pass' => true],
             ['fen' => 'rn2kb1r/2qp1ppp/b3pn2/2pP2B1/1pN1P3/5P2/PP4PP/R2QKBNR w KQkq - 4 11', 'error_number' => 0, 'should_pass' => true],

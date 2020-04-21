@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace PChess\Chess;
 
+/**
+ * @implements \ArrayAccess<int, ?Piece>
+ */
 class Board implements \ArrayAccess, \JsonSerializable
 {
+    public const DEFAULT_POSITION = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+
     public const SQUARES = [
         'a8' => 0, 'b8' => 1, 'c8' => 2, 'd8' => 3, 'e8' => 4, 'f8' => 5, 'g8' => 6, 'h8' => 7,
         'a7' => 16, 'b7' => 17, 'c7' => 18, 'd7' => 19, 'e7' => 20, 'f7' => 21, 'g7' => 22, 'h7' => 23,
@@ -33,6 +38,11 @@ class Board implements \ArrayAccess, \JsonSerializable
         'KSIDE_CASTLE' => 32,
         'QSIDE_CASTLE' => 64
     ];
+
+    public const RANK_1 = 7;
+    public const RANK_2 = 6;
+    public const RANK_7 = 1;
+    public const RANK_8 = 0;
 
     public const ATTACKS = [
         20, 0, 0, 0, 0, 0, 0, 24,  0, 0, 0, 0, 0, 0,20, 0,
@@ -70,31 +80,62 @@ class Board implements \ArrayAccess, \JsonSerializable
         -15,  0,  0,  0,  0,  0,  0,-16,  0,  0,  0,  0,  0,  0,-17
     ];
 
-    /** @var array */
+    /** @var array<int, ?Piece> */
     private $squares = [];
 
-    public function offsetExists($offset)
+    /**
+     * @param int $offset
+     */
+    public function offsetExists($offset): bool
     {
         return isset($this->squares[$offset]);
     }
 
-    public function offsetGet($offset)
+    /**
+     * @param int $offset
+     */
+    public function offsetGet($offset): ?Piece
     {
         return $this->squares[$offset];
     }
 
+    /**
+     * @param int    $offset
+     * @param ?Piece $value
+     */
     public function offsetSet($offset, $value): void
     {
         $this->squares[$offset] = $value;
     }
 
+    /**
+     * @param int $offset
+     */
     public function offsetUnset($offset): void
     {
         unset($this->squares[$offset]);
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): string
     {
         return json_encode($this->squares);
+    }
+
+    public static function rank(int $i): int
+    {
+        return $i >> 4;
+    }
+
+    public static function file(int $i): int
+    {
+        return $i & 15;
+    }
+
+    public static function algebraic(int $i): string
+    {
+        $file = self::file($i);
+        $rank = self::rank($i);
+
+        return substr('abcdefgh', $file, 1).substr('87654321', $rank, 1);
     }
 }

@@ -6,6 +6,9 @@ namespace PChess\Chess;
 
 class Validation
 {
+    /**
+     * @return array<string, mixed>
+     */
     public static function validateFen(string $fen): array
     {
         $errors = [
@@ -100,7 +103,9 @@ class Validation
     }
 
     /**
-     *  @return bool|array if ($options['verbose'] == true), return compact('header', 'moves', 'game') or false
+     *  @param array<string, mixed> $options
+     *
+     *  @return bool|array<string, mixed> if ($options['verbose'] == true), return compact('header', 'moves', 'game') or false
      */
     public static function validatePgn(string $pgn, array $options = [])
     {
@@ -122,6 +127,9 @@ class Validation
         return $verbose ? $parsedPgn : true;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public static function parsePgn(string $pgn): array
     {
         $header = [];
