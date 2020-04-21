@@ -8,16 +8,6 @@ class Chess
 {
     public const DEFAULT_POSITION = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
-    private const FLAGS = [
-        'NORMAL' => 'n',
-        'CAPTURE' => 'c',
-        'BIG_PAWN' => 'b',
-        'EP_CAPTURE' => 'e',
-        'PROMOTION' => 'p',
-        'KSIDE_CASTLE' => 'k',
-        'QSIDE_CASTLE' => 'q'
-    ];
-
     private const RANK_1 = 7;
     private const RANK_2 = 6;
     private const RANK_7 = 1;
@@ -25,11 +15,11 @@ class Chess
 
     /** @var Board */
     public $board;
-    /** @var array */
+    /** @var array<string, ?int> */
     protected $kings;
     /** @var string */
     protected $turn;
-    /** @var array */
+    /** @var array<string, int> */
     protected $castling;
     /** @var int|null */
     protected $epSquare;
@@ -39,13 +29,13 @@ class Chess
     protected $moveNumber;
     /** @var array<int, History> */
     protected $history;
-    /** @var array */
+    /** @var array<string, string> */
     protected $header;
-    /** @var array */
+    /** @var array<string, array> */
     protected $generateMovesCache;
     /** @var string */
     protected $boardHash;
-    /** @var array */
+    /** @var array<string, string> */
     protected $sanMoveCache;
 
     public function __construct(?string $fen = null)
@@ -108,7 +98,10 @@ class Chess
         }
     }
 
-    public function header($key = null, $value = ''): array
+    /**
+     * @return array<string, string>
+     */
+    public function header(?string $key = null, string $value = ''): array
     {
         if ($key !== null) {
             $this->header[$key] = $value;
@@ -308,8 +301,8 @@ class Chess
         $verbose = !empty($options['verbose']) ? $options['verbose'] : false;
 
         foreach ($this->history as $history) {
-            $moveTmp['to'] = self::algebraic($history->move->to);
-            $moveTmp['from'] = self::algebraic($history->move->from);
+            $moveTmp['to'] = $history->move->to;
+            $moveTmp['from'] = $history->move->from;
             if ($history->move->flags & Board::BITS['PROMOTION']) {
                 $moveTmp['promotion'] = $history->move->promotion;
             }
@@ -353,7 +346,7 @@ class Chess
         return true;
     }
 
-    public function get(string $square)
+    public function get(string $square): ?Piece
     {
         // check for valid square
         if (!array_key_exists($square, Board::SQUARES)) {
@@ -393,22 +386,22 @@ class Chess
         $them = self::swapColor($us);
         $historyKey = $this->recordMove($move);
 
-        $this->board[$move->to] = $this->board[$move->from];
-        $this->board[$move->from] = null;
+        $this->board[$move->toSquare] = $this->board[$move->fromSquare];
+        $this->board[$move->fromSquare] = null;
 
         // if flags:EP_CAPTURE (en passant), remove the captured pawn
         if ($move->flags & Board::BITS['EP_CAPTURE']) {
-            $this->board[$move->to + ($us === Piece::BLACK ? -16 : 16)] = null;
+            $this->board[$move->toSquare + ($us === Piece::BLACK ? -16 : 16)] = null;
         }
 
         // if pawn promotion, replace with new piece
         if ($move->flags & Board::BITS['PROMOTION']) {
-            $this->board[$move->to] = new Piece($move->promotion, $us);
+            $this->board[$move->toSquare] = new Piece($move->promotion, $us);
         }
 
         // if big pawn move, update the en passant square
         if ($move->flags & Board::BITS['BIG_PAWN']) {
-            $this->epSquare = $move->to + ($us === Piece::BLACK ? -16 : 16);
+            $this->epSquare = $move->toSquare + ($us === Piece::BLACK ? -16 : 16);
         } else {
             $this->epSquare = null;
         }
@@ -423,19 +416,18 @@ class Chess
         }
 
         // if we moved the king
-        if (null !== $this->board[$move->to] && $this->board[$move->to]->type === Piece::KING) {
-            //~ $this->kings[$this->board[$move->to]->color] = $move->to;
-            $this->kings[$us] = $move->to;
+        if (null !== $this->board[$move->toSquare] && $this->board[$move->toSquare]->type === Piece::KING) {
+            $this->kings[$us] = $move->toSquare;
 
             // if we castled, move the rook next to the king
             if ($move->flags & Board::BITS['KSIDE_CASTLE']) {
-                $castlingTo = $move->to - 1;
-                $castlingFrom = $move->to + 1;
+                $castlingTo = $move->toSquare - 1;
+                $castlingFrom = $move->toSquare + 1;
                 $this->board[$castlingTo] = $this->board[$castlingFrom];
                 $this->board[$castlingFrom] = null;
             } elseif ($move->flags & Board::BITS['QSIDE_CASTLE']) {
-                $castlingTo = $move->to + 1;
-                $castlingFrom = $move->to - 2;
+                $castlingTo = $move->toSquare + 1;
+                $castlingFrom = $move->toSquare - 2;
                 $this->board[$castlingTo] = $this->board[$castlingFrom];
                 $this->board[$castlingFrom] = null;
             }
@@ -447,7 +439,7 @@ class Chess
         if ($this->castling[$us] > 0) {
             for ($i = 0, $len = count(Board::ROOKS[$us]); $i < $len; ++$i) {
                 if (
-                    $move->from === Board::ROOKS[$us][$i]['square'] &&
+                    $move->fromSquare === Board::ROOKS[$us][$i]['square'] &&
                     $this->castling[$us] & Board::ROOKS[$us][$i]['flag']
                 ) {
                     $this->castling[$us] ^= Board::ROOKS[$us][$i]['flag'];
@@ -460,7 +452,7 @@ class Chess
         if ($this->castling[$them] > 0) {
             for ($i = 0, $len = count(Board::ROOKS[$them]); $i < $len; ++$i) {
                 if (
-                    $move->to === Board::ROOKS[$them][$i]['square'] &&
+                    $move->toSquare === Board::ROOKS[$them][$i]['square'] &&
                     $this->castling[$them] & Board::ROOKS[$them][$i]['flag']
                 ) {
                     $this->castling[$them] ^= Board::ROOKS[$them][$i]['flag'];
@@ -520,33 +512,33 @@ class Chess
         $us = $this->turn;
         $them = self::swapColor($us);
 
-        $this->board[$move->from] = $this->board[$move->to];
+        $this->board[$move->fromSquare] = $this->board[$move->toSquare];
         // to undo any promotions
-        $oldFrom = $this->board[$move->from];
+        $oldFrom = $this->board[$move->fromSquare];
         if (null !== $oldFrom) {
             $oldFrom->type = $move->piece;
         }
-        $this->board[$move->from] = $oldFrom;
-        $this->board[$move->to] = null;
+        $this->board[$move->fromSquare] = $oldFrom;
+        $this->board[$move->toSquare] = null;
 
         // if capture
         if ($move->flags & Board::BITS['CAPTURE']) {
-            $this->board[$move->to] = new Piece($move->captured, $them);
+            $this->board[$move->toSquare] = new Piece($move->captured, $them);
         } elseif ($move->flags & Board::BITS['EP_CAPTURE']) {
-            $index = $move->to + ($us === Piece::BLACK ? -16 : 16);
+            $index = $move->toSquare + ($us === Piece::BLACK ? -16 : 16);
             $this->board[$index] = new Piece(Piece::PAWN, $them);
         }
 
         // if castling
         if ($move->flags & Board::BITS['KSIDE_CASTLE']) {
-            $castlingTo = $move->to + 1;
-            $castlingFrom = $move->to - 1;
+            $castlingTo = $move->toSquare + 1;
+            $castlingFrom = $move->toSquare - 1;
             $this->board[$castlingTo] = $this->board[$castlingFrom];
             $this->board[$castlingFrom] = null;
         }
         if ($move->flags & Board::BITS['QSIDE_CASTLE']) {
-            $castlingTo = $move->to - 2;
-            $castlingFrom = $move->to + 1;
+            $castlingTo = $move->toSquare - 2;
+            $castlingFrom = $move->toSquare + 1;
             $this->board[$castlingTo] = $this->board[$castlingFrom];
             $this->board[$castlingFrom] = null;
         }
@@ -559,11 +551,17 @@ class Chess
     public function undo(): ?Move
     {
         $move = $this->undoMove();
+        if (null !== $move) {
+            $this->moveToSAN($move);
+        }
 
-        return $move !== null ? $this->makePretty($move) : null; // make pretty
+        return $move;
     }
 
-    protected function generateMoves(array $options = [])
+    /**
+     * @return array<int, Move>
+     */
+    protected function generateMoves(array $options = []): array
     {
         $cacheKey = $this->boardHash.json_encode($options);
 
@@ -701,7 +699,7 @@ class Chess
 
         // filter out illegal moves
         $legalMoves = [];
-        foreach ($moves as $i => $move) { // in php we have foreach :-p
+        foreach ($moves as $i => $move) {
             $this->makeMove($move);
             if (!$this->kingAttacked($us)) {
                 $legalMoves[] = $move;
@@ -726,7 +724,8 @@ class Chess
 
         if (is_string($sanOrArray)) {
             foreach ($moves as $move) {
-                if ($this->moveToSAN($move) === $sanOrArray) {
+                $this->moveToSAN($move);
+                if ($move->san === $sanOrArray) {
                     $moveObject = $move;
                     break;
                 }
@@ -737,8 +736,8 @@ class Chess
             foreach ($moves as $move) {
                 if (
                     ($move->promotion === null || $sanOrArray['promotion'] === $move->promotion) &&
-                    $sanOrArray['from'] === self::algebraic($move->from) &&
-                    $sanOrArray['to'] === self::algebraic($move->to)
+                    $sanOrArray['from'] === $move->from &&
+                    $sanOrArray['to'] === $move->to
                 ) {
                     $moveObject = $move;
                     break;
@@ -750,22 +749,26 @@ class Chess
             return null;
         }
 
-        $movePretty = $this->makePretty($moveObject);
+        $this->moveToSAN($moveObject);
         $this->makeMove($moveObject);
 
-        return $movePretty;
+        return $moveObject;
     }
 
-    /* The internal representation of a chess move is in 0x88 format, and
+    /**
+     * The internal representation of a chess move is in 0x88 format, and
      * not meant to be human-readable.  The code below converts the 0x88
      * square coordinates to algebraic coordinates.  It also prunes an
      * unnecessary move keys resulting from a verbose call.
+     *
+     * @return array<int, Move>
      */
-    public function moves($options = ['verbose' => false]): array
+    public function moves(): array
     {
         $moves = [];
         foreach ($this->generateMoves() as $key => $move) {
-            $moves[$key] = $options['verbose'] ? $this->makePretty($move) : $this->moveToSAN($move);
+            $this->moveToSAN($move);
+            $moves[$key] = $move;
         }
 
         return $moves;
@@ -979,8 +982,8 @@ class Chess
     {
         $moves = $this->generateMoves();
 
-        $from = $move->from;
-        $to = $move->to;
+        $from = $move->fromSquare;
+        $to = $move->toSquare;
         $piece = $move->piece;
 
         $ambiguities = 0;
@@ -988,8 +991,8 @@ class Chess
         $sameFile = 0;
 
         foreach ($moves as $aMove) {
-            $ambiguityFrom = $aMove->from;
-            $ambiguityTo = $aMove->to;
+            $ambiguityFrom = $aMove->fromSquare;
+            $ambiguityTo = $aMove->toSquare;
             $ambiguityPiece = $aMove->piece;
 
             /* if a move of the same piece type ends on the same to square, we'll
@@ -1032,12 +1035,12 @@ class Chess
         return '';
     }
 
-    // convert a move from 0x88 to SAN
-    protected function moveToSAN(Move $move): string
+    // calculate SAN for Move
+    protected function moveToSAN(Move $move): void
     {
         $cacheKey = json_encode($move).$this->boardHash;
         if (isset($this->sanMoveCache[$cacheKey])) {
-            return $this->sanMoveCache[$cacheKey];
+            return;
         }
 
         $output = '';
@@ -1057,13 +1060,13 @@ class Chess
             if ($move->flags & (Board::BITS['CAPTURE'] | Board::BITS['EP_CAPTURE'])) {
                 // pawn e5->d6 is "exd6"
                 if ($move->piece === Piece::PAWN) {
-                    $output .= substr(self::algebraic($move->from), 0, 1);
+                    $output .= $move->from[0];
                 }
 
                 $output .= 'x';
             }
 
-            $output .= self::algebraic($move->to);
+            $output .= $move->to;
 
             // promotion example: e8=Q
             if ($move->flags & Board::BITS['PROMOTION']) {
@@ -1078,27 +1081,8 @@ class Chess
         }
         $this->undoMove();
 
-        return $this->sanMoveCache[$cacheKey] = $output;
-    }
-
-    protected function makePretty(Move $uglyMove): Move
-    {
-        $move = clone $uglyMove;
-        $move->san = $this->moveToSAN($move);
-        // TODO to and from should be int, strings here :-|
-        $move->to = self::algebraic($move->to);
-        $move->from = self::algebraic($move->from);
-
-        // TODO flags should be int, string here :-|
-        $flags = '';
-        foreach (Board::BITS as $k => $v) {
-            if (Board::BITS[$k] & $move->flags) {
-                $flags .= self::FLAGS[$k];
-            }
-        }
-        $move->flags = $flags;
-
-        return $move;
+        $this->sanMoveCache[$cacheKey] = $output;
+        $move->san = $output;
     }
 
     public function __toString(): string

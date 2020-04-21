@@ -15,11 +15,17 @@ class Move
     /** @var string */
     public $piece;
 
-    /** @var int */
+    /** @var string */
     public $from;
 
-    /** @var int */
+    /** @var string */
     public $to;
+
+    /** @var int */
+    public $fromSquare;
+
+    /** @var int */
+    public $toSquare;
 
     /** @var string|null */
     public $captured;
@@ -35,15 +41,14 @@ class Move
         $this->turn = $turn;
         $this->flags = $flags;
         $this->piece = $piece;
-        $this->from = $from;
-        $this->to = $to;
+        $this->fromSquare = $from;
+        $this->toSquare = $to;
+        $this->from = array_search($from, Board::SQUARES);
+        $this->to = array_search($to, Board::SQUARES);
         $this->captured = $captured;
         $this->promotion = $promotion;
     }
 
-    // here, we add first parameter turn, to make this really static method
-    // because in chess.js var turn got from outside scope,
-    // maybe need a little fix in chess.js or maybe i am :-p
     public static function buildMove(
         string $turn,
         Board $board,

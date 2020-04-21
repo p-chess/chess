@@ -44,9 +44,9 @@ class ChessPublicator extends Chess
     {
         return $this->undoMove();
     }
-    
-    public function moveToSANPublic(?Move $move): string
+
+    public function moveToSANPublic(?Move $move): void
     {
-        return $this->moveToSAN($move);
+        $this->moveToSAN($move);
     }
 }
