@@ -423,7 +423,7 @@ class Chess
         }
 
         // if we moved the king
-        if ($this->board[$move->to]->type === Piece::KING) {
+        if (null !== $this->board[$move->to] && $this->board[$move->to]->type === Piece::KING) {
             //~ $this->kings[$this->board[$move->to]->color] = $move->to;
             $this->kings[$us] = $move->to;
 
@@ -521,7 +521,12 @@ class Chess
         $them = self::swapColor($us);
 
         $this->board[$move->from] = $this->board[$move->to];
-        $this->board[$move->from]->type = $move->piece; // to undo any promotions
+        // to undo any promotions
+        $oldFrom = $this->board[$move->from];
+        if (null !== $oldFrom) {
+            $oldFrom->type = $move->piece;
+        }
+        $this->board[$move->from] = $oldFrom;
         $this->board[$move->to] = null;
 
         // if capture
