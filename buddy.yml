@@ -12,11 +12,13 @@
         execute_commands:
             - "composer validate"
             - "composer install"
-            - "composer build"
+            - "composer build-ci"
+            - "bash <(curl -s https://codecov.io/bash)"
         setup_commands:
             - "echo \"memory_limit=-1\" >> /usr/local/etc/php/conf.d/buddy.ini"
             - "apt-get update && apt-get install -y git zip"
             - "curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer"
+            - "pecl install pcov && docker-php-ext-enable pcov"
         volume_mappings:
             - "/:/buddy/chess"
         trigger_condition: "ALWAYS"

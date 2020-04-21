@@ -52,9 +52,15 @@
             "@phpstan",
             "@test"
         ],
+        "build-ci": [
+          "@check-cs",
+          "@phpstan",
+          "@test-ci"
+        ],
         "check-cs": "./vendor/bin/php-cs-fixer fix --dry-run",
         "fix-cs": "./vendor/bin/php-cs-fixer fix",
         "phpstan": "./vendor/bin/phpstan analyze src tests benchmarks --level 6 --configuration phpstan.neon",
-        "test": "./vendor/bin/phpunit"
+        "test": "./vendor/bin/phpunit",
+        "test-ci": "./vendor/bin/phpunit --coverage-clover 'clover.xml'"
     }
 }
