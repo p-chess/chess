@@ -17,7 +17,7 @@ final class PgnOutput implements OutputInterface
         // process header
         $output = '';
         foreach ($chess->getHeader() as $header => $value) {
-            $value = addslashes($value);
+            $value = \addslashes($value);
             $output .= "[{$header} \"{$value}\"]".$newline;
         }
 
@@ -33,11 +33,11 @@ final class PgnOutput implements OutputInterface
                 $tmp = $i.'. ... ';
                 ++$i;
             } else {
-                $tmp = ($i % 2 === 1 ? ceil($i / 2).'. ' : '');
+                $tmp = ($i % 2 === 1 ? \ceil($i / 2).'. ' : '');
             }
             $tmp .= $history->san.' ';
 
-            $currentWidth += strlen($tmp);
+            $currentWidth += \strlen($tmp);
             if ($currentWidth > $maxWidth && $maxWidth > 0) {
                 $tmp = $newline.$tmp;
                 $currentWidth = 0;
@@ -47,7 +47,7 @@ final class PgnOutput implements OutputInterface
             ++$i;
         }
         if ($i > 1) {
-            $output = substr($output, 0, -1);
+            $output = \substr($output, 0, -1);
         } // remove last space
 
         return $output;

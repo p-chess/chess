@@ -118,7 +118,7 @@ class Board implements \ArrayAccess, \JsonSerializable
 
     public function jsonSerialize(): string
     {
-        return json_encode($this->squares);
+        return \json_encode($this->squares);
     }
 
     public static function rank(int $i): int
@@ -136,6 +136,6 @@ class Board implements \ArrayAccess, \JsonSerializable
         $file = self::file($i);
         $rank = self::rank($i);
 
-        return substr('abcdefgh', $file, 1).substr('87654321', $rank, 1);
+        return \substr('abcdefgh', $file, 1).\substr('87654321', $rank, 1);
     }
 }
