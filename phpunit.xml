@@ -15,8 +15,14 @@
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>
-    
+
 	<listeners>
 		<listener class="JohnKary\PHPUnit\Listener\SpeedTrapListener" />
 	</listeners>
+
+    <filter>
+        <whitelist>
+            <directory>./src</directory>
+        </whitelist>
+    </filter>
 </phpunit>
