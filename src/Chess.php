@@ -400,12 +400,6 @@ class Chess
         $this->history[$historyKey]->position = $this->boardHash;
     }
 
-    protected function push(Move $move): int
-    {
-        // just aliasing, because name method "push" is confusing
-        return $this->recordMove($move);
-    }
-
     protected function recordMove(Move $move): int
     {
         $this->history[] = new History(
