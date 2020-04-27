@@ -36,6 +36,13 @@ class MoveTest extends TestCase
         $this->assertSame($move->flags, Board::BITS['NORMAL']);
     }
 
+    public function testPutOnInvalidSquare(): void
+    {
+        $chess = new ChessPublicator();
+        $result = $chess->put(new Piece(Piece::PAWN, Piece::WHITE), 'a9');
+        $this->assertFalse($result);
+    }
+
     /**
      * @depends testBuildMove
      */

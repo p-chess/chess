@@ -11,8 +11,8 @@ class GameTest extends TestCase
 {
     public function testRandomMove(): void
     {
-        $chess = new Chess;
-        
+        $chess = new Chess();
+
         $i = 0;
         while (!$chess->gameOver()) {
             ++$i;
@@ -26,7 +26,14 @@ class GameTest extends TestCase
             $move = $chess->move(['from' => $moveRandom->from, 'to' => $moveRandom->to]);
             $this->assertNotNull($move);
         }
-        
+
         $this->assertTrue($chess->gameOver() || $i > 50);
+    }
+
+    public function testGetHistory(): void
+    {
+        $chess = new Chess();
+        $chess->move('e4');
+        $this->assertEquals('e4', $chess->getHistory()[0]->move->san);
     }
 }
