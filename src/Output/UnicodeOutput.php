@@ -14,7 +14,7 @@ final class UnicodeOutput extends BasicOutput implements OutputInterface
         $output = self::$line;
         for ($i = Board::SQUARES['a8']; $i <= Board::SQUARES['h1']; ++$i) {
             if (Board::file($i) === 0) {
-                $output .= ' '.substr('87654321', Board::rank($i), 1).' |';
+                $output .= ' '.\substr('87654321', Board::rank($i), 1).' |';
             }
 
             if ($chess->board[$i] === null) {

@@ -29,9 +29,9 @@ class PgnTest extends TestCase
 
         $match = '1. e4 e6 2. d4 d5 3. Nc3 Nf6 4. Bg5 dxe4 5. Nxe4 Be7 6. Bxf6
 				gxf6 7. g3 f5 8. Nc3 Bf6';
-        $moves = preg_replace("/([0-9]{0,})\./", '', $match);
-        $moves = str_replace('  ', ' ', str_replace("\r", ' ', str_replace("\n", ' ', str_replace("\t", '', $moves))));
-        $moves = explode(' ', trim($moves));
+        $moves = \preg_replace("/([0-9]{0,})\./", '', $match);
+        $moves = \str_replace('  ', ' ', \str_replace("\r", ' ', \str_replace("\n", ' ', \str_replace("\t", '', $moves))));
+        $moves = \explode(' ', \trim($moves));
         foreach ($moves as $move) {
             $chess->move($move);
         }

@@ -43,8 +43,8 @@ class Move
         $this->piece = $piece;
         $this->fromSquare = $from;
         $this->toSquare = $to;
-        $this->from = array_search($from, Board::SQUARES);
-        $this->to = array_search($to, Board::SQUARES);
+        $this->from = \array_search($from, Board::SQUARES);
+        $this->to = \array_search($to, Board::SQUARES);
         $this->captured = $captured;
         $this->promotion = $promotion;
     }

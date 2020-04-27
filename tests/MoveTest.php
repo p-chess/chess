@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace PChess\Chess\Test;
 
 use PChess\Chess\Board;
-use PChess\Chess\Chess;
 use PChess\Chess\Move;
 use PChess\Chess\Piece;
 use PHPUnit\Framework\TestCase;
@@ -27,7 +26,7 @@ class MoveTest extends TestCase
             Board::SQUARES['a4'],
             Board::BITS['NORMAL']
         ));
-        
+
         $this->assertSame($move->piece, Piece::PAWN);
         $this->assertSame($move->turn, $chess->turn);
         $this->assertSame($move->fromSquare, Board::SQUARES['a2']);
@@ -36,7 +35,7 @@ class MoveTest extends TestCase
         $this->assertSame($move->to, 'a4');
         $this->assertSame($move->flags, Board::BITS['NORMAL']);
     }
-    
+
     /**
      * @depends testBuildMove
      */
@@ -56,7 +55,7 @@ class MoveTest extends TestCase
             Board::BITS['NORMAL']
         ));
         $chess->makeMovePublic($move);
-        
+
         $lastHistory = $chess->getLastHistory();
         $this->assertSame($lastHistory->move, $move);
         $this->assertSame($lastHistory->turn, Piece::WHITE);
@@ -66,7 +65,7 @@ class MoveTest extends TestCase
         $this->assertEquals($lastHistory->castling[Piece::BLACK], 0);
         $this->assertSame($lastHistory->halfMoves, 0);
         $this->assertSame($lastHistory->moveNumber, 1);
-        
+
         // promotions
         $chess->load('8/P7/8/8/8/8/8/K6k w - - 0 1');
         $move = (ChessPublicator::buildMovePublic(
@@ -80,7 +79,7 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $this->assertSame($chess->fen(), 'Q7/8/8/8/8/8/8/K6k b - - 0 1');
     }
-    
+
     public function testUndoMoveAndCheckHistory(): void
     {
         $chess = new ChessPublicator();
@@ -89,7 +88,7 @@ class MoveTest extends TestCase
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'h1');
         $chess->put(new Piece(Piece::PAWN, Piece::WHITE), 'a7');
         $fenStart = $chess->fen();
-        
+
         // normal move
         $chess->load($fenStart);
         $move = (ChessPublicator::buildMovePublic(
@@ -103,7 +102,7 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $chess->undoMovePublic();
         $this->assertSame($chess->fen(), $fenStart);
-        
+
         // big pawn
         $chess->load($fenStart);
         $chess->put(new Piece(Piece::PAWN, Piece::WHITE), 'd2');
@@ -119,7 +118,7 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $chess->undoMovePublic();
         $this->assertSame($chess->fen(), $fenStart);
-        
+
         // capture
         $chess->load($fenStart);
         $chess->put(new Piece(Piece::PAWN, Piece::BLACK), 'e5');
@@ -136,7 +135,7 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $chess->undoMovePublic();
         $this->assertSame($chess->fen(), $fenStart);
-        
+
         // en passant
         $chess->load($fenStart);
         $chess->put(new Piece(Piece::PAWN, Piece::BLACK), 'g4');
@@ -168,8 +167,7 @@ class MoveTest extends TestCase
         $chess->remove('g4');
         $chess->remove('h2');
         $this->assertSame($chess->fen(), $fenStart);
-        
-        
+
         // castling king side
         $fenTmp = 'r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4';
         $chess->load($fenTmp);
@@ -187,7 +185,7 @@ class MoveTest extends TestCase
         $this->assertSame($chess->fen(), $fenTmp);
         $chess->load($fenStart);
         $this->assertSame($chess->fen(), $fenStart);
-        
+
         // castling queen side
         $fenTmp = 'r3kb1r/pppq1ppp/2np1n2/1B2p2b/4P3/3P1N1P/PPPB1PP1/RN1QR1K1 b kq - 2 8';
         $chess->load($fenTmp);
@@ -206,11 +204,11 @@ class MoveTest extends TestCase
         $chess->load($fenStart);
         $this->assertSame($chess->fen(), $fenStart);
     }
-    
+
     public function testMoveToSAN(): void
     {
         $chess = new ChessPublicator();
-    
+
         // normal pawn move
         $move = ($chess::buildMovePublic(
             $chess->turn,
@@ -222,7 +220,7 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
         $this->assertSame($undo->san, 'e4');
-        
+
         // normal knight move
         $chess->makeMovePublic($move);
         $move = ($chess::buildMovePublic(
@@ -235,7 +233,7 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
         $this->assertSame($undo->san, 'Nf6');
-        
+
         // normal pawn capture
         $chess->load('rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2');
         $move = ($chess::buildMovePublic(
@@ -248,7 +246,7 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
         $this->assertSame($undo->san, 'exd5');
-        
+
         // en passant capture
         $chess->load('rnbqkbnr/ppp2ppp/8/3Pp3/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1');
         $move = ($chess::buildMovePublic(
@@ -261,7 +259,7 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
         $this->assertSame($undo->san, 'dxe6');
-        
+
         // normal knight capture
         $chess->load('rnbqkb1r/ppp1pppp/5n2/3P4/8/5N2/PPPP1PPP/RNBQKB1R b KQkq - 2 3');
         $move = ($chess::buildMovePublic(
@@ -274,7 +272,7 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
         $this->assertSame($undo->san, 'Nxd5');
-        
+
         // promotion
         $chess->load('8/2KP4/8/5k2/8/8/8/8 w - - 0 1');
         $move = ($chess::buildMovePublic(
@@ -288,7 +286,7 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
         $this->assertSame($undo->san, 'd8=R');
-        
+
         // check
         $chess->load('3R4/2K5/8/5k2/8/8/8/8 w - - 0 1');
         $move = ($chess::buildMovePublic(
@@ -301,7 +299,7 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
         $this->assertSame($undo->san, 'Rf8+');
-        
+
         // checkmate
         $chess->load('5k2/8/1R3K2/8/8/8/8/8 w - - 0 1');
         $move = ($chess::buildMovePublic(
@@ -314,8 +312,7 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
         $this->assertSame($undo->san, 'Rb8#');
-        
-        
+
         // ambiguous moves: row
         $chess->load('2N2k2/8/3p4/8/2N5/8/1K6/8 w - - 0 1');
         $move = ($chess::buildMovePublic(
@@ -328,8 +325,7 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
         $this->assertSame($undo->san, 'N4xd6');
-        
-        
+
         // ambiguous moves: rank > 0 & file > 0
         $chess->load('8/8/8/2qqq3/2qPq3/2qqq3/1n6/K6k b - - 0 1'); // this one is really ambiguous haha
         $move = ($chess::buildMovePublic(
@@ -355,7 +351,7 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
         $this->assertSame($undo->san, 'Nexd6');
-        
+
         // ambiguous moves: col
         $chess->load('5k2/8/3p4/8/2N1N3/8/1K6/8 w - - 0 1');
         $move = ($chess::buildMovePublic(
@@ -368,7 +364,7 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
         $this->assertSame($undo->san, 'Ncxd6');
-        
+
         // ambiguous moves: normal capture
         $chess->load('5k2/8/3p2R1/8/2N5/8/1K6/8 w - - 0 1');
         $move = ($chess::buildMovePublic(
@@ -381,7 +377,7 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
         $this->assertSame($undo->san, 'Nxd6');
-        
+
         // ambiguous moves: normal capture
         $chess->load('5k2/8/3p2R1/8/2N5/8/1K6/8 w - - 0 1');
         $move = ($chess::buildMovePublic(
@@ -398,10 +394,10 @@ class MoveTest extends TestCase
         // generate moves test
         $chess->load('8/ppp2P2/pkp5/ppp5/5PPP/5PKP/5PPP/8 w - - 0 1');
         $moves = $chess->generateMovesPublic();
-        array_walk($moves, static function (Move $move) use ($chess): void {
+        \array_walk($moves, static function (Move $move) use ($chess): void {
             $chess->moveToSANPublic($move);
         });
-        $sans = array_map(static function (Move $move): string {
+        $sans = \array_map(static function (Move $move): string {
             return $move->san;
         }, $moves);
         $this->assertContains('f8=Q', $sans);
@@ -412,7 +408,7 @@ class MoveTest extends TestCase
         $this->assertContains('g5', $sans);
         $this->assertContains('h5', $sans);
     }
-    
+
     public function testSANMove(): void
     {
         // Ruy Lopez (C70)
@@ -427,7 +423,7 @@ class MoveTest extends TestCase
         $chess->move('Bc5');
         $this->assertSame($chess->fen(), 'r1bqk1nr/1ppp1ppp/p1n5/2b1p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 5');
     }
-    
+
     public function testArrayMove(): void
     {
         // Ruy Lopez (C70)
@@ -442,67 +438,37 @@ class MoveTest extends TestCase
         $chess->move(['from' => 'f8', 'to' => 'c5']);
         $this->assertSame($chess->fen(), 'r1bqk1nr/1ppp1ppp/p1n5/2b1p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 5');
     }
-    
-    public function testSANMoveFromRealGame(): void
+
+    /**
+     * @dataProvider gameProvider
+     *
+     * @param string $match
+     * @param string $finalFen
+     */
+    public function testSANMoveFromRealGame(string $match, string $finalFen): void
     {
         $chess = new ChessPublicator();
-        
-        /* [Event "Earl tourn"]
-         * [Site "?"]
-         * [Date "1906.??.??"]
-         * [Round "?"]
-         * [White "Alekhine, Alexander"]
-         * [Black "Ljubimov, T."]
-         * [Result "1-0"]
-         * [ECO "C58"]
-         */
-        $match = '1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Nxd4 Nf6 5.Nc3 Bb4 6.Nxc6 bxc6 7.Qd4 Qe7 8.f3 d5 9.Bg5 O-O 10.O-O-O Bc5 11.Bxf6 gxf6 12.Qa4 Be3+ 13.Kb1 d4 14.Ne2 c5 15.Nc1 Be6 16.Bc4 Rfb8 17.Nd3 Rb6';
-        $moves = preg_replace("/([0-9]{0,})\./", '', $match);
-        $moves = str_replace('  ', ' ', str_replace("\r", ' ', str_replace("\n", ' ', str_replace("\t", '', $moves))));
-        $moves = explode(' ', trim($moves));
-        //~ foreach($moves as $move) if($chess->move($move) === null) { echo $move . PHP_EOL; break; }
+        $moves = \preg_replace('/(\d*)\./', '', $match);
+        $moves = \str_replace(["\t", "\n", "\r", '  '], ['', ' ', ' ', ' '], $moves);
+        $moves = \explode(' ', \trim($moves));
         foreach ($moves as $move) {
             $this->assertNotNull($chess->move($move), $move);
         }
-        $this->assertSame($chess->fen(), 'r5k1/p1p1qp1p/1r2bp2/2p5/Q1BpP3/3NbP2/PPP3PP/1K1R3R w - - 6 18');
+        $this->assertSame($chess->fen(), $finalFen);
+    }
 
-        $chess->reset();
-        /* [Event "Earl tourn"]
-         * [Site "?"]
-         * [Date "1906.??.??"]
-         * [Round "?"]
-         * [White "Zubakin, N."]
-         * [Black "Alekhine, Alexander"]
-         * [Result "1/2-1/2"]
-         * [ECO "C55"]
-         */
-        $match = '1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.O-O d6 5.c3 Nf6 6.d4 exd4 7.cxd4 Bb6 8.Nc3 O-O
+    /**
+     * @return array<string, array>
+     */
+    public function gameProvider(): array
+    {
+        $match1 = '1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Nxd4 Nf6 5.Nc3 Bb4 6.Nxc6 bxc6 7.Qd4 Qe7 8.f3 d5 9.Bg5 O-O 10.O-O-O Bc5 11.Bxf6 gxf6 12.Qa4 Be3+ 13.Kb1 d4 14.Ne2 c5 15.Nc1 Be6 16.Bc4 Rfb8 17.Nd3 Rb6';
+        $match2 = '1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.O-O d6 5.c3 Nf6 6.d4 exd4 7.cxd4 Bb6 8.Nc3 O-O
 		9.h3 h6 10.Be3 Re8 11.d5 Ne5 12.Nxe5 dxe5 13.Bxb6 axb6 14.f4 Qd6 15.fxe5 Rxe5
 		16.Qe2 Rg5 17.Rf3 Qc5+ 18.Kh1 Ng4 19.Rg3 Ne5 20.Rxg5 hxg5 21.Bb3 g4 22.Rf1 Qe7
 		23.Qe3 Qh4 24.Qf4 Qh5 25.Nb5 gxh3 26.Qe3 hxg2+ 27.Kxg2 Qg6+ 28.Kh1 Bd7 29.Nxc7 Rc8
 		30.d6 Kh7';
-        $moves = preg_replace("/([0-9]{0,})\./", '', $match);
-        $moves = str_replace('  ', ' ', str_replace("\r", ' ', str_replace("\n", ' ', str_replace("\t", '', $moves))));
-        $moves = explode(' ', trim($moves));
-        foreach ($moves as $move) {
-            $this->assertNotNull($chess->move($move), $move);
-        }
-        $this->assertSame($chess->fen(), '2r5/1pNb1ppk/1p1P2q1/4n3/4P3/1B2Q3/PP6/5R1K w - - 1 31');
-        
-        
-        $chess->reset();
-        /* [Event "World Championship 35th-KK5"]
-         * [Site "Lyon/New York"]
-         * [Date "1990.??.??"]
-         * [Round "16"]
-         * [White "Kasparov, Gary"]
-         * [Black "Karpov, Anatoly"]
-         * [Result "1-0"]
-         * [WhiteElo "2800"]
-         * [BlackElo "2730"]
-         * [ECO "C45"]
-         */
-        $match = '1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Nxd4 Nf6 5.Nxc6 bxc6 6.e5 Qe7 7.Qe2 Nd5 8.c4 Nb6
+        $match3 = '1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Nxd4 Nf6 5.Nxc6 bxc6 6.e5 Qe7 7.Qe2 Nd5 8.c4 Nb6
 		9.Nd2 Qe6 10.b3 a5 11.Bb2 Bb4 12.a3 Bxd2+ 13.Qxd2 d5 14.cxd5 cxd5 15.Rc1 O-O
 		16.Rxc7 Qg6 17.f3 Bf5 18.g4 Bb1 19.Bb5 Rac8 20.Rxc8 Rxc8 21.O-O h5 22.h3 hxg4
 		23.hxg4 Bc2 24.Qd4 Qe6 25.Rf2 Rc7 26.Rh2 Nd7 27.b4 axb4 28.axb4 Nf8 29.Bf1 Bb3
@@ -517,12 +483,11 @@ class MoveTest extends TestCase
 		85.Bd6 Kg8 86.Re8+ Kf7 87.Re7+ Kg8 88.Be5 Kf8 89.Ra7 Bg4 90.Kd6 Bh3 91.Ra3 Bg4
 		92.Re3 Bf5 93.Kc7 Kf7 94.Kd8 Bg4 95.Bb2 Be6 96.Bc3 Bf5 97.Re7+ Kf8 98.Be5 Bd3
 		99.Ra7 Be4 100.Rc7 Bb1 101.Bd6+ Kg8 102.Ke7';
-        $moves = preg_replace("/([0-9]{0,})\./", '', $match);
-        $moves = str_replace('  ', ' ', str_replace("\r", ' ', str_replace("\n", ' ', str_replace("\t", '', $moves))));
-        $moves = explode(' ', trim($moves));
-        foreach ($moves as $move) {
-            $this->assertNotNull($chess->move($move), $move);
-        }
-        $this->assertSame($chess->fen(), '6k1/2R1K3/3B2p1/6Pn/8/8/8/1b6 b - - 76 102');
+
+        return [
+            'Alekhine - Ljubimov' => [$match1, 'r5k1/p1p1qp1p/1r2bp2/2p5/Q1BpP3/3NbP2/PPP3PP/1K1R3R w - - 6 18'],
+            'Zubakin - Alekhine' => [$match2, '2r5/1pNb1ppk/1p1P2q1/4n3/4P3/1B2Q3/PP6/5R1K w - - 1 31'],
+            'Kasparov - Karpov' => [$match3, '6k1/2R1K3/3B2p1/6Pn/8/8/8/1b6 b - - 76 102'],
+        ];
     }
 }

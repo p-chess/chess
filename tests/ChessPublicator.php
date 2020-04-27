@@ -20,7 +20,7 @@ class ChessPublicator extends Chess
 
     public function getLastHistory(): History
     {
-        return $this->history[count($this->history) - 1];
+        return $this->history[\count($this->history) - 1];
     }
     
     public function attackedPublic(string $color, int $square): bool
@@ -103,7 +103,7 @@ class ChessPublicator extends Chess
             return $nodes;
         }
 
-        return compact('nodes', 'captures', 'enPassants', 'castles', 'promotions', 'checks', 'checkmates');
+        return \compact('nodes', 'captures', 'enPassants', 'castles', 'promotions', 'checks', 'checkmates');
     }
 
     public function pgn(): string

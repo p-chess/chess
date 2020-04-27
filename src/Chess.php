@@ -45,7 +45,7 @@ class Chess
 
     public function clear(): void
     {
-        $this->boardHash = json_encode($this->board);
+        $this->boardHash = \json_encode($this->board);
         $this->kings = [Piece::WHITE => null, Piece::BLACK => null];
         $this->turn = Piece::WHITE;
         $this->castling = [Piece::WHITE => 0, Piece::BLACK => 0];
@@ -64,7 +64,7 @@ class Chess
 
     protected function updateSetup(string $fen): void
     {
-        if (count($this->history) > 0) {
+        if (\count($this->history) > 0) {
             return;
         }
         if ($fen !== Board::DEFAULT_POSITION) {
@@ -111,21 +111,21 @@ class Chess
         if (!Validation::validateFen($fen)['valid']) {
             return false;
         }
-        $tokens = explode(' ', $fen);
+        $tokens = \explode(' ', $fen);
         $this->clear();
 
         // position
         $position = $tokens[0];
         $square = 0;
-        for ($i = 0, $iMax = strlen($position); $i < $iMax; ++$i) {
+        for ($i = 0, $iMax = \strlen($position); $i < $iMax; ++$i) {
             $piece = $position[$i];
             if ($piece === '/') {
                 $square += 8;
-            } elseif (ctype_digit($piece)) {
+            } elseif (\ctype_digit($piece)) {
                 $square += (int) $piece;
             } else {
-                $color = (ord($piece) < ord('a')) ? Piece::WHITE : Piece::BLACK;
-                $this->put(new Piece(strtolower($piece), $color), Board::algebraic($square));
+                $color = (\ord($piece) < \ord('a')) ? Piece::WHITE : Piece::BLACK;
+                $this->put(new Piece(\strtolower($piece), $color), Board::algebraic($square));
                 ++$square;
             }
         }
@@ -134,16 +134,16 @@ class Chess
         $this->turn = $tokens[1];
 
         // castling options
-        if (strpos($tokens[2], 'K') !== false) {
+        if (\strpos($tokens[2], 'K') !== false) {
             $this->castling[Piece::WHITE] |= Board::BITS['KSIDE_CASTLE'];
         }
-        if (strpos($tokens[2], 'Q') !== false) {
+        if (\strpos($tokens[2], 'Q') !== false) {
             $this->castling[Piece::WHITE] |= Board::BITS['QSIDE_CASTLE'];
         }
-        if (strpos($tokens[2], 'k') !== false) {
+        if (\strpos($tokens[2], 'k') !== false) {
             $this->castling[Piece::BLACK] |= Board::BITS['KSIDE_CASTLE'];
         }
-        if (strpos($tokens[2], 'q') !== false) {
+        if (\strpos($tokens[2], 'q') !== false) {
             $this->castling[Piece::BLACK] |= Board::BITS['QSIDE_CASTLE'];
         }
 
@@ -180,7 +180,7 @@ class Chess
                 }
                 $color = $this->board[$i]->color;
                 $piece = $this->board[$i]->type;
-                $fen .= $color === Piece::WHITE ? strtoupper($piece) : strtolower($piece);
+                $fen .= $color === Piece::WHITE ? \strtoupper($piece) : \strtolower($piece);
             }
 
             if (($i + 1) & 0x88) {
@@ -214,7 +214,7 @@ class Chess
 
         $epFlags = $this->epSquare === null ? '-' : Board::algebraic($this->epSquare);
 
-        return implode(' ', [$fen, $this->turn, $cFlags, $epFlags, $this->halfMoves, $this->moveNumber]);
+        return \implode(' ', [$fen, $this->turn, $cFlags, $epFlags, $this->halfMoves, $this->moveNumber]);
     }
 
     /**
@@ -259,7 +259,7 @@ class Chess
     public function remove(string $square): bool
     {
         // check for valid square
-        if (!array_key_exists($square, Board::SQUARES)) {
+        if (!\array_key_exists($square, Board::SQUARES)) {
             return false;
         }
 
@@ -278,7 +278,7 @@ class Chess
     public function get(string $square): ?Piece
     {
         // check for valid square
-        if (!array_key_exists($square, Board::SQUARES)) {
+        if (!\array_key_exists($square, Board::SQUARES)) {
             return null;
         }
 
@@ -288,7 +288,7 @@ class Chess
     public function put(Piece $piece, string $square): bool
     {
         // check for valid square
-        if (!array_key_exists($square, Board::SQUARES)) {
+        if (!\array_key_exists($square, Board::SQUARES)) {
             return false;
         }
 
@@ -366,7 +366,7 @@ class Chess
 
         // turn of castling of we move a rock
         if ($this->castling[$us] > 0) {
-            for ($i = 0, $len = count(Board::ROOKS[$us]); $i < $len; ++$i) {
+            for ($i = 0, $len = \count(Board::ROOKS[$us]); $i < $len; ++$i) {
                 if (
                     $move->fromSquare === Board::ROOKS[$us][$i]['square'] &&
                     $this->castling[$us] & Board::ROOKS[$us][$i]['flag']
@@ -379,7 +379,7 @@ class Chess
 
         // turn of castling of we capture a rock
         if ($this->castling[$them] > 0) {
-            for ($i = 0, $len = count(Board::ROOKS[$them]); $i < $len; ++$i) {
+            for ($i = 0, $len = \count(Board::ROOKS[$them]); $i < $len; ++$i) {
                 if (
                     $move->toSquare === Board::ROOKS[$them][$i]['square'] &&
                     $this->castling[$them] & Board::ROOKS[$them][$i]['flag']
@@ -396,7 +396,7 @@ class Chess
         }
         $this->turn = $them;
 
-        $this->boardHash = json_encode($this->board);
+        $this->boardHash = \json_encode($this->board);
         $this->history[$historyKey]->position = $this->boardHash;
     }
 
@@ -418,14 +418,14 @@ class Chess
             $this->moveNumber
         );
 
-        end($this->history);
+        \end($this->history);
 
-        return key($this->history);
+        return \key($this->history);
     }
 
     protected function undoMove(): ?Move
     {
-        $old = array_pop($this->history);
+        $old = \array_pop($this->history);
         if ($old === null) {
             return null;
         }
@@ -472,7 +472,7 @@ class Chess
             $this->board[$castlingFrom] = null;
         }
 
-        $this->boardHash = json_encode($this->board);
+        $this->boardHash = \json_encode($this->board);
 
         return $move;
     }
@@ -494,7 +494,7 @@ class Chess
      */
     protected function generateMoves(array $options = []): array
     {
-        $cacheKey = $this->boardHash.json_encode($options);
+        $cacheKey = $this->boardHash.\json_encode($options);
 
         // check cache first
         if (isset($this->generateMovesCache[$cacheKey])) {
@@ -646,14 +646,14 @@ class Chess
     /**
      * Move with SAN string (case-sensitive) or array.
      *
-     * @param string|array<string, string> $sanOrArray E.g. "Nxb7" or ['from' => 'h7', 'to' => 'h8', 'promotion' => 'q']
+     * @param string|array<string, ?string> $sanOrArray E.g. "Nxb7" or ['from' => 'h7', 'to' => 'h8', 'promotion' => 'q']
      */
     public function move($sanOrArray): ?Move
     {
         $moveObject = null;
         $moves = $this->generateMoves();
 
-        if (is_string($sanOrArray)) {
+        if (\is_string($sanOrArray)) {
             foreach ($moves as $move) {
                 $this->moveToSAN($move);
                 if ($move->san === $sanOrArray) {
@@ -661,7 +661,7 @@ class Chess
                     break;
                 }
             }
-        } elseif (is_array($sanOrArray)) {
+        } elseif (\is_array($sanOrArray)) {
             $sanOrArray['promotion'] = $sanOrArray['promotion'] ?? null;
 
             foreach ($moves as $move) {
@@ -772,12 +772,12 @@ class Chess
 
     public function inCheckmate(): bool
     {
-        return $this->inCheck() && count($this->generateMoves()) === 0;
+        return $this->inCheck() && \count($this->generateMoves()) === 0;
     }
 
     public function inStalemate(): bool
     {
-        return !$this->inCheck() && count($this->generateMoves()) === 0;
+        return !$this->inCheck() && \count($this->generateMoves()) === 0;
     }
 
     public function insufficientMaterial(): bool
@@ -824,7 +824,7 @@ class Chess
         // k(b){0,} vs k(b){0,}  , because maybe you are a programmer we talk in regex (preg) :-p
         if ($numPieces === $pieces[Piece::BISHOP] + 2) {
             $sum = 0;
-            $len = count($bishops);
+            $len = \count($bishops);
             foreach ($bishops as $bishop) {
                 $sum += $bishop;
             }
@@ -933,11 +933,11 @@ class Chess
              * disambiguator
              */
             if ($sameFile > 0) {
-                return substr(Board::algebraic($from), 1, 1);
+                return \substr(Board::algebraic($from), 1, 1);
             }
 
             // else use the file symbol
-            return substr(Board::algebraic($from), 0, 1);
+            return \substr(Board::algebraic($from), 0, 1);
         }
 
         return '';
@@ -946,7 +946,7 @@ class Chess
     // calculate SAN for Move
     protected function moveToSAN(Move $move): void
     {
-        $cacheKey = json_encode($move).$this->boardHash;
+        $cacheKey = \json_encode($move).$this->boardHash;
         if (isset($this->sanMoveCache[$cacheKey])) {
             $move->san = $this->sanMoveCache[$cacheKey];
 
@@ -963,7 +963,7 @@ class Chess
 
             // pawn e2->e4 is "e4", knight g8->f6 is "Nf6"
             if ($move->piece !== Piece::PAWN) {
-                $output .= strtoupper($move->piece).$disambiguator;
+                $output .= \strtoupper($move->piece).$disambiguator;
             }
 
             // x on capture
@@ -980,14 +980,14 @@ class Chess
 
             // promotion example: e8=Q
             if ($move->flags & Board::BITS['PROMOTION']) {
-                $output .= '='.strtoupper($move->promotion);
+                $output .= '='.\strtoupper($move->promotion);
             }
         }
 
         // check / checkmate
         $this->makeMove($move);
         if ($this->inCheck()) {
-            $output .= count($this->generateMoves()) === 0 ? '#' : '+';
+            $output .= \count($this->generateMoves()) === 0 ? '#' : '+';
         }
         $this->undoMove();
 

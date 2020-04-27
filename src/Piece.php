@@ -81,10 +81,10 @@ class Piece
 
     public function __construct(string $type, string $color)
     {
-        if (!in_array($type, self::$types, true)) {
+        if (!\in_array($type, self::$types, true)) {
             throw new \InvalidArgumentException('Invalid piece type');
         }
-        if (!in_array($color, self::$colors, true)) {
+        if (!\in_array($color, self::$colors, true)) {
             throw new \InvalidArgumentException('Invalid piece color');
         }
         $this->type = $type;

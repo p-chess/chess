@@ -29,7 +29,7 @@ class MiscTest extends TestCase
         }
         $histories = $chess->history(['verbose' => true]);
 
-        $this->assertCount(count($histories), $moves);
+        $this->assertCount(\count($histories), $moves);
         foreach ($histories as $k => $history) {
             $this->assertSame($history->san, $moves[$k]);
         }

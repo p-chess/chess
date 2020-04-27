@@ -26,41 +26,41 @@ class Validation
             11 => 'Illegal en-passant square',
         ];
 
-        $tokens = explode(' ', $fen);
+        $tokens = \explode(' ', $fen);
 
         // 1st criterion: 6 space-separated fields
-        if (count($tokens) !== 6) {
+        if (\count($tokens) !== 6) {
             return ['valid' => false, 'error_number' => 1, 'error' => $errors[1]];
         }
 
         // 2nd criterion: move number field is a integer value > 0
-        if (!ctype_digit($tokens[5]) || (int) $tokens[5] <= 0) {
+        if (!\ctype_digit($tokens[5]) || (int) $tokens[5] <= 0) {
             return ['valid' => false, 'error_number' => 2, 'error' => $errors[2]];
         }
 
         // 3rd criterion: half move counter is an integer >= 0
-        if (!ctype_digit($tokens[4]) || (int) $tokens[4] < 0) {
+        if (!\ctype_digit($tokens[4]) || (int) $tokens[4] < 0) {
             return ['valid' => false, 'error_number' => 3, 'error' => $errors[3]];
         }
 
         // 4th criterion: 4th field is a valid e.p.-string
-        if (!(preg_match('/^(-|[a-h]{1}[3|6]{1})$/', $tokens[3]) === 1)) {
+        if (!(\preg_match('/^(-|[a-h]{1}[3|6]{1})$/', $tokens[3]) === 1)) {
             return ['valid' => false, 'error_number' => 4, 'error' => $errors[4]];
         }
 
         // 5th criterion: 3th field is a valid castle-string
-        if (!(preg_match('/(^-$)|(^[K|Q|k|q]{1,}$)/', $tokens[2]) === 1)) {
+        if (!(\preg_match('/(^-$)|(^[K|Q|k|q]{1,}$)/', $tokens[2]) === 1)) {
             return ['valid' => false, 'error_number' => 5, 'error' => $errors[5]];
         }
 
         // 6th criterion: 2nd field is "w" (white) or "b" (black)
-        if (!(preg_match('/^(w|b)$/', $tokens[1]) === 1)) {
+        if (!(\preg_match('/^(w|b)$/', $tokens[1]) === 1)) {
             return ['valid' => false, 'error_number' => 6, 'error' => $errors[6]];
         }
 
         // 7th criterion: 1st field contains 8 rows
-        $rows = explode('/', $tokens[0]);
-        if (count($rows) !== 8) {
+        $rows = \explode('/', $tokens[0]);
+        if (\count($rows) !== 8) {
             return ['valid' => false, 'error_number' => 7, 'error' => $errors[7]];
         }
 
@@ -68,8 +68,8 @@ class Validation
         foreach ($rows as $row) {
             $sumFields = 0;
             $previousWasNumber = false;
-            for ($k = 0, $kMax = strlen($row); $k < $kMax; ++$k) {
-                if (ctype_digit($row[$k])) {
+            for ($k = 0, $kMax = \strlen($row); $k < $kMax; ++$k) {
+                if (\ctype_digit($row[$k])) {
                     // 8th criterion: every row is valid
                     if ($previousWasNumber) {
                         return ['valid' => false, 'error_number' => 8, 'error' => $errors[8]];
@@ -78,7 +78,7 @@ class Validation
                     $previousWasNumber = true;
                 } else {
                     // 9th criterion: check symbols of piece
-                    if (strpos(Piece::SYMBOLS, $row[$k]) === false) {
+                    if (\strpos(Piece::SYMBOLS, $row[$k]) === false) {
                         return ['valid' => false, 'error_number' => 9, 'error' => $errors[9]];
                     }
                     ++$sumFields;
@@ -92,7 +92,7 @@ class Validation
         }
 
         // 11th criterion: en-passant if last is black's move, then its must be white turn
-        if (strlen($tokens[3]) > 1) {
+        if (\strlen($tokens[3]) > 1) {
             if (($tokens[3][1] == '3' && $tokens[1] === 'w') ||
                 ($tokens[3][1] == '6' && $tokens[1] === 'b')) {
                 return ['valid' => false, 'error_number' => 11, 'error' => $errors[11]];
@@ -136,19 +136,19 @@ class Validation
         $moves = [];
 
         // separate lines
-        $lines = str_replace("\r", "\n", $pgn);
-        while (strpos($lines, "\n\n") !== false) {
-            $lines = str_replace("\n\n", "\n", $lines);
+        $lines = \str_replace("\r", "\n", $pgn);
+        while (\strpos($lines, "\n\n") !== false) {
+            $lines = \str_replace("\n\n", "\n", $lines);
         }
-        $lines = explode("\n", $lines);
+        $lines = \explode("\n", $lines);
 
         $parseHeader = true;
         foreach ($lines as $line) {
 
             // parse header
             if ($parseHeader) {
-                preg_match('/^\[(\S+) \"(.*)\"\]$/', $line, $matches);
-                if (count($matches) >= 3) {
+                \preg_match('/^\[(\S+) \"(.*)\"\]$/', $line, $matches);
+                if (\count($matches) >= 3) {
                     $header[$matches[1]] = $matches[2];
                     continue;
                 }
@@ -156,17 +156,17 @@ class Validation
             $parseHeader = false;
 
             // parse movements
-            $movesTmp = explode(' ', $line);
+            $movesTmp = \explode(' ', $line);
             foreach ($movesTmp as $moveTmp) {
-                $moveTmp = trim($moveTmp);
-                $moveTmp = preg_replace("/^(\d+)\.\s?/", '', $moveTmp);
+                $moveTmp = \trim($moveTmp);
+                $moveTmp = \preg_replace("/^(\d+)\.\s?/", '', $moveTmp);
 
-                if (!in_array($moveTmp, ['', '*', '1-0', '1/2-1/2', '0-1'], true)) {
+                if (!\in_array($moveTmp, ['', '*', '1-0', '1/2-1/2', '0-1'], true)) {
                     $moves[] = $moveTmp;
                 }
             }
         }
 
-        return compact('header', 'moves');
+        return \compact('header', 'moves');
     }
 }
