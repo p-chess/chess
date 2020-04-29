@@ -171,16 +171,14 @@ class Chess
         $empty = 0;
         $fen = '';
         for ($i = Board::SQUARES['a8']; $i <= Board::SQUARES['h1']; ++$i) {
-            if ($this->board[$i] === null) {
+            if (null === $piece = $this->board[$i]) {
                 ++$empty;
             } else {
                 if ($empty > 0) {
                     $fen .= $empty;
                     $empty = 0;
                 }
-                $color = $this->board[$i]->color;
-                $piece = $this->board[$i]->type;
-                $fen .= $color === Piece::WHITE ? \strtoupper($piece) : \strtolower($piece);
+                $fen .= $piece->toAscii();
             }
 
             if (($i + 1) & 0x88) {
@@ -705,16 +703,13 @@ class Chess
             if ($i & 0x88) {
                 $i += 7;
                 continue;
-            } // check edge of board
-
-            if ($this->board[$i] === null) {
-                continue;
-            } // check empty square
-            if ($this->board[$i]->color !== $color) {
-                continue;
-            } // check color
-
+            }
             $piece = $this->board[$i];
+            // check empty square and color
+            if (null === $piece || $piece->color !== $color) {
+                continue;
+            }
+
             $difference = $i - $square;
             $index = $difference + 119;
 
@@ -797,7 +792,7 @@ class Chess
 
             $piece = $this->board[$i];
             if ($piece !== null) {
-                $pieces[$piece->type] = isset($pieces[$piece->type]) ? $pieces[$piece->type] + 1 : 1;
+                ++$pieces[$piece->type];
                 if ($piece->type === Piece::BISHOP) {
                     $bishops[] = $sqColor;
                 }
