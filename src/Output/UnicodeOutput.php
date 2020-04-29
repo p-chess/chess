@@ -12,22 +12,15 @@ final class UnicodeOutput extends BasicOutput implements OutputInterface
     public function render(Chess $chess): string
     {
         $output = self::$line;
-        for ($i = Board::SQUARES['a8']; $i <= Board::SQUARES['h1']; ++$i) {
+        foreach ($chess->board as $i => $piece) {
             if (Board::file($i) === 0) {
                 $output .= ' '.\substr('87654321', Board::rank($i), 1).' |';
             }
 
-            if ($chess->board[$i] === null) {
-                $output .= '   |';
-            } else {
-                $output .= ' '.$chess->board[$i].' |';
-            }
+            $output .= ' '.($piece ?? ' ').' |';
 
             if (($i + 1) & 0x88) {
-                $output .= ' '.PHP_EOL;
-                $output .= self::$line;
-                ;
-                $i += 8;
+                $output .= ' '.PHP_EOL.self::$line;
             }
         }
         $output .= self::$bottom;

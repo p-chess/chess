@@ -98,6 +98,6 @@ class Piece
 
     public function toAscii(): string
     {
-        return $this->color === self::BLACK ? \strtoupper($this->type) : $this->type;
+        return $this->color === self::WHITE ? \strtoupper($this->type) : $this->type;
     }
 }

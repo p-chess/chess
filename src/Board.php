@@ -6,8 +6,9 @@ namespace PChess\Chess;
 
 /**
  * @implements \ArrayAccess<int, ?Piece>
+ * @implements \Iterator<int, ?Piece>
  */
-class Board implements \ArrayAccess, \JsonSerializable
+class Board implements \ArrayAccess, \Iterator, \JsonSerializable
 {
     public const DEFAULT_POSITION = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
@@ -105,7 +106,9 @@ class Board implements \ArrayAccess, \JsonSerializable
      */
     public function offsetSet($offset, $value): void
     {
-        $this->squares[$offset] = $value;
+        if (\in_array($offset, self::SQUARES, true)) {
+            $this->squares[$offset] = $value;
+        }
     }
 
     /**
@@ -114,6 +117,34 @@ class Board implements \ArrayAccess, \JsonSerializable
     public function offsetUnset($offset): void
     {
         unset($this->squares[$offset]);
+    }
+
+    public function current()
+    {
+        return \current($this->squares);
+    }
+
+    /**
+     * @return Piece|null|false
+     */
+    public function next()
+    {
+        return \next($this->squares);
+    }
+
+    public function key(): ?int
+    {
+        return \key($this->squares);
+    }
+
+    public function valid(): bool
+    {
+        return null !== $this->key();
+    }
+
+    public function rewind(): ?Piece
+    {
+        return \reset($this->squares);
     }
 
     public function jsonSerialize(): string
