@@ -17,7 +17,11 @@ final class UnicodeOutput extends BasicOutput implements OutputInterface
                 $output .= ' '.\substr('87654321', Board::rank($i), 1).' |';
             }
 
-            $output .= ' '.($piece ?? ' ').' |';
+            if (null === $piece) {
+                $output .= '   |';
+            } else {
+                $output .= ' '.$piece->toUnicode().' |';
+            }
 
             if (($i + 1) & 0x88) {
                 $output .= ' '.PHP_EOL.self::$line;

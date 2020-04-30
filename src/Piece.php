@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PChess\Chess;
 
-class Piece
+final class Piece implements \JsonSerializable
 {
     public const SYMBOLS = 'pnbrqkPNBRQK';
 
@@ -41,10 +41,10 @@ class Piece
     ];
 
     /** @var string */
-    public $type;
+    private $type;
 
     /** @var string */
-    public $color;
+    private $color;
 
     /** @var array<string> */
     private static $types = [
@@ -93,11 +93,51 @@ class Piece
 
     public function __toString(): string
     {
-        return self::$pieces[$this->color][$this->type];
+        return $this->toAscii();
     }
 
     public function toAscii(): string
     {
         return $this->color === self::WHITE ? \strtoupper($this->type) : $this->type;
+    }
+
+    public function toUnicode(): string
+    {
+        return self::$pieces[$this->color][$this->type];
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function getColor(): string
+    {
+        return $this->color;
+    }
+
+    public function isBishop(): bool
+    {
+        return $this->type === self::BISHOP;
+    }
+
+    public function isKing(): bool
+    {
+        return $this->type === self::KING;
+    }
+
+    public function isKnight(): bool
+    {
+        return $this->type === self::KNIGHT;
+    }
+
+    public function isPawn(): bool
+    {
+        return $this->type === self::PAWN;
+    }
+
+    public function jsonSerialize(): string
+    {
+        return $this->toAscii();
     }
 }

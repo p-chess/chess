@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PChess\Chess\Test;
 
 use PChess\Chess\Board;
+use PChess\Chess\Chess;
 use PChess\Chess\Move;
 use PChess\Chess\Piece;
 use PHPUnit\Framework\TestCase;
@@ -27,7 +28,7 @@ class MoveTest extends TestCase
             Board::BITS['NORMAL']
         ));
 
-        $this->assertSame($move->piece->type, Piece::PAWN);
+        $this->assertSame($move->piece->getType(), Piece::PAWN);
         $this->assertSame($move->turn, $chess->turn);
         $this->assertSame($move->fromSquare, Board::SQUARES['a2']);
         $this->assertSame($move->toSquare, Board::SQUARES['a4']);
@@ -496,5 +497,11 @@ class MoveTest extends TestCase
             'Zubakin - Alekhine' => [$match2, '2r5/1pNb1ppk/1p1P2q1/4n3/4P3/1B2Q3/PP6/5R1K w - - 1 31'],
             'Kasparov - Karpov' => [$match3, '6k1/2R1K3/3B2p1/6Pn/8/8/8/1b6 b - - 76 102'],
         ];
+    }
+
+    public function testGetInvalidSquare(): void
+    {
+        $chess = new Chess();
+        $this->assertNull($chess->get('b11'));
     }
 }

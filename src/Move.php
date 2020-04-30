@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PChess\Chess;
 
-class Move
+final class Move implements \JsonSerializable
 {
     /** @var string */
     public $turn;
@@ -59,7 +59,7 @@ class Move
     ): self {
         $captured = null;
         if ($board[$to] !== null) {
-            $captured = $board[$to]->type;
+            $captured = $board[$to]->getType();
         } elseif ($flags & Board::BITS['EP_CAPTURE']) {
             $captured = Piece::PAWN;
         }
@@ -76,5 +76,10 @@ class Move
             $captured,
             $promotion
         );
+    }
+
+    public function jsonSerialize(): string
+    {
+        return $this->turn.$this->flags.$this->piece->toAscii().$this->from.$this->to.$this->promotion;
     }
 }
