@@ -12,7 +12,7 @@ class Move
     /** @var int */
     public $flags;
 
-    /** @var string */
+    /** @var Piece */
     public $piece;
 
     /** @var string */
@@ -36,7 +36,7 @@ class Move
     /** @var string|null */
     public $san;
 
-    public function __construct(string $turn, int $flags, string $piece, int $from, int $to, ?string $captured = null, ?string $promotion = null)
+    public function __construct(string $turn, int $flags, Piece $piece, int $from, int $to, ?string $captured = null, ?string $promotion = null)
     {
         $this->turn = $turn;
         $this->flags = $flags;
@@ -70,7 +70,7 @@ class Move
         return new self(
             $turn,
             $flags,
-            $board[$from]->type,
+            $board[$from],
             $from,
             $to,
             $captured,
