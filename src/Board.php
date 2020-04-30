@@ -20,14 +20,14 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
         'a4' => 64, 'b4' => 65, 'c4' => 66, 'd4' => 67, 'e4' => 68, 'f4' => 69, 'g4' => 70, 'h4' => 71,
         'a3' => 80, 'b3' => 81, 'c3' => 82, 'd3' => 83, 'e3' => 84, 'f3' => 85, 'g3' => 86, 'h3' => 87,
         'a2' => 96, 'b2' => 97, 'c2' => 98, 'd2' => 99, 'e2' => 100, 'f2' => 101, 'g2' => 102, 'h2' => 103,
-        'a1' => 112, 'b1' => 113, 'c1' => 114, 'd1' => 115, 'e1' => 116, 'f1' => 117, 'g1' => 118, 'h1' => 119
+        'a1' => 112, 'b1' => 113, 'c1' => 114, 'd1' => 115, 'e1' => 116, 'f1' => 117, 'g1' => 118, 'h1' => 119,
     ];
 
     public const ROOKS = [
         Piece::WHITE => [['square' => self::SQUARES['a1'], 'flag' => self::BITS['QSIDE_CASTLE']],
-            ['square' => Board::SQUARES['h1'], 'flag' => self::BITS['KSIDE_CASTLE']]],
+            ['square' => self::SQUARES['h1'], 'flag' => self::BITS['KSIDE_CASTLE']], ],
         Piece::BLACK => [['square' => self::SQUARES['a8'], 'flag' => self::BITS['QSIDE_CASTLE']],
-            ['square' => Board::SQUARES['h8'], 'flag' => self::BITS['KSIDE_CASTLE']]]
+            ['square' => self::SQUARES['h8'], 'flag' => self::BITS['KSIDE_CASTLE']], ],
     ];
 
     public const BITS = [
@@ -37,7 +37,7 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
         'EP_CAPTURE' => 8,
         'PROMOTION' => 16,
         'KSIDE_CASTLE' => 32,
-        'QSIDE_CASTLE' => 64
+        'QSIDE_CASTLE' => 64,
     ];
 
     public const RANK_1 = 7;
@@ -60,7 +60,7 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
         0, 0, 0,20, 0, 0, 0, 24,  0, 0, 0,20, 0, 0, 0, 0,
         0, 0,20, 0, 0, 0, 0, 24,  0, 0, 0, 0,20, 0, 0, 0,
         0,20, 0, 0, 0, 0, 0, 24,  0, 0, 0, 0, 0,20, 0, 0,
-        20, 0, 0, 0, 0, 0, 0, 24,  0, 0, 0, 0, 0, 0,20
+        20, 0, 0, 0, 0, 0, 0, 24,  0, 0, 0, 0, 0, 0,20,
     ];
 
     public const RAYS = [
@@ -78,7 +78,7 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
         0,  0,  0,-15,  0,  0,  0,-16,  0,  0,  0,-17,  0,  0,  0, 0,
         0,  0,-15,  0,  0,  0,  0,-16,  0,  0,  0,  0,-17,  0,  0, 0,
         0,-15,  0,  0,  0,  0,  0,-16,  0,  0,  0,  0,  0,-17,  0, 0,
-        -15,  0,  0,  0,  0,  0,  0,-16,  0,  0,  0,  0,  0,  0,-17
+        -15,  0,  0,  0,  0,  0,  0,-16,  0,  0,  0,  0,  0,  0,-17,
     ];
 
     /** @var array<int, ?Piece> */

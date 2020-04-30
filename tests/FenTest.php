@@ -17,7 +17,7 @@ class FenTest extends TestCase
         $chess->clear();
         $this->assertSame($chess->fen(), '8/8/8/8/8/8/8/8 w - - 0 1');
     }
-    
+
     public function testLoad(): void
     {
         $positions = [
@@ -36,27 +36,27 @@ class FenTest extends TestCase
             /* bad piece (X)*/
             ['fen' => '1nbqkbn1/pppp1ppX/8/4p3/4P3/8/PPPP1PPP/1NBQKBN1 b - - 1 2', 'should_pass' => false],
         ];
-        
+
         foreach ($positions as $position) {
             $load = Validation::validateFen($position['fen']);
             //~ echo $position['fen'] . ' => ' . ($load['valid'] ? 'T' : 'F') . PHP_EOL;
             $this->assertEquals($load['valid'], $position['should_pass']);
         }
     }
-    
+
     public function testValidate(): void
     {
         $positions = [
             // 1st criterion: 6 space-separated fields
             ['fen' => '8/8/8/8/8/8/8/8 w 1', 'should_pass' => false],
-            
+
             // 2nd criterion: move number field is a integer value > 0
             ['fen' => '8/8/8/8/8/8/8/8 w - - 0 0', 'should_pass' => false],
             ['fen' => '8/8/8/8/8/8/8/8 w - - 0 -10', 'should_pass' => false],
-            
+
             // 3rd criterion: half move counter is an integer >= 0
             ['fen' => '8/8/8/8/8/8/8/8 w - - -10 1', 'should_pass' => false],
-            
+
             // 4th criterion: 4th field is a valid e.p.-string
             ['fen' => '8/8/8/8/8/8/8/8 w - - 0 1', 'should_pass' => true],
             ['fen' => '8/8/8/8/8/8/8/8 b - a3 0 1', 'should_pass' => true],
@@ -67,7 +67,7 @@ class FenTest extends TestCase
             ['fen' => '8/8/8/8/8/8/8/8 w - e5 0 1', 'should_pass' => false],
             ['fen' => '8/8/8/8/8/8/8/8 w - e51 0 1', 'should_pass' => false],
             ['fen' => '8/8/8/8/8/8/8/8 w - ea351 0 1', 'should_pass' => false],
-            
+
             // 5th criterion: 3th field is a valid castle-string
             ['fen' => '8/8/8/8/8/8/8/8 w KQkq - 0 1', 'should_pass' => true],
             ['fen' => '8/8/8/8/8/8/8/8 w KQk - 0 1', 'should_pass' => true],
@@ -82,32 +82,32 @@ class FenTest extends TestCase
             ['fen' => '8/8/8/8/8/8/8/8 w a - 0 1', 'should_pass' => false],
             ['fen' => '8/8/8/8/8/8/8/8 w K- - 0 1', 'should_pass' => false],
             ['fen' => '8/8/8/8/8/8/8/8 w -q - 0 1', 'should_pass' => false],
-            
+
             // 6th criterion: 2nd field is "w" (white) or "b" (black)
             ['fen' => '8/8/8/8/8/8/8/8 w - - 0 1', 'should_pass' => true],
             ['fen' => '8/8/8/8/8/8/8/8 b - - 0 1', 'should_pass' => true],
             ['fen' => '8/8/8/8/8/8/8/8 a - - 0 1', 'should_pass' => false],
-            
+
             // 7th criterion: 1st field contains 8 rows
             ['fen' => '8/8/8/8/8/8/8/8/8 w - - 0 1', 'should_pass' => false],
             ['fen' => '8/8/8/8/8/8/8 w - - 0 1', 'should_pass' => false],
-            
+
             // 8th criterion: every row is valid
             ['fen' => '8/8/8/8/8/44/8/8 w - - 0 1', 'should_pass' => false],
-            
+
             // 9th criterion: check symbols of piece
             ['fen' => '8/8/8/8/8/8/8/6k1 w - - 0 1', 'should_pass' => true],
             ['fen' => '8/8/8/8/8/8/8/6q1 w - - 0 1', 'should_pass' => true],
             ['fen' => '8/8/8/8/8/8/8/6B1 w - - 0 1', 'should_pass' => true],
             ['fen' => '8/8/8/8/8/8/8/6N1 w - - 0 1', 'should_pass' => true],
             ['fen' => '8/8/8/8/8/8/8/6d1 w - - 0 1', 'should_pass' => false],
-            
+
             // 10th criterion: check sum piece + empty square must be 8
             ['fen' => '8/8/8/8/8/8/8/4k3 w - - 0 1', 'should_pass' => true],
             ['fen' => '8/8/8/8/8/8/8/4k4 w - - 0 1', 'should_pass' => false],
             ['fen' => '8/8/8/8/8/8/8/5k3 w - - 0 1', 'should_pass' => false],
             ['fen' => '8/8/8/8/8/8/8/2k2 w - - 0 1', 'should_pass' => false],
-            
+
             // original from chess.js test
             ['fen' => 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNRw KQkq - 0 1',   'error_number' => 1, 'should_pass' => false],
             ['fen' => 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 x',  'error_number' => 2, 'should_pass' => false],
@@ -234,14 +234,14 @@ class FenTest extends TestCase
             ['fen' => 'r1rb2k1/5ppp/pqp5/3pPb2/QB1P4/2R2N2/P4PPP/2R3K1 b - - 7 23', 'error_number' => 0, 'should_pass' => true],
             ['fen' => '3r1r2/3P2pk/1p1R3p/1Bp2p2/6q1/4Q3/PP3P1P/7K w - - 4 30', 'error_number' => 0, 'should_pass' => true],
         ];
-        
+
         foreach ($positions as $position) {
             $load = Validation::validateFen($position['fen']);
             //~ echo $position['fen'] . ' => ' . ($load['valid'] ? 'T' : 'F') . PHP_EOL;
             $this->assertEquals($load['valid'], $position['should_pass']);
         }
     }
-    
+
     public function testGeneration(): void
     {
         $positions = [
@@ -267,9 +267,8 @@ class FenTest extends TestCase
             ['fen' => '8/k7/Pr2R3/7p/8/4n1P1/1r2p1P1/4R1K1 w - - 0 59', 'error_number' => 0, 'should_pass' => true],
             ['fen' => '3r1r2/3P2pk/1p1R3p/1Bp2p2/6q1/4Q3/PP3P1P/7K w - - 4 30', 'error_number' => 0, 'should_pass' => true],
         ];
-        
-        
-        $chess = new Chess;
+
+        $chess = new Chess();
         foreach ($positions as $position) {
             $chess->load($position['fen']);
             $this->assertEquals($position['fen'], $chess->fen());

@@ -388,7 +388,6 @@ class Chess
             }
         }
 
-
         if ($us === Piece::BLACK) {
             ++$this->moveNumber;
         }

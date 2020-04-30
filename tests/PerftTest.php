@@ -17,7 +17,7 @@ class PerftTest extends TestCase
         $this->assertSame($chess->perft(2), 400);
         //~ $this->assertSame($chess->perft(3), 8902);
     }
-    
+
     // Position 2 also know as "Kiwipete" by Peter McKenzie
     public function test2(): void
     {
@@ -26,7 +26,7 @@ class PerftTest extends TestCase
         $this->assertSame($chess->perft(2), 2039);
         //~ $this->assertSame($chess->perft(3), 97862);
     }
-    
+
     // Position 3
     public function test3(): void
     {
@@ -35,7 +35,7 @@ class PerftTest extends TestCase
         $this->assertSame($chess->perft(2), 191);
         //~ $this->assertSame($chess->perft(3), 2812);
     }
-    
+
     // Position 4
     public function test4(): void
     {
@@ -44,7 +44,7 @@ class PerftTest extends TestCase
         $this->assertSame($chess->perft(2), 264);
         //~ $this->assertSame($chess->perft(3), 9467);
     }
-    
+
     // Position 5
     public function test5(): void
     {
@@ -53,7 +53,7 @@ class PerftTest extends TestCase
         $this->assertSame($chess->perft(2), 1486);
         //~ $this->assertSame($chess->perft(3), 62379);
     }
-    
+
     // Position 6 An alternative Perft given by Steven Edwards
     public function test6(): void
     {
@@ -62,7 +62,7 @@ class PerftTest extends TestCase
         $this->assertSame($chess->perft(2), 2079);
         //~ $this->assertSame($chess->perft(3), 89890);
     }
-    
+
     // Tests that square '0' cannot be confused for the EP square when EP square is null
     public function test7(): void
     {

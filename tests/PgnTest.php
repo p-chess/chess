@@ -40,7 +40,6 @@ class PgnTest extends TestCase
         $chess->header('FEN', $fen);
         $pgn = $chess->pgn();
 
-
         // check setup ok
         $this->assertStringContainsString('[White "John"]', $pgn);
         $this->assertStringContainsString('[Black "Cena"]', $pgn);
@@ -89,7 +88,6 @@ class PgnTest extends TestCase
         $this->assertContains('e5', $parsed['moves']);
         $this->assertContains('Nf3', $parsed['moves']);
 
-
         $parsed = Validation::parsePgn(
             <<<EOD
 [Event "Earl tourn"]
@@ -112,7 +110,6 @@ EOD
         $parsed = Validation::validatePgn('1.e4 e5some failed string 2.Nf3');
         $this->assertFalse($parsed);
 
-
         $parsed = Validation::validatePgn(
             <<<EOD
 [Event "Earl tourn"]
@@ -121,7 +118,6 @@ EOD
 EOD
         );
         $this->assertFalse($parsed);
-
 
         $parsed = Validation::validatePgn(
             <<<EOD
@@ -132,7 +128,6 @@ oke failed here
 EOD
         );
         $this->assertFalse($parsed);
-
 
         $parsed = Validation::validatePgn(
             <<<EOD
@@ -152,13 +147,11 @@ EOD
         );
         $this->assertTrue($parsed);
 
-
         $parsed = Validation::validatePgn('1.e4 e5 2.Nf3', ['verbose' => true]);
         $this->assertContains('e4', $parsed['moves']);
         $this->assertContains('e5', $parsed['moves']);
         $this->assertContains('Nf3', $parsed['moves']);
         $this->assertSame($parsed['game']->fen(), 'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2');
-
 
         $parsed = Validation::validatePgn(<<<EOD
 [Event "Earl tourn"]

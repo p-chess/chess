@@ -22,7 +22,7 @@ class ChessPublicator extends Chess
     {
         return $this->history[\count($this->history) - 1];
     }
-    
+
     public function attackedPublic(string $color, int $square): bool
     {
         return $this->attacked($color, $square);
@@ -37,7 +37,7 @@ class ChessPublicator extends Chess
     {
         return $this->generateMoves($options);
     }
-    
+
     public static function buildMovePublic(
         string $turn,
         Board $board,
@@ -48,12 +48,12 @@ class ChessPublicator extends Chess
     ): Move {
         return Move::buildMove($turn, $board, $from, $to, $flags, $promotion);
     }
-    
+
     public function makeMovePublic(Move $move): void
     {
         $this->makeMove($move);
     }
-    
+
     public function undoMovePublic(): ?Move
     {
         return $this->undoMove();
