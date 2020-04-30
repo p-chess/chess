@@ -334,7 +334,7 @@ class Chess
         }
 
         // reset the 50 move counter if a pawn is moved or piece is captured
-        if ($move->piece === Piece::PAWN) {
+        if ($move->piece->type === Piece::PAWN) {
             $this->halfMoves = 0;
         } elseif ($move->flags & (Board::BITS['CAPTURE'] | Board::BITS['EP_CAPTURE'])) {
             $this->halfMoves = 0;
@@ -436,7 +436,7 @@ class Chess
         // to undo any promotions
         $oldFrom = $this->board[$move->fromSquare];
         if (null !== $oldFrom) {
-            $oldFrom->type = $move->piece;
+            $oldFrom->type = $move->piece->type;
         }
         $this->board[$move->fromSquare] = $oldFrom;
         $this->board[$move->toSquare] = null;
@@ -880,7 +880,7 @@ class Chess
 
         $from = $move->fromSquare;
         $to = $move->toSquare;
-        $piece = $move->piece;
+        $pieceType = $move->piece->type;
 
         $ambiguities = 0;
         $sameRank = 0;
@@ -889,16 +889,12 @@ class Chess
         foreach ($moves as $aMove) {
             $ambiguityFrom = $aMove->fromSquare;
             $ambiguityTo = $aMove->toSquare;
-            $ambiguityPiece = $aMove->piece;
+            $ambiguityPieceType = $aMove->piece->type;
 
             /* if a move of the same piece type ends on the same to square, we'll
              * need to add a disambiguator to the algebraic notation
              */
-            if (
-                $piece === $ambiguityPiece &&
-                $from !== $ambiguityFrom &&
-                $to === $ambiguityTo
-            ) {
+            if ($pieceType === $ambiguityPieceType && $from !== $ambiguityFrom && $to === $ambiguityTo) {
                 ++$ambiguities;
                 if (Board::rank($from) === Board::rank($ambiguityFrom)) {
                     ++$sameRank;
@@ -950,14 +946,14 @@ class Chess
             $disambiguator = $this->getDisambiguator($move);
 
             // pawn e2->e4 is "e4", knight g8->f6 is "Nf6"
-            if ($move->piece !== Piece::PAWN) {
-                $output .= \strtoupper($move->piece).$disambiguator;
+            if ($move->piece->type !== Piece::PAWN) {
+                $output .= \strtoupper($move->piece->type).$disambiguator;
             }
 
             // x on capture
             if ($move->flags & (Board::BITS['CAPTURE'] | Board::BITS['EP_CAPTURE'])) {
                 // pawn e5->d6 is "exd6"
-                if ($move->piece === Piece::PAWN) {
+                if ($move->piece->type === Piece::PAWN) {
                     $output .= $move->from[0];
                 }
 
