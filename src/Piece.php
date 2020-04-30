@@ -37,7 +37,7 @@ class Piece
         self::BISHOP => 2,
         self::ROOK => 3,
         self::QUEEN => 4,
-        self::KING => 5
+        self::KING => 5,
     ];
 
     /** @var string */
@@ -57,7 +57,7 @@ class Piece
     ];
 
     /** @var array<string> */
-    private static $colors = [Piece::BLACK, self::WHITE];
+    private static $colors = [self::BLACK, self::WHITE];
 
     /** @var array<string, string[]> */
     private static $pieces = [

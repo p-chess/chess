@@ -18,7 +18,7 @@ class MiscTest extends TestCase
         }
         $this->assertSame($chess->history(), $moves);
     }
-    
+
     public function testHistoryPrettyMoves(): void
     {
         $chess = new ChessPublicator();
