@@ -27,7 +27,7 @@ class MoveTest extends TestCase
             Board::BITS['NORMAL']
         ));
 
-        $this->assertSame($move->piece->type, Piece::PAWN);
+        $this->assertSame($move->piece->getType(), Piece::PAWN);
         $this->assertSame($move->turn, $chess->turn);
         $this->assertSame($move->fromSquare, Board::SQUARES['a2']);
         $this->assertSame($move->toSquare, Board::SQUARES['a4']);

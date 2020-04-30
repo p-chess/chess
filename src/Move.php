@@ -59,7 +59,7 @@ class Move
     ): self {
         $captured = null;
         if ($board[$to] !== null) {
-            $captured = $board[$to]->type;
+            $captured = $board[$to]->getType();
         } elseif ($flags & Board::BITS['EP_CAPTURE']) {
             $captured = Piece::PAWN;
         }

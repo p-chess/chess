@@ -41,10 +41,10 @@ class Piece
     ];
 
     /** @var string */
-    public $type;
+    private $type;
 
     /** @var string */
-    public $color;
+    private $color;
 
     /** @var array<string> */
     private static $types = [
@@ -99,5 +99,20 @@ class Piece
     public function toAscii(): string
     {
         return $this->color === self::WHITE ? \strtoupper($this->type) : $this->type;
+    }
+
+    public function setType(string $type): void
+    {
+        $this->type = $type;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function getColor(): string
+    {
+        return $this->color;
     }
 }
