@@ -217,8 +217,8 @@ class AttackTest extends TestCase
 		22. Rd4 Bxf4 23. Rxf4 Rad8 24. Rxd8 Rxd8 25. Bxf5 Nxf5
 		26. Nxf5 Rd5 27. g4 Bxf5 28. gxf5 h6 29. h3 Kh7 30. Qe2 Qe5
 		31. Qh5 Qf6 32. Qe2 Re5 33.Qd3 Rd5 34.Qe2';
-        $moves = \preg_replace("/([0-9]{0,})\./", '', $match);
-        $moves = \str_replace('  ', ' ', \str_replace("\r", ' ', \str_replace("\n", ' ', \str_replace("\t", '', $moves))));
+        $moves = \preg_replace("/(\d*)\./", '', $match);
+        $moves = \str_replace(["\t", "\n", "\r", '  '], ['', ' ', ' ', ' '], $moves);
         $moves = \explode(' ', \trim($moves));
         foreach ($moves as $move) {
             $this->assertNotNull($chess->move($move), $move);
