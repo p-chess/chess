@@ -36,7 +36,7 @@ class Chess
         $this->board = new Board();
         $this->clear();
 
-        if ((string) $fen !== '') {
+        if (null !== $fen) {
             $this->load($fen);
         } else {
             $this->reset();
@@ -81,10 +81,7 @@ class Chess
     private static function addMove(string $turn, Board $board, array &$moves, int $from, int $to, int $flags): void
     {
         // if pawn promotion
-        if (
-            $board[$from]->type === Piece::PAWN &&
-            (Board::rank($to) === Board::RANK_8 || Board::rank($to) === Board::RANK_1)
-        ) {
+        if ($board[$from]->isPawn() && (Board::rank($to) === Board::RANK_8 || Board::rank($to) === Board::RANK_1)) {
             $promotionPieces = [Piece::QUEEN, Piece::ROOK, Piece::BISHOP, Piece::KNIGHT];
             foreach ($promotionPieces as $promotionPiece) {
                 $moves[] = Move::buildMove($turn, $board, $from, $to, $flags, $promotionPiece);
@@ -264,8 +261,8 @@ class Chess
         $piece = $this->get($square);
         $this->board[Board::SQUARES[$square]] = null;
 
-        if ($piece !== null && $piece->type === Piece::KING) {
-            $this->kings[$piece->color] = null;
+        if ($piece !== null && $piece->isKing()) {
+            $this->kings[$piece->getColor()] = null;
         }
 
         $this->updateSetup($this->fen());
@@ -293,13 +290,13 @@ class Chess
         $sq = Board::SQUARES[$square];
 
         // don't let the use place more than one king
-        if ($piece->type === Piece::KING && !($this->kings[$piece->color] === null || $this->kings[$piece->color] === $sq)) {
+        if ($piece->isKing() && !($this->kings[$piece->getColor()] === null || $this->kings[$piece->getColor()] === $sq)) {
             return false;
         }
 
         $this->board[$sq] = $piece;
-        if ($piece->type === Piece::KING) {
-            $this->kings[$piece->color] = $sq;
+        if ($piece->isKing()) {
+            $this->kings[$piece->getColor()] = $sq;
         }
 
         $this->updateSetup($this->fen());
@@ -334,7 +331,7 @@ class Chess
         }
 
         // reset the 50 move counter if a pawn is moved or piece is captured
-        if ($move->piece->type === Piece::PAWN) {
+        if ($move->piece->isPawn()) {
             $this->halfMoves = 0;
         } elseif ($move->flags & (Board::BITS['CAPTURE'] | Board::BITS['EP_CAPTURE'])) {
             $this->halfMoves = 0;
@@ -343,7 +340,7 @@ class Chess
         }
 
         // if we moved the king
-        if (null !== $this->board[$move->toSquare] && $this->board[$move->toSquare]->type === Piece::KING) {
+        if (null !== $this->board[$move->toSquare] && $this->board[$move->toSquare]->isKing()) {
             $this->kings[$us] = $move->toSquare;
 
             // if we castled, move the rook next to the king
@@ -433,10 +430,9 @@ class Chess
         $them = self::swapColor($us);
 
         $this->board[$move->fromSquare] = $this->board[$move->toSquare];
-        // to undo any promotions
-        $oldFrom = $this->board[$move->fromSquare];
-        if (null !== $oldFrom) {
-            $oldFrom->type = $move->piece->type;
+        if (null !== $oldFrom = $this->board[$move->fromSquare]) {
+            // to undo any promotions
+            $oldFrom = new Piece($move->piece->getType(), $move->piece->getColor());
         }
         $this->board[$move->fromSquare] = $oldFrom;
         $this->board[$move->toSquare] = null;
@@ -516,11 +512,11 @@ class Chess
             } // check edge of board
 
             $piece = $this->board[$i];
-            if ($piece === null || $piece->color !== $us) {
+            if ($piece === null || $piece->getColor() !== $us) {
                 continue;
             }
 
-            if ($piece->type === Piece::PAWN) {
+            if ($piece->isPawn()) {
                 // single square, non-capturing
                 $square = $i + Piece::PAWN_OFFSETS[$us][0];
                 if ($this->board[$square] === null) {
@@ -540,7 +536,7 @@ class Chess
                         continue;
                     }
                     if ($this->board[$square] !== null) {
-                        if ($this->board[$square]->color === $them) {
+                        if ($this->board[$square]->getColor() === $them) {
                             self::addMove($us, $this->board, $moves, $i, $square, Board::BITS['CAPTURE']);
                         }
                     } elseif ($square === $this->epSquare) { // get epSquare from enemy
@@ -548,7 +544,7 @@ class Chess
                     }
                 }
             } else {
-                foreach (Piece::OFFSETS[$piece->type] as $jValue) {
+                foreach (Piece::OFFSETS[$piece->getType()] as $jValue) {
                     $offset = $jValue;
                     $square = $i;
 
@@ -561,14 +557,14 @@ class Chess
                         if ($this->board[$square] === null) {
                             self::addMove($us, $this->board, $moves, $i, $square, Board::BITS['NORMAL']);
                         } else {
-                            if ($this->board[$square]->color === $us) {
+                            if ($this->board[$square]->getColor() === $us) {
                                 break;
                             }
                             self::addMove($us, $this->board, $moves, $i, $square, Board::BITS['CAPTURE']);
                             break;
                         }
 
-                        if ($piece->type === Piece::KNIGHT || $piece->type === Piece::KING) {
+                        if ($piece->isKnight() || $piece->isKing()) {
                             break;
                         }
                     }
@@ -705,26 +701,26 @@ class Chess
             }
             $piece = $this->board[$i];
             // check empty square and color
-            if (null === $piece || $piece->color !== $color) {
+            if (null === $piece || $piece->getColor() !== $color) {
                 continue;
             }
 
             $difference = $i - $square;
             $index = $difference + 119;
 
-            if (Board::ATTACKS[$index] & (1 << Piece::SHIFTS[$piece->type])) {
-                if ($piece->type === Piece::PAWN) {
+            if (Board::ATTACKS[$index] & (1 << Piece::SHIFTS[$piece->getType()])) {
+                if ($piece->isPawn()) {
                     if ($difference > 0) {
-                        if ($piece->color === Piece::WHITE) {
+                        if ($piece->getColor() === Piece::WHITE) {
                             return true;
                         }
-                    } elseif ($piece->color === Piece::BLACK) {
+                    } elseif ($piece->getColor() === Piece::BLACK) {
                         return true;
                     }
                     continue;
                 }
 
-                if ($piece->type === Piece::KNIGHT || $piece->type === Piece::KING) {
+                if ($piece->isKnight() || $piece->isKing()) {
                     return true;
                 }
 
@@ -791,8 +787,8 @@ class Chess
 
             $piece = $this->board[$i];
             if ($piece !== null) {
-                ++$pieces[$piece->type];
-                if ($piece->type === Piece::BISHOP) {
+                ++$pieces[$piece->getType()];
+                if ($piece->isBishop()) {
                     $bishops[] = $sqColor;
                 }
                 ++$numPieces;
@@ -880,7 +876,7 @@ class Chess
 
         $from = $move->fromSquare;
         $to = $move->toSquare;
-        $pieceType = $move->piece->type;
+        $pieceType = $move->piece->getType();
 
         $ambiguities = 0;
         $sameRank = 0;
@@ -889,7 +885,7 @@ class Chess
         foreach ($moves as $aMove) {
             $ambiguityFrom = $aMove->fromSquare;
             $ambiguityTo = $aMove->toSquare;
-            $ambiguityPieceType = $aMove->piece->type;
+            $ambiguityPieceType = $aMove->piece->getType();
 
             /* if a move of the same piece type ends on the same to square, we'll
              * need to add a disambiguator to the algebraic notation
@@ -946,14 +942,14 @@ class Chess
             $disambiguator = $this->getDisambiguator($move);
 
             // pawn e2->e4 is "e4", knight g8->f6 is "Nf6"
-            if ($move->piece->type !== Piece::PAWN) {
-                $output .= \strtoupper($move->piece->type).$disambiguator;
+            if (!$move->piece->isPawn()) {
+                $output .= \strtoupper($move->piece->getType()).$disambiguator;
             }
 
             // x on capture
             if ($move->flags & (Board::BITS['CAPTURE'] | Board::BITS['EP_CAPTURE'])) {
                 // pawn e5->d6 is "exd6"
-                if ($move->piece->type === Piece::PAWN) {
+                if ($move->piece->isPawn()) {
                     $output .= $move->from[0];
                 }
 

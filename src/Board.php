@@ -149,7 +149,7 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
 
     public function jsonSerialize(): string
     {
-        return \json_encode($this->squares);
+        return \implode(' ', $this->squares);
     }
 
     public static function rank(int $i): int
