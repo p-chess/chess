@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace PChess\Chess\Output;
 
-use PChess\Chess\Board;
 use PChess\Chess\Chess;
 
 final class AsciiOutput extends BasicOutput implements OutputInterface
@@ -12,22 +11,17 @@ final class AsciiOutput extends BasicOutput implements OutputInterface
     public function render(Chess $chess): string
     {
         $output = self::$line;
+        $reversed = $chess->board->isReversed();
         foreach ($chess->board as $i => $piece) {
-            if (Board::file($i) === 0) {
-                $output .= ' '.\substr('87654321', Board::rank($i), 1).' |';
-            }
-
+            $output .= self::getLines($reversed, $i);
             if (null === $piece) {
                 $output .= '   |';
             } else {
                 $output .= ' '.$piece->toAscii().' |';
             }
-
-            if (($i + 1) & 0x88) {
-                $output .= ' '.PHP_EOL.self::$line;
-            }
+            $output .= self::getEndLine($reversed, $i);
         }
-        $output .= self::$bottom;
+        $output .= self::getRanks($reversed).PHP_EOL;
 
         return $output;
     }

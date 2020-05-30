@@ -84,6 +84,9 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
     /** @var array<int, ?Piece> */
     private $squares = [];
 
+    /** @var bool */
+    private $reversed = false;
+
     /**
      * @param int $offset
      */
@@ -150,6 +153,18 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
     public function jsonSerialize(): string
     {
         return \implode(' ', $this->squares);
+    }
+
+    public function reverse(): void
+    {
+        $this->squares = \array_reverse($this->squares, true);
+        $this->rewind();
+        $this->reversed = !$this->reversed;
+    }
+
+    public function isReversed(): bool
+    {
+        return $this->reversed;
     }
 
     public static function rank(int $i): int
