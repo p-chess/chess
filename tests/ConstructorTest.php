@@ -28,4 +28,15 @@ class ConstructorTest extends TestCase
         $output = new Output\UnicodeOutput();
         $this->assertStringContainsString('♙ ', $output->render($chess));
     }
+
+    public function testReversedeOutput(): void
+    {
+        $chess = new Chess();
+        $output = new Output\AsciiOutput();
+        $this->assertStringStartsWith('   +---+---+---+---+---+---+---+---+
+ 8', $output->render($chess));
+        $chess->board->reverse();
+        $this->assertStringStartsWith('   +---+---+---+---+---+---+---+---+
+ 1', $output->render($chess));
+    }
 }
