@@ -147,7 +147,7 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
 
     public function rewind(): ?Piece
     {
-        return \reset($this->squares);
+        return empty($this->squares) ? null : \reset($this->squares);
     }
 
     public function jsonSerialize(): string

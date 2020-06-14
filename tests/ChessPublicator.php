@@ -85,6 +85,9 @@ class ChessPublicator extends Chess
             if (!$this->kingAttacked($color)) {
                 if ($depth - 1 > 0) {
                     $childs = $this->perft($depth - 1, true);
+                    if (!\is_array($childs)) {
+                        continue;
+                    }
                     $nodes += $childs['nodes'];
                     $captures += $childs['captures'];
                     $enPassants += $childs['enPassants'];

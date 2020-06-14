@@ -27,10 +27,13 @@ class MiscTest extends TestCase
         foreach ($moves as $move) {
             $this->assertNotNull($chess->move($move), $move);
         }
-        $histories = $chess->history(['verbose' => true]);
+        $histories = $chess->history(true);
 
         $this->assertCount(\count($histories), $moves);
         foreach ($histories as $k => $history) {
+            if (!\is_object($history)) {
+                continue;
+            }
             $this->assertSame($history->san, $moves[$k]);
         }
     }
