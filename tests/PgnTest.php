@@ -145,9 +145,7 @@ EOD
 
         $parsed = Validation::validatePgn('1.e4 e5 2.Nf3', ['verbose' => true]);
         if (!\is_array($parsed)) {
-            $this->markTestSkipped();
-
-            return;
+            throw new \RuntimeException('Invalid result from validatePgn call.');
         }
         $this->assertContains('e4', $parsed['moves']);
         $this->assertContains('e5', $parsed['moves']);
