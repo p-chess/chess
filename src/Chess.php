@@ -45,7 +45,8 @@ class Chess
 
     public function clear(): void
     {
-        $this->boardHash = \json_encode($this->board);
+        $boardHash = \json_encode($this->board);
+        $this->boardHash = false === $boardHash ? '' : $boardHash;
         $this->kings = [Piece::WHITE => null, Piece::BLACK => null];
         $this->turn = Piece::WHITE;
         $this->castling = [Piece::WHITE => 0, Piece::BLACK => 0];
@@ -213,16 +214,13 @@ class Chess
     }
 
     /**
-     * @param array<string, mixed> $options
-     *
-     * @return array<Move>
+     * @return array<int, Move|string|null>
      */
-    public function history(array $options = []): array
+    public function history(bool $verbose = false): array
     {
         $moveHistory = [];
         $gameTmp = !empty($this->header['SetUp']) ? new self($this->header['FEN']) : new self();
         $moveTmp = [];
-        $verbose = $options['verbose'] ?? false;
 
         foreach ($this->history as $history) {
             $moveTmp['to'] = $history->move->to;
@@ -390,7 +388,8 @@ class Chess
         }
         $this->turn = $them;
 
-        $this->boardHash = \json_encode($this->board);
+        $boardHash = \json_encode($this->board);
+        $this->boardHash = false === $boardHash ? '' : $boardHash;
         $this->history[$historyKey]->position = $this->boardHash;
     }
 
@@ -459,7 +458,8 @@ class Chess
             $this->board[$castlingFrom] = null;
         }
 
-        $this->boardHash = \json_encode($this->board);
+        $boardHash = \json_encode($this->board);
+        $this->boardHash = false === $boardHash ? '' : $boardHash;
 
         return $move;
     }

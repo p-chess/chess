@@ -43,8 +43,8 @@ final class Move implements \JsonSerializable
         $this->piece = $piece;
         $this->fromSquare = $from;
         $this->toSquare = $to;
-        $this->from = \array_search($from, Board::SQUARES);
-        $this->to = \array_search($to, Board::SQUARES);
+        $this->from = self::getSquare($from);
+        $this->to = self::getSquare($to);
         $this->captured = $captured;
         $this->promotion = $promotion;
     }
@@ -81,5 +81,15 @@ final class Move implements \JsonSerializable
     public function jsonSerialize(): string
     {
         return $this->turn.$this->flags.$this->piece->toAscii().$this->from.$this->to.$this->promotion;
+    }
+
+    private static function getSquare(int $code): string
+    {
+        $fen = \array_search($code, Board::SQUARES, true);
+        if (false === $fen) {
+            throw new \InvalidArgumentException('Invalid board code: '.$code);
+        }
+
+        return $fen;
     }
 }

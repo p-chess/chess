@@ -51,9 +51,6 @@ class PgnTest extends TestCase
         $this->assertStringContainsString('3. Nc3 Nf6', $pgn);
         $this->assertStringContainsString('4. Bg5 dxe4', $pgn);
         $this->assertStringContainsString('5. Nxe4 Be7', $pgn);
-        // .
-        // .
-        // .
         $this->assertStringContainsString('8. Nc3 Bf6', $pgn);
     }
 
@@ -70,7 +67,6 @@ class PgnTest extends TestCase
 
         //~ $pgn = $chess->pgn([ 'max_width' => 40, 'new_line' => PHP_EOL ]);
         $pgn = $chess->pgn();
-        //~ echo $pgn;exit;
 
         // check setup ok
         $this->assertStringContainsString('[SetUp "1"]', $pgn);
@@ -148,6 +144,9 @@ EOD
         $this->assertTrue($parsed);
 
         $parsed = Validation::validatePgn('1.e4 e5 2.Nf3', ['verbose' => true]);
+        if (!\is_array($parsed)) {
+            throw new \RuntimeException('Invalid result from validatePgn call.');
+        }
         $this->assertContains('e4', $parsed['moves']);
         $this->assertContains('e5', $parsed['moves']);
         $this->assertContains('Nf3', $parsed['moves']);
@@ -159,6 +158,11 @@ EOD
 1.e4 e5 2.Nf3
 EOD
         , ['verbose' => true]);
+        if (!\is_array($parsed)) {
+            $this->markTestSkipped();
+
+            return;
+        }
         $this->assertEquals(['Event' => 'Earl tourn', 'Site' => '?'], $parsed['header']);
         $this->assertContains('e4', $parsed['moves']);
         $this->assertContains('e5', $parsed['moves']);

@@ -12,7 +12,7 @@ class History
     /** @var string */
     public $position;
 
-    /** @var array<string, int> */
+    /** @var array<string, ?int> */
     public $kings;
 
     /** @var string */
@@ -31,7 +31,7 @@ class History
     public $moveNumber;
 
     /**
-     * @param array<string, int>  $kings
+     * @param array<string, ?int> $kings
      * @param array<string, ?int> $castling
      */
     public function __construct(

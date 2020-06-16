@@ -504,4 +504,11 @@ class MoveTest extends TestCase
         $chess = new Chess();
         $this->assertNull($chess->get('b11'));
     }
+
+    public function testInvalidConstruct(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid board code: 24');
+        new Move('b', 0, new Piece('p', 'b'), 24, 1);
+    }
 }

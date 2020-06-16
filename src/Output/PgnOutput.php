@@ -28,7 +28,8 @@ final class PgnOutput implements OutputInterface
         // process movements
         $currentWidth = 0;
         $i = 1;
-        foreach ($chess->history(['verbose' => true]) as $history) {
+        /** @var \PChess\Chess\Move $history */
+        foreach ($chess->history(true) as $history) {
             if ($i === 1 && $history->turn === Piece::BLACK) {
                 $tmp = $i.'. ... ';
                 ++$i;
