@@ -12,13 +12,13 @@ class PieceTest extends TestCase
     public function testPieceString(): void
     {
         $piece = new Piece('p', 'w');
-        $this->assertEquals('P', (string) $piece);
+        self::assertEquals('P', (string) $piece);
     }
 
     public function testJson(): void
     {
         $piece = new Piece('p', 'w');
-        $this->assertEquals('"P"', \json_encode($piece));
+        self::assertEquals('"P"', \json_encode($piece));
     }
 
     public function testInvalidPieceType(): void
