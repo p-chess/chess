@@ -4,7 +4,7 @@
   ref_type: "WILDCARD"
   trigger_condition: "ALWAYS"
   actions:
-      - action: "Execute: composer build"
+      - action: "Build and test on 7.4"
         type: "BUILD"
         working_directory: "/buddy/chess"
         docker_image_name: "library/php"
@@ -13,6 +13,27 @@
             - "composer validate"
             - "composer install"
             - "composer build-ci"
+            - "composer phpstan"
+            - "bash <(curl -s https://codecov.io/bash)"
+        setup_commands:
+            - "echo \"memory_limit=-1\" >> /usr/local/etc/php/conf.d/buddy.ini"
+            - "apt-get update && apt-get install -y git zip"
+            - "curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer"
+            - "pecl install pcov && docker-php-ext-enable pcov"
+        volume_mappings:
+            - "/:/buddy/chess"
+        trigger_condition: "ALWAYS"
+        shell: "BASH"
+      - action: "Build and test on 8.0"
+        type: "BUILD"
+        working_directory: "/buddy/chess"
+        docker_image_name: "library/php"
+        docker_image_tag: "8.0"
+        execute_commands:
+            - "composer validate"
+            - "composer install"
+            - "composer build-ci"
+            - "composer phpstan"
             - "bash <(curl -s https://codecov.io/bash)"
         setup_commands:
             - "echo \"memory_limit=-1\" >> /usr/local/etc/php/conf.d/buddy.ini"
