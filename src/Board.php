@@ -122,6 +122,9 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
         unset($this->squares[$offset]);
     }
 
+    /**
+     * @return Piece|null
+     */
     public function current()
     {
         return \current($this->squares) !== false ? \current($this->squares): null;
