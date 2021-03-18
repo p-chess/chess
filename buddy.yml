@@ -10,6 +10,7 @@
         docker_image_name: "library/php"
         docker_image_tag: "7.4"
         execute_commands:
+            - "rm -rf composer.lock"
             - "composer validate"
             - "composer install"
             - "composer build-ci"
