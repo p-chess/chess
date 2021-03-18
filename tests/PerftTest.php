@@ -15,9 +15,9 @@ class PerftTest extends TestCase
     public function testPerft(string $fen, int $expectedDeep1, int $expectedDeep2): void
     {
         $chess = new ChessPublicator($fen);
-        self::assertEquals($expectedDeep1, $chess->perft(1));
+        $this->assertEquals($expectedDeep1, $chess->perft(1));
         $chess->reset();
-        self::assertEquals($expectedDeep2, $chess->perft(2));
+        $this->assertEquals($expectedDeep2, $chess->perft(2));
     }
 
     /**

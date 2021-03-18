@@ -124,7 +124,7 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
 
     public function current()
     {
-        return false === \current($this->squares) ? null : \current($this->squares);
+        return \current($this->squares);
     }
 
     /**

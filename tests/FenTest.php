@@ -15,7 +15,7 @@ class FenTest extends TestCase
     {
         $chess = new Chess();
         $chess->clear();
-        self::assertSame($chess->fen(), '8/8/8/8/8/8/8/8 w - - 0 1');
+        $this->assertSame($chess->fen(), '8/8/8/8/8/8/8/8 w - - 0 1');
     }
 
     public function testLoad(): void
@@ -40,7 +40,7 @@ class FenTest extends TestCase
         foreach ($positions as $position) {
             $load = Validation::validateFen($position['fen']);
             //~ echo $position['fen'] . ' => ' . ($load['valid'] ? 'T' : 'F') . PHP_EOL;
-            self::assertEquals($load['valid'], $position['should_pass']);
+            $this->assertEquals($load['valid'], $position['should_pass']);
         }
     }
 
@@ -238,7 +238,7 @@ class FenTest extends TestCase
         foreach ($positions as $position) {
             $load = Validation::validateFen($position['fen']);
             //~ echo $position['fen'] . ' => ' . ($load['valid'] ? 'T' : 'F') . PHP_EOL;
-            self::assertEquals($load['valid'], $position['should_pass']);
+            $this->assertEquals($load['valid'], $position['should_pass']);
         }
     }
 
@@ -271,7 +271,7 @@ class FenTest extends TestCase
         $chess = new Chess();
         foreach ($positions as $position) {
             $chess->load($position['fen']);
-            self::assertEquals($position['fen'], $chess->fen());
+            $this->assertEquals($position['fen'], $chess->fen());
         }
     }
 }

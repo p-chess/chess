@@ -17,26 +17,26 @@ class ConstructorTest extends TestCase
         $b = new Chess();
         $b->load(Board::DEFAULT_POSITION);
         $output = new Output\AsciiOutput();
-        self::assertEquals($output->render($a), $output->render($b));
+        $this->assertEquals($output->render($a), $output->render($b));
         $b->reset();
-        self::assertEquals($output->render($a), $output->render($b));
+        $this->assertEquals($output->render($a), $output->render($b));
     }
 
     public function testUnicodeOutput(): void
     {
         $chess = new Chess();
         $output = new Output\UnicodeOutput();
-        self::assertStringContainsString('♙ ', $output->render($chess));
+        $this->assertStringContainsString('♙ ', $output->render($chess));
     }
 
     public function testReversedeOutput(): void
     {
         $chess = new Chess();
         $output = new Output\AsciiOutput();
-        self::assertStringStartsWith('   +---+---+---+---+---+---+---+---+
+        $this->assertStringStartsWith('   +---+---+---+---+---+---+---+---+
  8', $output->render($chess));
         $chess->board->reverse();
-        self::assertStringStartsWith('   +---+---+---+---+---+---+---+---+
+        $this->assertStringStartsWith('   +---+---+---+---+---+---+---+---+
  1', $output->render($chess));
     }
 }

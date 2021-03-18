@@ -14,9 +14,9 @@ class MiscTest extends TestCase
         $moves = ['e4','e6','d4','d5','Nc3','Nf6','Bg5','dxe4','Nxe4','Be7','Bxf6','gxf6','g3','f5','Nc3','Bf6'];
 
         foreach ($moves as $move) {
-            self::assertNotNull($chess->move($move), $move);
+            $this->assertNotNull($chess->move($move), $move);
         }
-        self::assertSame($chess->history(), $moves);
+        $this->assertSame($chess->history(), $moves);
     }
 
     public function testHistoryPrettyMoves(): void
@@ -25,16 +25,16 @@ class MiscTest extends TestCase
         $moves = ['e4','e6','d4','d5','Nc3','Nf6','Bg5','dxe4','Nxe4','Be7','Bxf6','gxf6','g3','f5','Nc3','Bf6'];
 
         foreach ($moves as $move) {
-            self::assertNotNull($chess->move($move), $move);
+            $this->assertNotNull($chess->move($move), $move);
         }
         $histories = $chess->history(true);
 
-        self::assertCount(\count($histories), $moves);
+        $this->assertCount(\count($histories), $moves);
         foreach ($histories as $k => $history) {
             if (!\is_object($history)) {
                 continue;
             }
-            self::assertSame($history->san, $moves[$k]);
+            $this->assertSame($history->san, $moves[$k]);
         }
     }
 
@@ -45,7 +45,7 @@ class MiscTest extends TestCase
         $chess->moves();
         $moves = $chess->moves();
         foreach ($moves as $move) {
-            self::assertNotNull($move->san);
+            $this->assertNotNull($move->san);
         }
     }
 }
