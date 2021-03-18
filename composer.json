@@ -18,15 +18,15 @@
         }
     ],
     "require": {
-        "php": "^7.2",
+        "php": "^7.2 || ^8.0",
         "ext-json": "*"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.16",
-        "johnkary/phpunit-speedtrap": "^3.2",
-        "phpbench/phpbench": "^0.17.0",
+        "friendsofphp/php-cs-fixer": "^2.18",
+        "johnkary/phpunit-speedtrap": "^3.3",
+        "phpbench/phpbench": "^1.0@alpha",
         "phpstan/phpstan": "^0.12",
-        "phpunit/phpunit": "^8.5 || ^9.0"
+        "phpunit/phpunit": "^8.5 || ^9.5"
     },
     "extra": {
         "branch-alias": {

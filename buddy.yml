@@ -24,7 +24,7 @@
             - "/:/buddy/chess"
         trigger_condition: "ALWAYS"
         shell: "BASH"
-      - action: "Execute: composer build 8.0"
+      - action: "Execute: composer build php 8.0"
         type: "BUILD"
         working_directory: "/buddy/chess"
         docker_image_name: "library/php"
@@ -34,6 +34,7 @@
             - "composer validate"
             - "composer install"
             - "composer build-ci"
+            - "composer phpstan"
             - "bash <(curl -s https://codecov.io/bash)"
         setup_commands:
             - "echo \"memory_limit=-1\" >> /usr/local/etc/php/conf.d/buddy.ini"
