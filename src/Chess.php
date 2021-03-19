@@ -9,38 +9,32 @@ class Chess
     /** @var Board&\ArrayAccess<int, ?Piece> */
     public $board;
     /** @var array<string, ?int> */
-    protected $kings;
+    protected $kings = [Piece::WHITE => null, Piece::BLACK => null];
     /** @var string */
-    public $turn;
+    public $turn = Piece::WHITE;
     /** @var array<string, int> */
-    protected $castling;
+    protected $castling = [Piece::WHITE => 0, Piece::BLACK => 0];
     /** @var int|null */
     protected $epSquare;
     /** @var int */
-    protected $halfMoves;
+    protected $halfMoves = 0;
     /** @var int */
-    protected $moveNumber;
+    protected $moveNumber = 1;
     /** @var array<int, History> */
-    protected $history;
+    protected $history = [];
     /** @var array<string, string> */
-    protected $header;
+    protected $header = [];
     /** @var array<string, array> */
-    protected $generateMovesCache;
+    protected $generateMovesCache = [];
     /** @var string */
-    protected $boardHash;
+    protected $boardHash = '';
     /** @var array<string, string> */
-    protected $sanMoveCache;
+    protected $sanMoveCache = [];
 
-    public function __construct(?string $fen = null)
+    public function __construct(?string $fen = Board::DEFAULT_POSITION)
     {
         $this->board = new Board();
-        $this->clear();
-
-        if (null !== $fen) {
-            $this->load($fen);
-        } else {
-            $this->reset();
-        }
+        $this->load($fen);
     }
 
     public function clear(): void
@@ -157,11 +151,6 @@ class Chess
         $this->updateSetup($this->fen());
 
         return true;
-    }
-
-    public function reset(): bool
-    {
-        return $this->load(Board::DEFAULT_POSITION);
     }
 
     public function fen(): string

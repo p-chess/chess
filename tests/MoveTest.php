@@ -28,20 +28,20 @@ class MoveTest extends TestCase
             Board::BITS['NORMAL']
         ));
 
-        $this->assertSame($move->piece->getType(), Piece::PAWN);
-        $this->assertSame($move->turn, $chess->turn);
-        $this->assertSame($move->fromSquare, Board::SQUARES['a2']);
-        $this->assertSame($move->toSquare, Board::SQUARES['a4']);
-        $this->assertSame($move->from, 'a2');
-        $this->assertSame($move->to, 'a4');
-        $this->assertSame($move->flags, Board::BITS['NORMAL']);
+        self::assertSame($move->piece->getType(), Piece::PAWN);
+        self::assertSame($move->turn, $chess->turn);
+        self::assertSame($move->fromSquare, Board::SQUARES['a2']);
+        self::assertSame($move->toSquare, Board::SQUARES['a4']);
+        self::assertSame($move->from, 'a2');
+        self::assertSame($move->to, 'a4');
+        self::assertSame($move->flags, Board::BITS['NORMAL']);
     }
 
     public function testPutOnInvalidSquare(): void
     {
         $chess = new ChessPublicator();
         $result = $chess->put(new Piece(Piece::PAWN, Piece::WHITE), 'a9');
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
     /**
@@ -65,14 +65,14 @@ class MoveTest extends TestCase
         $chess->makeMovePublic($move);
 
         $lastHistory = $chess->getLastHistory();
-        $this->assertSame($lastHistory->move, $move);
-        $this->assertSame($lastHistory->turn, Piece::WHITE);
-        $this->assertSame($lastHistory->kings[Piece::WHITE], Board::SQUARES['e7']);
-        $this->assertSame($lastHistory->kings[Piece::BLACK], Board::SQUARES['a7']);
-        $this->assertEquals($lastHistory->castling[Piece::WHITE], 0);
-        $this->assertEquals($lastHistory->castling[Piece::BLACK], 0);
-        $this->assertSame($lastHistory->halfMoves, 0);
-        $this->assertSame($lastHistory->moveNumber, 1);
+        self::assertSame($lastHistory->move, $move);
+        self::assertSame($lastHistory->turn, Piece::WHITE);
+        self::assertSame($lastHistory->kings[Piece::WHITE], Board::SQUARES['e7']);
+        self::assertSame($lastHistory->kings[Piece::BLACK], Board::SQUARES['a7']);
+        self::assertEquals(0, $lastHistory->castling[Piece::WHITE]);
+        self::assertEquals(0, $lastHistory->castling[Piece::BLACK]);
+        self::assertSame($lastHistory->halfMoves, 0);
+        self::assertSame($lastHistory->moveNumber, 1);
 
         // promotions
         $chess->load('8/P7/8/8/8/8/8/K6k w - - 0 1');
@@ -85,7 +85,7 @@ class MoveTest extends TestCase
             Piece::QUEEN
         ));
         $chess->makeMovePublic($move);
-        $this->assertSame($chess->fen(), 'Q7/8/8/8/8/8/8/K6k b - - 0 1');
+        self::assertSame($chess->fen(), 'Q7/8/8/8/8/8/8/K6k b - - 0 1');
     }
 
     public function testUndoMoveAndCheckHistory(): void
@@ -109,7 +109,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $chess->undoMovePublic();
-        $this->assertSame($chess->fen(), $fenStart);
+        self::assertSame($chess->fen(), $fenStart);
 
         // big pawn
         $chess->load($fenStart);
@@ -125,7 +125,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $chess->undoMovePublic();
-        $this->assertSame($chess->fen(), $fenStart);
+        self::assertSame($chess->fen(), $fenStart);
 
         // capture
         $chess->load($fenStart);
@@ -142,7 +142,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $chess->undoMovePublic();
-        $this->assertSame($chess->fen(), $fenStart);
+        self::assertSame($chess->fen(), $fenStart);
 
         // en passant
         $chess->load($fenStart);
@@ -169,12 +169,12 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $chess->undoMovePublic();
-        $this->assertSame($chess->fen(), $fenTmp1);
+        self::assertSame($chess->fen(), $fenTmp1);
         $chess->undoMovePublic();
-        $this->assertSame($chess->fen(), $fenTmp);
+        self::assertSame($chess->fen(), $fenTmp);
         $chess->remove('g4');
         $chess->remove('h2');
-        $this->assertSame($chess->fen(), $fenStart);
+        self::assertSame($chess->fen(), $fenStart);
 
         // castling king side
         $fenTmp = 'r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4';
@@ -188,11 +188,11 @@ class MoveTest extends TestCase
             //~ Piece::QUEEN
         ));
         $chess->makeMovePublic($move);
-        $this->assertSame($chess->fen(), 'r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 5 4');
+        self::assertSame($chess->fen(), 'r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 5 4');
         $chess->undoMovePublic();
-        $this->assertSame($chess->fen(), $fenTmp);
+        self::assertSame($chess->fen(), $fenTmp);
         $chess->load($fenStart);
-        $this->assertSame($chess->fen(), $fenStart);
+        self::assertSame($chess->fen(), $fenStart);
 
         // castling queen side
         $fenTmp = 'r3kb1r/pppq1ppp/2np1n2/1B2p2b/4P3/3P1N1P/PPPB1PP1/RN1QR1K1 b kq - 2 8';
@@ -206,11 +206,11 @@ class MoveTest extends TestCase
             //~ Piece::QUEEN
         ));
         $chess->makeMovePublic($move);
-        $this->assertSame($chess->fen(), '2kr1b1r/pppq1ppp/2np1n2/1B2p2b/4P3/3P1N1P/PPPB1PP1/RN1QR1K1 w - - 3 9');
+        self::assertSame($chess->fen(), '2kr1b1r/pppq1ppp/2np1n2/1B2p2b/4P3/3P1N1P/PPPB1PP1/RN1QR1K1 w - - 3 9');
         $chess->undoMovePublic();
-        $this->assertSame($chess->fen(), $fenTmp);
+        self::assertSame($chess->fen(), $fenTmp);
         $chess->load($fenStart);
-        $this->assertSame($chess->fen(), $fenStart);
+        self::assertSame($chess->fen(), $fenStart);
     }
 
     public function testMoveToSAN(): void
@@ -227,7 +227,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        $this->assertSame($undo->san, 'e4');
+        self::assertSame($undo->san, 'e4');
 
         // normal knight move
         $chess->makeMovePublic($move);
@@ -240,7 +240,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        $this->assertSame($undo->san, 'Nf6');
+        self::assertSame($undo->san, 'Nf6');
 
         // normal pawn capture
         $chess->load('rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2');
@@ -253,7 +253,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        $this->assertSame($undo->san, 'exd5');
+        self::assertSame($undo->san, 'exd5');
 
         // en passant capture
         $chess->load('rnbqkbnr/ppp2ppp/8/3Pp3/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1');
@@ -266,7 +266,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        $this->assertSame($undo->san, 'dxe6');
+        self::assertSame($undo->san, 'dxe6');
 
         // normal knight capture
         $chess->load('rnbqkb1r/ppp1pppp/5n2/3P4/8/5N2/PPPP1PPP/RNBQKB1R b KQkq - 2 3');
@@ -279,7 +279,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        $this->assertSame($undo->san, 'Nxd5');
+        self::assertSame($undo->san, 'Nxd5');
 
         // promotion
         $chess->load('8/2KP4/8/5k2/8/8/8/8 w - - 0 1');
@@ -293,7 +293,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        $this->assertSame($undo->san, 'd8=R');
+        self::assertSame($undo->san, 'd8=R');
 
         // check
         $chess->load('3R4/2K5/8/5k2/8/8/8/8 w - - 0 1');
@@ -306,7 +306,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        $this->assertSame($undo->san, 'Rf8+');
+        self::assertSame($undo->san, 'Rf8+');
 
         // checkmate
         $chess->load('5k2/8/1R3K2/8/8/8/8/8 w - - 0 1');
@@ -319,7 +319,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        $this->assertSame($undo->san, 'Rb8#');
+        self::assertSame($undo->san, 'Rb8#');
 
         // ambiguous moves: row
         $chess->load('2N2k2/8/3p4/8/2N5/8/1K6/8 w - - 0 1');
@@ -332,7 +332,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        $this->assertSame($undo->san, 'N4xd6');
+        self::assertSame($undo->san, 'N4xd6');
 
         // ambiguous moves: rank > 0 & file > 0
         $chess->load('8/8/8/2qqq3/2qPq3/2qqq3/1n6/K6k b - - 0 1'); // this one is really ambiguous haha
@@ -345,7 +345,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        $this->assertSame($undo->san, 'Qd5xd4');
+        self::assertSame($undo->san, 'Qd5xd4');
 
         // ambiguous moves: col
         $chess->load('5k2/8/3p4/8/2N1N3/8/1K6/8 w - - 0 1');
@@ -358,7 +358,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        $this->assertSame($undo->san, 'Nexd6');
+        self::assertSame($undo->san, 'Nexd6');
 
         // ambiguous moves: col
         $chess->load('5k2/8/3p4/8/2N1N3/8/1K6/8 w - - 0 1');
@@ -371,7 +371,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        $this->assertSame($undo->san, 'Ncxd6');
+        self::assertSame($undo->san, 'Ncxd6');
 
         // ambiguous moves: normal capture
         $chess->load('5k2/8/3p2R1/8/2N5/8/1K6/8 w - - 0 1');
@@ -384,7 +384,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        $this->assertSame($undo->san, 'Nxd6');
+        self::assertSame($undo->san, 'Nxd6');
 
         // ambiguous moves: normal capture
         $chess->load('5k2/8/3p2R1/8/2N5/8/1K6/8 w - - 0 1');
@@ -397,7 +397,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        $this->assertSame($undo->san, 'Rxd6');
+        self::assertSame($undo->san, 'Rxd6');
 
         // generate moves test
         $chess->load('8/ppp2P2/pkp5/ppp5/5PPP/5PKP/5PPP/8 w - - 0 1');
@@ -408,13 +408,13 @@ class MoveTest extends TestCase
         $sans = \array_map(static function (Move $move): string {
             return $move->san;
         }, $moves);
-        $this->assertContains('f8=Q', $sans);
-        $this->assertContains('f8=R', $sans);
-        $this->assertContains('f8=B', $sans);
-        $this->assertContains('f8=N', $sans);
-        $this->assertContains('f5', $sans);
-        $this->assertContains('g5', $sans);
-        $this->assertContains('h5', $sans);
+        self::assertContains('f8=Q', $sans);
+        self::assertContains('f8=R', $sans);
+        self::assertContains('f8=B', $sans);
+        self::assertContains('f8=N', $sans);
+        self::assertContains('f5', $sans);
+        self::assertContains('g5', $sans);
+        self::assertContains('h5', $sans);
     }
 
     public function testSANMove(): void
@@ -429,7 +429,7 @@ class MoveTest extends TestCase
         $chess->move('a6');
         $chess->move('Ba4');
         $chess->move('Bc5');
-        $this->assertSame($chess->fen(), 'r1bqk1nr/1ppp1ppp/p1n5/2b1p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 5');
+        self::assertSame($chess->fen(), 'r1bqk1nr/1ppp1ppp/p1n5/2b1p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 5');
     }
 
     public function testArrayMove(): void
@@ -444,7 +444,7 @@ class MoveTest extends TestCase
         $chess->move(['from' => 'a7', 'to' => 'a6']);
         $chess->move(['from' => 'b5', 'to' => 'a4']);
         $chess->move(['from' => 'f8', 'to' => 'c5']);
-        $this->assertSame($chess->fen(), 'r1bqk1nr/1ppp1ppp/p1n5/2b1p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 5');
+        self::assertSame($chess->fen(), 'r1bqk1nr/1ppp1ppp/p1n5/2b1p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 5');
     }
 
     /**
@@ -460,9 +460,9 @@ class MoveTest extends TestCase
         $moves = \str_replace(["\t", "\n", "\r", '  '], ['', ' ', ' ', ' '], $moves);
         $moves = \explode(' ', \trim($moves));
         foreach ($moves as $move) {
-            $this->assertNotNull($chess->move($move), $move);
+            self::assertNotNull($chess->move($move), $move);
         }
-        $this->assertSame($chess->fen(), $finalFen);
+        self::assertSame($chess->fen(), $finalFen);
     }
 
     /**
@@ -502,7 +502,7 @@ class MoveTest extends TestCase
     public function testGetInvalidSquare(): void
     {
         $chess = new Chess();
-        $this->assertNull($chess->get('b11'));
+        self::assertNull($chess->get('b11'));
     }
 
     public function testInvalidConstruct(): void

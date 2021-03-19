@@ -14,30 +14,30 @@ class PiecePlacementTest extends TestCase
     {
         $chess = new Chess('8/8/8/8/8/8/8/8 w KQkq - 0 1');
 
-        $this->assertNull($chess->get('a1'));
-        $this->assertNull($chess->get('a2'));
-        $this->assertNull($chess->get('e4'));
-        $this->assertNull($chess->get('g8'));
+        self::assertNull($chess->get('a1'));
+        self::assertNull($chess->get('a2'));
+        self::assertNull($chess->get('e4'));
+        self::assertNull($chess->get('g8'));
 
         $piece = new Piece(Piece::QUEEN, Piece::WHITE);
         $chess->put($piece, 'e4');
-        $this->assertSame($chess->get('e4'), $piece);
+        self::assertSame($chess->get('e4'), $piece);
 
         $piece = new Piece(Piece::KING, Piece::BLACK);
         $chess->put($piece, 'd3');
-        $this->assertSame($chess->get('d3'), $piece);
+        self::assertSame($chess->get('d3'), $piece);
 
         $chess->remove('d3');
-        $this->assertNull($chess->get('d3'));
+        self::assertNull($chess->get('d3'));
 
         $chess->remove('d3');
-        $this->assertNull($chess->get('d3'));
+        self::assertNull($chess->get('d3'));
     }
 
     public function testInvalidFen(): void
     {
         $chess = new Chess('8/8/8/8/8/8/8/8 w KQkq - 0 1');
         $result = $chess->load('invalid FEN string');
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 }

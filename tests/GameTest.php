@@ -24,16 +24,16 @@ class GameTest extends TestCase
             $rnd = \random_int(0, \count($moves) - 1);
             $moveRandom = $moves[$rnd];
             $move = $chess->move(['from' => $moveRandom->from, 'to' => $moveRandom->to]);
-            $this->assertNotNull($move);
+            self::assertNotNull($move);
         }
 
-        $this->assertTrue($chess->gameOver() || $i > 50);
+        self::assertTrue($chess->gameOver() || $i > 50);
     }
 
     public function testGetHistory(): void
     {
         $chess = new Chess();
         $chess->move('e4');
-        $this->assertEquals('e4', $chess->getHistory()[0]->move->san);
+        self::assertEquals('e4', $chess->getHistory()[0]->move->san);
     }
 }
