@@ -464,13 +464,11 @@ class Chess
     }
 
     /**
-     * @param array<string, mixed> $options
-     *
      * @return array<int, Move>
      */
-    protected function generateMoves(array $options = []): array
+    protected function generateMoves(int $square = null, bool $legal = true): array
     {
-        $cacheKey = $this->boardHash.\json_encode($options);
+        $cacheKey = $this->boardHash.\json_encode($square.($legal ? '1' : '0'));
 
         // check cache first
         if (isset($this->generateMovesCache[$cacheKey])) {
@@ -482,8 +480,8 @@ class Chess
         $them = self::swapColor($us);
         $secondRank = [Piece::BLACK => Board::RANK_7, Piece::WHITE => Board::RANK_2];
 
-        if (!empty($options['square'])) {
-            $firstSquare = $lastSquare = $options['square'];
+        if (null !== $square) {
+            $firstSquare = $lastSquare = $square;
             $singleSquare = true;
         } else {
             $firstSquare = Board::SQUARES['a8'];
@@ -492,8 +490,6 @@ class Chess
         }
 
         // legal moves only?
-        $legal = $options['legal'] ?? true;
-
         for ($i = $firstSquare; $i <= $lastSquare; ++$i) {
             if ($i & 0x88) {
                 $i += 7;
@@ -606,7 +602,7 @@ class Chess
 
         // filter out illegal moves
         $legalMoves = [];
-        foreach ($moves as $i => $move) {
+        foreach ($moves as $move) {
             $this->makeMove($move);
             if (!$this->kingAttacked($us)) {
                 $legalMoves[] = $move;

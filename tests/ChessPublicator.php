@@ -29,13 +29,11 @@ class ChessPublicator extends Chess
     }
 
     /**
-     * @param array<string, mixed> $options
-     *
      * @return array<int, Move>
      */
-    public function generateMovesPublic(array $options = []): array
+    public function generateMovesPublic(int $square = null, bool $legal = true): array
     {
-        return $this->generateMoves($options);
+        return $this->generateMoves($square, $legal);
     }
 
     public static function buildMovePublic(
@@ -77,7 +75,7 @@ class ChessPublicator extends Chess
         $checks = 0;
         $checkmates = 0;
 
-        $moves = $this->generateMoves(['legal' => false]);
+        $moves = $this->generateMoves(null, false);
         $color = $this->turn;
         foreach ($moves as $iValue) {
             $this->makeMove($iValue);
