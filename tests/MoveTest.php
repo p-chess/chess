@@ -511,4 +511,11 @@ class MoveTest extends TestCase
         $this->expectExceptionMessage('Invalid board code: 24');
         new Move('b', 0, new Piece('p', 'b'), 24, 1);
     }
+
+    public function testGenerateMovesForSquare(): void
+    {
+        $chess = new ChessPublicator();
+        $moves = $chess->generateMovesPublic(Board::SQUARES['a2'], false);
+        self::assertCount(2, $moves);
+    }
 }
