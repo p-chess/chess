@@ -23,10 +23,14 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.18",
+        "imagine/imagine": "^1.2",
         "johnkary/phpunit-speedtrap": "^3.3",
         "phpbench/phpbench": "^1.0@alpha",
         "phpstan/phpstan": "^0.12",
         "phpunit/phpunit": "^8.5 || ^9.5"
+    },
+    "suggest": {
+        "imagine/imagine": "To generate board images."
     },
     "extra": {
         "branch-alias": {

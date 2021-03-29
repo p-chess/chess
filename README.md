@@ -61,6 +61,56 @@ echo (new UnicodeOutput())->render($chess) . PHP_EOL;
      a   b   c   d   e   f   g   h
 ```
 
+## Supported output formats
+
+### ASCII
+
+Pieces are displayed with corresponding codes (e.g. "p" for pawn, "q" for queen, etc.).
+
+```
+<?php
+// use...
+$chess = new Chess();
+echo (new AsciiOutput())->render($chess);
+```
+
+### Unicode
+
+Pieces are displayed like in the example above.
+
+```
+<?php
+// use...
+$chess = new Chess();
+echo (new UnicodeOutput())->render($chess);
+```
+
+### PNG Image
+
+This opion requires [Imagine library](https://packagist.org/packages/imagine/imagine).
+
+You need to provide an instance of Imagine, and a path of images for pieces.
+Names of such images need to match a color/name code.
+For example, a black pawn image must be named `bp.png` (_b_ for black and _p_ for pawn), a
+white queen image must me named `wq.png` (_w_ for white and _q_ for queen).
+Refer to `Piece` class source code to get all abbreviations.
+A good source for free images is [Wikimedia](https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces).
+
+Other possible arguments are: a color for light squares, a color for dark squares, and a size for the board
+(must be a number divisible by 8, default is 400).
+
+```
+<?php
+// use...
+$chess = new Chess();
+$imagine = new \Imagine\Gd\Imagine();   // or \Imagine\Imagick\Imagine()
+$output = new ImageOutput($imagine, '/your/path/to/images', 480);
+header('Content-Type: image/png');  
+echo $output->render($chess);
+```
+
+<img src="https://user-images.githubusercontent.com/179866/112304837-411be280-8c9e-11eb-8333-c2489f9bef05.png">        
+
 ## Performance
 
 There is still a lot to do in this topic.  
