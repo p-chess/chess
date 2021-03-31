@@ -10,6 +10,7 @@
         docker_image_name: "library/php"
         docker_image_tag: "7.4.16"
         execute_commands:
+            - "cd docs && ./get-resources.sh && cd .."
             - "rm -rf composer.lock"
             - "composer validate"
             - "composer install"
