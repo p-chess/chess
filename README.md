@@ -67,7 +67,7 @@ echo (new UnicodeOutput())->render($chess) . PHP_EOL;
 
 Pieces are displayed with corresponding codes (e.g. "p" for pawn, "q" for queen, etc.).
 
-```
+```php
 <?php
 // use...
 $chess = new Chess();
@@ -78,7 +78,7 @@ echo (new AsciiOutput())->render($chess);
 
 Pieces are displayed like in the example above.
 
-```
+```php
 <?php
 // use...
 $chess = new Chess();
@@ -96,10 +96,10 @@ white queen image must me named `wq.png` (_w_ for white and _q_ for queen).
 Refer to `Piece` class source code to get all abbreviations.
 A good source for free images is [Wikimedia](https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces).
 
-Other possible arguments are: a color for light squares, a color for dark squares, and a size for the board
-(must be a number divisible by 8, default is 400).
+Other possible arguments are: a size for the board (must be a number divisible by 8, default is 400), a boolean
+to add coordinates (default `false`), an hex color for light squares, and an hex color for dark squares.
 
-```
+```php
 <?php
 // use...
 $chess = new Chess();
