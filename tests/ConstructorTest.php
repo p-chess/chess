@@ -55,13 +55,13 @@ class ConstructorTest extends TestCase
      */
     public function testImagineOutput(): void
     {
-        $dir = self::createPieceSprites();
+        $dir = self::createSprites();
         $chess = new Chess();
-        $output = new Output\ImagineOutput(self::getImagine(), $dir);
+        $output = new Output\ImagineOutput(self::getImagine(), $dir, 400, true);
         self::assertNotEmpty($output->render($chess));
         $chess->board->reverse();
         self::assertNotEmpty($output->render($chess));
-        self::removePieceSprites($dir);
+        self::removeSprites($dir);
     }
 
     private static function getImagine(): AbstractImagine
@@ -75,7 +75,7 @@ class ConstructorTest extends TestCase
         self::markTestSkipped('No GD nor Imagick installed.');
     }
 
-    private static function createPieceSprites(): string
+    private static function createSprites(): string
     {
         $dir = __DIR__.'/../resources/';
         if (!\is_dir($dir)) {
@@ -89,17 +89,38 @@ class ConstructorTest extends TestCase
             \imagepng($imagePiece, $dir.'b'.$piece.'.png');
             \imagepng($imagePiece, $dir.'w'.$piece.'.png');
         }
+        $files = \range('a', 'h');
+        foreach ($files as $file) {
+            if (false === $imagePiece = \imagecreatetruecolor(1, 1)) {
+                self::markTestIncomplete('Error in image creation');
+            }
+            \imagepng($imagePiece, $dir.$file.'.png');
+        }
+        $ranks = \range(8, 1);
+        foreach ($ranks as $rank) {
+            if (false === $imagePiece = \imagecreatetruecolor(1, 1)) {
+                self::markTestIncomplete('Error in image creation');
+            }
+            \imagepng($imagePiece, $dir.$rank.'.png');
+        }
 
         return $dir;
     }
 
-    private static function removePieceSprites(string $dir): void
+    private static function removeSprites(string $dir): void
     {
         $pieces = ['p', 'n', 'b', 'r', 'q', 'k'];
-        foreach (['w', 'b'] as $color) {
-            foreach ($pieces as $piece) {
-                \unlink($dir.$color.$piece.'.png');
-            }
+        foreach ($pieces as $piece) {
+            \unlink($dir.'b'.$piece.'.png');
+            \unlink($dir.'w'.$piece.'.png');
+        }
+        $files = \range('a', 'h');
+        foreach ($files as $file) {
+            \unlink($dir.$file.'.png');
+        }
+        $ranks = \range(8, 1);
+        foreach ($ranks as $rank) {
+            \unlink($dir.$rank.'.png');
         }
         \rmdir($dir);
     }

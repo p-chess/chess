@@ -44,10 +44,16 @@ final class ImagineOutput implements OutputInterface
      */
     private $spritesPath;
 
+    /**
+     * @var int|null
+     */
+    private $coordSize;
+
     public function __construct(
         AbstractImagine $imagine,
         string $spritesPath,
         int $size = 400,
+        bool $coords = false,
         string $darkSquareColor = '#8ca2ad',
         string $liteSquareColor = '#dee3e6'
     ) {
@@ -60,11 +66,32 @@ final class ImagineOutput implements OutputInterface
         }
         $this->darkSquareColor = $darkSquareColor;
         $this->liteSquareColor = $liteSquareColor;
+        $this->coordSize = $coords ? (int) \floor($this->squareSize / 7) : null;
     }
 
     public function render(Chess $chess): string
     {
         $boardImage = $this->createBoard($chess->board);
+        if (null !== $this->coordSize) {
+            $x = 0;
+            $y = 0;
+            $rankImages = $this->createRankImages();
+            $fileImages = $this->createFileImages();
+            if ($chess->board->isReversed()) {
+                $rankImages = \array_reverse($rankImages);
+                $fileImages = \array_reverse($fileImages);
+            }
+            foreach ($rankImages as $rankImage) {
+                $boardImage->paste($rankImage, new Point($x, $y));
+                $y += $this->squareSize;
+            }
+            $x = $this->coordSize;
+            $y = $this->squareSize * 8;
+            foreach ($fileImages as $fileImage) {
+                $boardImage->paste($fileImage, new Point($x, $y));
+                $x += $this->squareSize;
+            }
+        }
         $pieceImages = $this->createPieceImages($chess->board);
         foreach ($chess->board as $i => $piece) {
             if (null === $piece) {
@@ -76,7 +103,7 @@ final class ImagineOutput implements OutputInterface
                 $file = 7 - $file;
                 $rank = 7 - $rank;
             }
-            $x = $file * $this->squareSize;
+            $x = $file * $this->squareSize + ($this->coordSize ?: 0);
             $y = $rank * $this->squareSize;
             $boardImage->paste($pieceImages[(string) $piece], new Point($x, $y));
         }
@@ -86,13 +113,14 @@ final class ImagineOutput implements OutputInterface
 
     private function createBoard(Board $board): ImageInterface
     {
-        $image = $this->imagine->create(new Box($this->boardSize, $this->boardSize));
+        $size = $this->coordSize ? $this->boardSize + $this->coordSize : $this->boardSize;
+        $image = $this->imagine->create(new Box($size, $size));
         $palette = new RGB();
         foreach ($board as $i => $piece) {
             $rank = Board::rank($i);
             $file = Board::file($i);
             $hex = (($rank + $file) % 2 === 1) ? $this->darkSquareColor : $this->liteSquareColor;
-            $x1 = $rank * $this->squareSize;
+            $x1 = $rank * $this->squareSize + ($this->coordSize ?: 0);
             $y1 = $file * $this->squareSize;
             $x2 = $x1 + $this->squareSize - 1;
             $y2 = $y1 + $this->squareSize - 1;
@@ -115,6 +143,38 @@ final class ImagineOutput implements OutputInterface
             }
             $file = $this->spritesPath.$piece->getColor().$piece->getType().'.png';
             $images[(string) $piece] = $this->imagine->open($file)->resize($size);
+        }
+
+        return $images;
+    }
+
+    /**
+     * @return array<int, ImageInterface>
+     */
+    private function createRankImages(): array
+    {
+        $images = [];
+        $ranks = \range(8, 1);
+        $size = new Box($this->coordSize, $this->squareSize);
+        foreach ($ranks as $rank) {
+            $path = $this->spritesPath.$rank.'.png';
+            $images[$rank] = $this->imagine->open($path)->resize($size);
+        }
+
+        return $images;
+    }
+
+    /**
+     * @return array<string, ImageInterface>
+     */
+    private function createFileImages(): array
+    {
+        $images = [];
+        $files = \range('a', 'h');
+        $size = new Box($this->squareSize, $this->coordSize);
+        foreach ($files as $file) {
+            $path = $this->spritesPath.$file.'.png';
+            $images[$file] = $this->imagine->open($path)->resize($size);
         }
 
         return $images;
