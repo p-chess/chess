@@ -87,17 +87,7 @@ echo (new UnicodeOutput())->render($chess);
 
 ### PNG Image
 
-This opion requires [Imagine library](https://packagist.org/packages/imagine/imagine).
-
-You need to provide an instance of Imagine, and a path of images for pieces.
-Names of such images need to match a color/name code.
-For example, a black pawn image must be named `bp.png` (_b_ for black and _p_ for pawn), a
-white queen image must me named `wq.png` (_w_ for white and _q_ for queen).
-Refer to `Piece` class source code to get all abbreviations.
-A good source for free images is [Wikimedia](https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces).
-
-Other possible arguments are: a size for the board (must be a number divisible by 8, default is 400), a boolean
-to add coordinates (default `false`), an hex color for light squares, and an hex color for dark squares.
+Pieces are displayed inside a png image.
 
 ```php
 <?php
@@ -110,6 +100,8 @@ echo $output->render($chess);
 ```
 
 <img src="https://user-images.githubusercontent.com/179866/112304837-411be280-8c9e-11eb-8333-c2489f9bef05.png">        
+
+See [dedicated documentation](docs/output_imagine.md) for a detailed instructions.
 
 ## Performance
 

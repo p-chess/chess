@@ -10,6 +10,7 @@
         docker_image_name: "library/php"
         docker_image_tag: "7.4.16"
         execute_commands:
+            - "cd docs && ./get-resources.sh && cd .."
             - "rm -rf composer.lock"
             - "composer validate"
             - "composer install"
@@ -32,6 +33,7 @@
         docker_image_name: "library/php"
         docker_image_tag: "8.0.3"
         execute_commands:
+            - "cd docs && ./get-resources.sh && cd .."
             - "rm -rf composer.lock"
             - "composer validate"
             - "composer install"
@@ -40,9 +42,11 @@
             - "bash <(curl -s https://codecov.io/bash)"
         setup_commands:
             - "echo \"memory_limit=-1\" >> /usr/local/etc/php/conf.d/buddy.ini"
-            - "apt-get update && apt-get install -y git zip"
+            - "apt-get update && apt-get install -y git zip libfreetype6-dev libjpeg62-turbo-dev libpng-dev"
             - "curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer"
             - "pecl install pcov && docker-php-ext-enable pcov"
+            - "docker-php-ext-configure gd --with-freetype --with-jpeg"
+            - "docker-php-ext-install gd"
         volume_mappings:
             - "/:/buddy/chess"
         trigger_condition: "ALWAYS"
