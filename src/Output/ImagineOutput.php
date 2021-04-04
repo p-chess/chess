@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PChess\Chess\Output;
 
+use Imagine\Gd\Font;
 use Imagine\Image\AbstractImagine;
 use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
@@ -66,7 +67,7 @@ final class ImagineOutput implements OutputInterface
         }
         $this->darkSquareColor = $darkSquareColor;
         $this->liteSquareColor = $liteSquareColor;
-        $this->coordSize = $coords ? (int) \floor($this->squareSize / 7) : null;
+        $this->coordSize = $coords ? (int) \floor($this->squareSize / 6) : null;
     }
 
     public function render(Chess $chess): string
@@ -156,9 +157,11 @@ final class ImagineOutput implements OutputInterface
         $images = [];
         $ranks = \range(8, 1);
         $size = new Box($this->coordSize, $this->squareSize);
+        $font = $this->getFont();
+        $position = new Point($this->getCoordStartPoint(), $this->squareSize / 2);
         foreach ($ranks as $rank) {
-            $path = $this->spritesPath.$rank.'.png';
-            $images[$rank] = $this->imagine->open($path)->resize($size);
+            $images[$rank] = $this->imagine->create($size);
+            $images[$rank]->draw()->text((string) $rank, $font, $position);
         }
 
         return $images;
@@ -172,11 +175,45 @@ final class ImagineOutput implements OutputInterface
         $images = [];
         $files = \range('a', 'h');
         $size = new Box($this->squareSize, $this->coordSize);
+        $font = $this->getFont();
+        $position = new Point($this->squareSize / 2, $this->getCoordStartPoint());
         foreach ($files as $file) {
-            $path = $this->spritesPath.$file.'.png';
-            $images[$file] = $this->imagine->open($path)->resize($size);
+            $images[$file] = $this->imagine->create($size);
+            $images[$file]->draw()->text($file, $font, $position);
         }
 
         return $images;
+    }
+
+    private function getFont(): Font
+    {
+        return new Font($this->spritesPath.'font.ttf', $this->getFontSize(), (new RGB())->color('#111111'));
+    }
+
+    private function getCoordStartPoint(): int
+    {
+        if ($this->squareSize > 50) {
+            return 4;
+        }
+        if ($this->squareSize > 25) {
+            return 2;
+        }
+
+        return 0;
+    }
+
+    private function getFontSize(): int
+    {
+        if ($this->squareSize >= 200) {
+            return 11;
+        }
+        if ($this->squareSize > 100) {
+            return 10;
+        }
+        if ($this->squareSize > 50) {
+            return 8;
+        }
+
+        return 5;
     }
 }

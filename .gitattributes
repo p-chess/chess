@@ -1,5 +1,6 @@
 * text=auto
 
+/docs export-ignore
 /benchmarks export-ignore
 /tests export-ignore
 /.gitattributes export-ignore
