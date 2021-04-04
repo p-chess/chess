@@ -65,6 +65,13 @@ class ConstructorTest extends TestCase
         self::assertNotEmpty($output->render($chess));
     }
 
+    public function testHtmlOutput(): void
+    {
+        $chess = new Chess();
+        $output = new HtmlOutputStub();
+        self::assertNotEmpty($output->render($chess));
+    }
+
     private static function getImagine(): AbstractImagine
     {
         if (\extension_loaded('gd')) {

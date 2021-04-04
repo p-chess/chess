@@ -103,6 +103,12 @@ echo $output->render($chess);
 
 See [dedicated documentation](docs/output_imagine.md) for a detailed instructions.
 
+### HTML
+
+Pieces are displayed inside an HTML table.
+
+See [dedicated documentation](docs/output_html.md) for a detailed instructions.
+
 ## Performance
 
 There is still a lot to do in this topic.  

@@ -660,16 +660,16 @@ class Chess
 
     /**
      * The internal representation of a chess move is in 0x88 format, and
-     * not meant to be human-readable.  The code below converts the 0x88
-     * square coordinates to algebraic coordinates.  It also prunes an
+     * not meant to be human-readable. The code below converts the 0x88
+     * square coordinates to algebraic coordinates. It also prunes an
      * unnecessary move keys resulting from a verbose call.
      *
      * @return array<int, Move>
      */
-    public function moves(): array
+    public function moves(int $square = null): array
     {
         $moves = [];
-        foreach ($this->generateMoves() as $key => $move) {
+        foreach ($this->generateMoves($square) as $key => $move) {
             $this->moveToSAN($move);
             $moves[$key] = $move;
         }
