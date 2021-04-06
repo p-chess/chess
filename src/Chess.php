@@ -34,7 +34,9 @@ class Chess
     public function __construct(?string $fen = Board::DEFAULT_POSITION)
     {
         $this->board = new Board();
-        $this->load($fen);
+        if (null !== $error = $this->load($fen)) {
+            throw new \InvalidArgumentException(\sprintf('Invalid fen: %s. Error: %s', $fen, $error));
+        }
     }
 
     public function clear(): void
@@ -98,10 +100,11 @@ class Chess
         return $this->header;
     }
 
-    public function load(string $fen): bool
+    public function load(string $fen): ?string
     {
-        if (!Validation::validateFen($fen)['valid']) {
-            return false;
+        $result = Validation::validateFen($fen);
+        if (!$result['valid']) {
+            return $result['error'];
         }
         $tokens = \explode(' ', $fen);
         $this->clear();
@@ -150,7 +153,7 @@ class Chess
 
         $this->updateSetup($this->fen());
 
-        return true;
+        return null;
     }
 
     public function fen(): string
@@ -643,6 +646,7 @@ class Chess
                     $sanOrArray['to'] === $move->to
                 ) {
                     $moveObject = $move;
+                    $this->moveToSAN($moveObject);
                     break;
                 }
             }
@@ -652,7 +656,6 @@ class Chess
             return null;
         }
 
-        $this->moveToSAN($moveObject);
         $this->makeMove($moveObject);
 
         return $moveObject;

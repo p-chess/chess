@@ -100,7 +100,7 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
      */
     public function offsetGet($offset): ?Piece
     {
-        return $this->squares[$offset];
+        return $this->squares[$offset] ?? null;
     }
 
     /**
