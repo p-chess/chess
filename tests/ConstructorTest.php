@@ -21,6 +21,12 @@ class ConstructorTest extends TestCase
         self::assertEquals($output->render($a), $output->render($b));
     }
 
+    public function testInvalidFen(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new Chess('an invalid fen string');
+    }
+
     public function testUnicodeOutput(): void
     {
         $chess = new Chess();

@@ -38,6 +38,6 @@ class PiecePlacementTest extends TestCase
     {
         $chess = new Chess('8/8/8/8/8/8/8/8 w KQkq - 0 1');
         $result = $chess->load('invalid FEN string');
-        self::assertFalse($result);
+        self::assertNotNull($result);
     }
 }
