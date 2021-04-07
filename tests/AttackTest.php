@@ -143,27 +143,27 @@ class AttackTest extends TestCase
     public function testInsufficientMaterial(): void
     {
         // k vs k
-        $chess = new ChessPublicator('8/8/8/8/8/8/8/8 w - - 0 1');
+        $chess = new ChessPublicator(Board::EMPTY);
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
         self::assertTrue($chess->insufficientMaterial());
 
         // k vs kn
-        $chess = new ChessPublicator('8/8/8/8/8/8/8/8 w - - 0 1');
+        $chess = new ChessPublicator(Board::EMPTY);
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
         $chess->put(new Piece(Piece::KNIGHT, Piece::WHITE), 'e4');
         self::assertTrue($chess->insufficientMaterial());
 
         // k vs kb
-        $chess = new ChessPublicator('8/8/8/8/8/8/8/8 w - - 0 1');
+        $chess = new ChessPublicator(Board::EMPTY);
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
         $chess->put(new Piece(Piece::BISHOP, Piece::WHITE), 'e4');
         self::assertTrue($chess->insufficientMaterial());
 
         // k vs k(b){0,} << bishop(s) in same color
-        $chess = new ChessPublicator('8/8/8/8/8/8/8/8 w - - 0 1');
+        $chess = new ChessPublicator(Board::EMPTY);
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
         $chess->put(new Piece(Piece::BISHOP, Piece::BLACK), 'e5');
