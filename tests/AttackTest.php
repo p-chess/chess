@@ -12,8 +12,7 @@ class AttackTest extends TestCase
 {
     public function testAttackedPawn(): void
     {
-        $chess = new ChessPublicator();
-        $chess->clear();
+        $chess = new ChessPublicator(Board::EMPTY);
         $chess->put(new Piece(Piece::PAWN, Piece::WHITE), 'e4');
         self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
         self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e3']));
@@ -30,8 +29,7 @@ class AttackTest extends TestCase
 
     public function testAttackedKnight(): void
     {
-        $chess = new ChessPublicator();
-        $chess->clear();
+        $chess = new ChessPublicator(Board::EMPTY);
         $chess->put(new Piece(Piece::KNIGHT, Piece::WHITE), 'e4');
         self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d2']));
         self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d6']));
@@ -55,8 +53,7 @@ class AttackTest extends TestCase
 
     public function testAttackedBishop(): void
     {
-        $chess = new ChessPublicator();
-        $chess->clear();
+        $chess = new ChessPublicator(Board::EMPTY);
         $chess->put(new Piece(Piece::BISHOP, Piece::WHITE), 'e4');
         self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
         self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']));
@@ -71,8 +68,7 @@ class AttackTest extends TestCase
 
     public function testAttackedRook(): void
     {
-        $chess = new ChessPublicator();
-        $chess->clear();
+        $chess = new ChessPublicator(Board::EMPTY);
         $chess->put(new Piece(Piece::ROOK, Piece::WHITE), 'e4');
         self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
         self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']));
@@ -89,8 +85,7 @@ class AttackTest extends TestCase
 
     public function testAttackedQueen(): void
     {
-        $chess = new ChessPublicator();
-        $chess->clear();
+        $chess = new ChessPublicator(Board::EMPTY);
         $chess->put(new Piece(Piece::QUEEN, Piece::WHITE), 'e4');
         self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
         self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']));
@@ -105,8 +100,7 @@ class AttackTest extends TestCase
 
     public function testAttackedKing(): void
     {
-        $chess = new ChessPublicator();
-        $chess->clear();
+        $chess = new ChessPublicator(Board::EMPTY);
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e4');
         self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
         self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']));
@@ -121,8 +115,7 @@ class AttackTest extends TestCase
 
     public function testInCheck(): void
     {
-        $chess = new ChessPublicator();
-        $chess->clear();
+        $chess = new ChessPublicator(Board::EMPTY);
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e7');
         $chess->put(new Piece(Piece::QUEEN, Piece::BLACK), 'e4');
         self::assertSame($chess->turn, Piece::WHITE);
@@ -135,51 +128,42 @@ class AttackTest extends TestCase
 
     public function testInCheckmate(): void
     {
-        $chess = new ChessPublicator();
-        self::assertFalse($chess->inCheckmate());
-
-        $chess->load('r1bqk1nr/pppp1Qpp/2n5/2b1p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4');
+        $chess = new ChessPublicator('r1bqk1nr/pppp1Qpp/2n5/2b1p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4');
         self::assertTrue($chess->inCheckmate());
     }
 
     public function testInStalemate(): void
     {
-        $chess = new ChessPublicator();
-        self::assertFalse($chess->inStalemate());
-
         // fen source: https://www.redhotpawn.com/forum/only-chess/interesting-stalemate-position.152109
         // start fen : 3b3k/p6p/1p5P/3q4/8/n7/PP6/K4Q2 w - - 0 1
-        $chess->load('7k/p6p/1p3b1P/3q4/8/n7/PP6/K7 w - - 0 2');
+        $chess = new ChessPublicator('7k/p6p/1p3b1P/3q4/8/n7/PP6/K7 w - - 0 2');
         self::assertTrue($chess->inStalemate());
     }
 
     public function testInsufficientMaterial(): void
     {
-        $chess = new ChessPublicator();
-        self::assertFalse($chess->insufficientMaterial());
-
         // k vs k
-        $chess->clear();
+        $chess = new ChessPublicator(Board::EMPTY);
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
         self::assertTrue($chess->insufficientMaterial());
 
         // k vs kn
-        $chess->clear();
+        $chess = new ChessPublicator(Board::EMPTY);
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
         $chess->put(new Piece(Piece::KNIGHT, Piece::WHITE), 'e4');
         self::assertTrue($chess->insufficientMaterial());
 
         // k vs kb
-        $chess->clear();
+        $chess = new ChessPublicator(Board::EMPTY);
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
         $chess->put(new Piece(Piece::BISHOP, Piece::WHITE), 'e4');
         self::assertTrue($chess->insufficientMaterial());
 
         // k vs k(b){0,} << bishop(s) in same color
-        $chess->clear();
+        $chess = new ChessPublicator(Board::EMPTY);
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
         $chess->put(new Piece(Piece::BISHOP, Piece::BLACK), 'e5');

@@ -66,6 +66,9 @@ final class Move implements \JsonSerializable
         if ($promotion !== null) {
             $flags |= Board::BITS['PROMOTION'];
         }
+        if (!isset($board[$from])) {
+            throw new \InvalidArgumentException('Invalid from: '.$from);
+        }
 
         return new self(
             $turn,

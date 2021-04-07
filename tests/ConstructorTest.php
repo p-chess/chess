@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace PChess\Chess\Test;
 
 use Imagine\Image\AbstractImagine;
-use PChess\Chess\Board;
 use PChess\Chess\Chess;
 use PChess\Chess\Output;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +15,6 @@ class ConstructorTest extends TestCase
     {
         $a = new Chess();
         $b = new Chess();
-        $b->load(Board::DEFAULT_POSITION);
         $output = new Output\AsciiOutput();
         self::assertEquals($output->render($a), $output->render($b));
     }

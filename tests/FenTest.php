@@ -11,13 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class FenTest extends TestCase
 {
-    public function testClear(): void
-    {
-        $chess = new Chess();
-        $chess->clear();
-        self::assertSame($chess->fen(), '8/8/8/8/8/8/8/8 w - - 0 1');
-    }
-
     public function testLoad(): void
     {
         $positions = [
@@ -268,9 +261,8 @@ class FenTest extends TestCase
             ['fen' => '3r1r2/3P2pk/1p1R3p/1Bp2p2/6q1/4Q3/PP3P1P/7K w - - 4 30', 'error_number' => 0, 'should_pass' => true],
         ];
 
-        $chess = new Chess();
         foreach ($positions as $position) {
-            $chess->load($position['fen']);
+            $chess = new Chess($position['fen']);
             self::assertEquals($position['fen'], $chess->fen());
         }
     }
