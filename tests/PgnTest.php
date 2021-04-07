@@ -9,18 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class PgnTest extends TestCase
 {
-    public function testClear(): void
-    {
-        // with clear
-        $chess = new ChessPublicator();
-        $chess->clear();
-        self::assertSame($chess->pgn(), '');
-
-        // without clear
-        $chess = new ChessPublicator();
-        self::assertSame($chess->pgn(), '');
-    }
-
     public function testNormal(): void
     {
         $chess = new ChessPublicator();
@@ -60,7 +48,7 @@ class PgnTest extends TestCase
         $chess->move('e4');
         $fen = $chess->fen();
 
-        $chess->load($fen); // do setup with black first
+        $chess = new ChessPublicator($fen); // do setup with black first
         $chess->move('e5');
         $chess->move('Nf3');
         $chess->move('Nc6');

@@ -33,11 +33,4 @@ class PiecePlacementTest extends TestCase
         $chess->remove('d3');
         self::assertNull($chess->get('d3'));
     }
-
-    public function testInvalidFen(): void
-    {
-        $chess = new Chess('8/8/8/8/8/8/8/8 w KQkq - 0 1');
-        $result = $chess->load('invalid FEN string');
-        self::assertNotNull($result);
-    }
 }

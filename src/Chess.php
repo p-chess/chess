@@ -34,12 +34,12 @@ class Chess
     public function __construct(?string $fen = Board::DEFAULT_POSITION)
     {
         $this->board = new Board();
-        if (null !== $error = $this->load($fen)) {
+        if (null !== $error = $this->load($fen ?? Board::DEFAULT_POSITION)) {
             throw new \InvalidArgumentException(\sprintf('Invalid fen: %s. Error: %s', $fen, $error));
         }
     }
 
-    public function clear(): void
+    protected function clear(): void
     {
         $boardHash = \json_encode($this->board);
         $this->boardHash = false === $boardHash ? '' : $boardHash;
@@ -78,7 +78,7 @@ class Chess
     private static function addMove(string $turn, Board $board, array &$moves, int $from, int $to, int $flags): void
     {
         // if pawn promotion
-        if ($board[$from]->isPawn() && (Board::rank($to) === Board::RANK_8 || Board::rank($to) === Board::RANK_1)) {
+        if (isset($board[$from]) && $board[$from]->isPawn() && (Board::rank($to) === Board::RANK_8 || Board::rank($to) === Board::RANK_1)) {
             $promotionPieces = [Piece::QUEEN, Piece::ROOK, Piece::BISHOP, Piece::KNIGHT];
             foreach ($promotionPieces as $promotionPiece) {
                 $moves[] = Move::buildMove($turn, $board, $from, $to, $flags, $promotionPiece);
@@ -100,7 +100,7 @@ class Chess
         return $this->header;
     }
 
-    public function load(string $fen): ?string
+    protected function load(string $fen): ?string
     {
         $result = Validation::validateFen($fen);
         if (!$result['valid']) {

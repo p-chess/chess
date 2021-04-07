@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace PChess\Chess\Test;
 
-use PChess\Chess\Board;
 use PHPUnit\Framework\TestCase;
 
 // source: https://chessprogramming.wikispaces.com/Perft+Results
@@ -17,7 +16,7 @@ class PerftTest extends TestCase
     {
         $chess = new ChessPublicator($fen);
         self::assertEquals($expectedDeep1, $chess->perft(1));
-        $chess->load(Board::DEFAULT_POSITION);
+        $chess = new ChessPublicator();
         self::assertEquals($expectedDeep2, $chess->perft(2));
     }
 
