@@ -12,9 +12,12 @@ use PChess\Chess\Chess;
  */
 abstract class HtmlOutput implements OutputInterface
 {
-    public function render(Chess $chess, ?string $from = null): string
+    /**
+     * @param mixed $identifier
+     */
+    public function render(Chess $chess, ?string $from = null, $identifier = null): string
     {
-        $links = $this->generateLinks($chess, $from);
+        $links = $this->generateLinks($chess, $from, $identifier);
         $reversed = $chess->board->isReversed();
         $output = '<table id="'.$this->getBoardId().'">';
         /** @var int $i */
@@ -50,12 +53,15 @@ abstract class HtmlOutput implements OutputInterface
      * (according to the result of $chess->moves() method).
      * In second case, you should assign a Link to cancel move start (on the same piece that started the move) to
      * the piece which SAN is identical to $from, and a Link to end move to every legal ending position
-     * (again, according to the result of $chess->moves() method). You must pay attention to special case of
+     * (according to the results of $chess->moves($from) method). You must pay attention to special case of
      * promotion (when piece is a pawn and is in rank 7).
+     * A possible identifier can be passed, to make a distinction between different Chess objects.
+     *
+     * @param mixed $identifier
      *
      * @return array<int, Link>
      */
-    abstract public function generateLinks(Chess $chess, ?string $from = null): array;
+    abstract public function generateLinks(Chess $chess, ?string $from = null, $identifier = null): array;
 
     protected function getBoardId(): string
     {

@@ -33,4 +33,17 @@ class PiecePlacementTest extends TestCase
         $chess->remove('d3');
         self::assertNull($chess->get('d3'));
     }
+
+    public function testCannotPutMoreThanOneKing(): void
+    {
+        $chess = new Chess();
+        self::assertFalse($chess->put(new Piece(Piece::KING, Piece::WHITE), 'e4'));
+    }
+
+    public function testRemovePieceWithHistory(): void
+    {
+        $chess = new Chess();
+        $chess->move('e4');
+        self::assertTrue($chess->remove('e2'));
+    }
 }

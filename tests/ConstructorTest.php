@@ -6,7 +6,10 @@ namespace PChess\Chess\Test;
 
 use Imagine\Image\AbstractImagine;
 use PChess\Chess\Chess;
+use PChess\Chess\History;
+use PChess\Chess\Move;
 use PChess\Chess\Output;
+use PChess\Chess\Piece;
 use PHPUnit\Framework\TestCase;
 
 class ConstructorTest extends TestCase
@@ -23,6 +26,14 @@ class ConstructorTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         new Chess('an invalid fen string');
+    }
+
+    public function testBuildWithHistory(): void
+    {
+        $move = new Move('w', 0, new Piece('p', 'w'), 100, 68);
+        $history = new History($move, ['w' => 116, 'b' => 4], 'b', ['w' => 96, 'b' => 96], null, 0, 1);
+        $chess = new Chess('rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1', [$history]);
+        self::assertCount(1, $chess->getHistory());
     }
 
     public function testUnicodeOutput(): void

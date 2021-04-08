@@ -49,6 +49,11 @@ final class Move implements \JsonSerializable
         $this->promotion = $promotion;
     }
 
+    public function __toString(): string
+    {
+        return (string) $this->san;
+    }
+
     public static function buildMove(
         string $turn,
         Board $board,

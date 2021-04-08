@@ -16,26 +16,6 @@ class MiscTest extends TestCase
         foreach ($moves as $move) {
             self::assertNotNull($chess->move($move), $move);
         }
-        self::assertSame($chess->history(), $moves);
-    }
-
-    public function testHistoryPrettyMoves(): void
-    {
-        $chess = new ChessPublicator();
-        $moves = ['e4','e6','d4','d5','Nc3','Nf6','Bg5','dxe4','Nxe4','Be7','Bxf6','gxf6','g3','f5','Nc3','Bf6'];
-
-        foreach ($moves as $move) {
-            self::assertNotNull($chess->move($move), $move);
-        }
-        $histories = $chess->history(true);
-
-        self::assertCount(\count($histories), $moves);
-        foreach ($histories as $k => $history) {
-            if (!\is_object($history)) {
-                continue;
-            }
-            self::assertSame($history->san, $moves[$k]);
-        }
     }
 
     public function testCachedGeneratedMovesHasSAN(): void
