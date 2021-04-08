@@ -31,11 +31,17 @@ class Chess
     /** @var array<string, string> */
     protected $sanMoveCache = [];
 
-    public function __construct(?string $fen = Board::DEFAULT_POSITION)
+    /**
+     * @param array<int, History>|null $history
+     */
+    public function __construct(?string $fen = Board::DEFAULT_POSITION, ?array $history = null)
     {
         $this->board = new Board();
         if (null !== $error = $this->load($fen ?? Board::DEFAULT_POSITION)) {
             throw new \InvalidArgumentException(\sprintf('Invalid fen: %s. Error: %s', $fen, $error));
+        }
+        if (null !== $history) {
+            $this->history = $history;
         }
     }
 
@@ -205,42 +211,6 @@ class Chess
         return \implode(' ', [$fen, $this->turn, $cFlags, $epFlags, $this->halfMoves, $this->moveNumber]);
     }
 
-    /**
-     * @return array<int, Move|string|null>
-     */
-    public function history(bool $verbose = false): array
-    {
-        $moveHistory = [];
-        $gameTmp = !empty($this->header['SetUp']) ? new self($this->header['FEN']) : new self();
-        $moveTmp = [];
-
-        foreach ($this->history as $history) {
-            $moveTmp['to'] = $history->move->to;
-            $moveTmp['from'] = $history->move->from;
-            if ($history->move->flags & Board::BITS['PROMOTION']) {
-                $moveTmp['promotion'] = $history->move->promotion;
-            }
-
-            $turn = $gameTmp->turn;
-            $moveObj = $gameTmp->move($moveTmp);
-
-            if (null !== $moveObj) {
-                if ($verbose) {
-                    $moveObj->turn = $turn;
-                    $moveHistory[] = $moveObj;
-                } else {
-                    $moveHistory[] = $moveObj->san;
-                }
-            }
-            $moveTmp = [];
-        }
-
-        //~ $move->flags |= Board::BITS['PROMOTION'];
-        //~ $move->promotion = $promotion;
-        return $moveHistory;
-    }
-
-    // this one from chess.js changed to return boolean (remove, true or false)
     public function remove(string $square): bool
     {
         // check for valid square

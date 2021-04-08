@@ -51,4 +51,9 @@ class History
         $this->halfMoves = $halfMoves;
         $this->moveNumber = $moveNumber;
     }
+
+    public function __toString(): string
+    {
+        return (string) $this->move;
+    }
 }

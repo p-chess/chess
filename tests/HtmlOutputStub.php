@@ -10,7 +10,7 @@ use PChess\Chess\Output\Link;
 
 final class HtmlOutputStub extends HtmlOutput
 {
-    public function generateLinks(Chess $chess, ?string $from = null): array
+    public function generateLinks(Chess $chess, ?string $from = null, $identifier = null): array
     {
         $links = [];
         /** @var int $i */

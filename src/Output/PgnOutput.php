@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PChess\Chess\Output;
 
+use PChess\Chess\Board;
 use PChess\Chess\Chess;
 use PChess\Chess\Piece;
 
@@ -28,15 +29,15 @@ final class PgnOutput implements OutputInterface
         // process movements
         $currentWidth = 0;
         $i = 1;
-        /** @var \PChess\Chess\Move $history */
-        foreach ($chess->history(true) as $history) {
-            if ($i === 1 && $history->turn === Piece::BLACK) {
+        $moves = self::getMoves($chess);
+        foreach ($moves as $move) {
+            if ($i === 1 && $move->turn === Piece::BLACK) {
                 $tmp = $i.'. ... ';
                 ++$i;
             } else {
                 $tmp = ($i % 2 === 1 ? \ceil($i / 2).'. ' : '');
             }
-            $tmp .= $history->san.' ';
+            $tmp .= $move->san.' ';
 
             $currentWidth += \strlen($tmp);
             if ($currentWidth > $maxWidth && $maxWidth > 0) {
@@ -52,5 +53,37 @@ final class PgnOutput implements OutputInterface
         } // remove last space
 
         return $output;
+    }
+
+    /**
+     * @return array<int, \PChess\Chess\Move>
+     */
+    private static function getMoves(Chess $chess): array
+    {
+        $moveHistory = [];
+        $gameTmp = !empty($chess->getHeader()['SetUp']) ? new Chess($chess->getHeader()['FEN']) : new Chess();
+        $moveTmp = [];
+
+        foreach ($chess->getHistory() as $history) {
+            $moveTmp['to'] = $history->move->to;
+            $moveTmp['from'] = $history->move->from;
+            if ($history->move->flags & Board::BITS['PROMOTION']) {
+                $moveTmp['promotion'] = $history->move->promotion;
+            }
+
+            $turn = $gameTmp->turn;
+            $moveObj = $gameTmp->move($moveTmp);
+
+            if (null !== $moveObj) {
+                $moveObj->turn = $turn;
+                $moveHistory[] = $moveObj;
+            }
+            $moveTmp = [];
+        }
+        unset($gameTmp);
+
+        //~ $move->flags |= Board::BITS['PROMOTION'];
+        //~ $move->promotion = $promotion;
+        return $moveHistory;
     }
 }

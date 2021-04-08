@@ -27,12 +27,12 @@ class MoveTest extends TestCase
             Board::BITS['NORMAL']
         ));
 
-        self::assertSame($move->piece->getType(), Piece::PAWN);
+        self::assertEquals(Piece::PAWN, $move->piece->getType());
         self::assertSame($move->turn, $chess->turn);
         self::assertSame($move->fromSquare, Board::SQUARES['a2']);
         self::assertSame($move->toSquare, Board::SQUARES['a4']);
-        self::assertSame($move->from, 'a2');
-        self::assertSame($move->to, 'a4');
+        self::assertEquals('a2', $move->from);
+        self::assertEquals('a4', $move->to);
         self::assertSame($move->flags, Board::BITS['NORMAL']);
     }
 
@@ -217,6 +217,12 @@ class MoveTest extends TestCase
         self::assertSame($chess->fen(), $fenStart);
     }
 
+    public function testUndoMoveWithEmptyHistory(): void
+    {
+        $chess = new ChessPublicator();
+        self::assertNull($chess->undoMovePublic());
+    }
+
     public function testMoveToSAN(): void
     {
         $chess = new ChessPublicator();
@@ -231,7 +237,8 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        self::assertSame($undo->san, 'e4');
+        self::assertEquals('e4', $undo->san);
+        self::assertEquals('e4', (string) $undo);
 
         // normal knight move
         $chess->makeMovePublic($move);
@@ -244,7 +251,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        self::assertSame($undo->san, 'Nf6');
+        self::assertEquals('Nf6', $undo->san);
 
         // normal pawn capture
         $chess = new ChessPublicator('rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2');
@@ -257,7 +264,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        self::assertSame($undo->san, 'exd5');
+        self::assertEquals('exd5', $undo->san);
 
         // en passant capture
         $chess = new ChessPublicator('rnbqkbnr/ppp2ppp/8/3Pp3/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1');
@@ -270,7 +277,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        self::assertSame($undo->san, 'dxe6');
+        self::assertEquals('dxe6', $undo->san);
 
         // normal knight capture
         $chess = new ChessPublicator('rnbqkb1r/ppp1pppp/5n2/3P4/8/5N2/PPPP1PPP/RNBQKB1R b KQkq - 2 3');
@@ -283,7 +290,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        self::assertSame($undo->san, 'Nxd5');
+        self::assertEquals('Nxd5', $undo->san);
 
         // promotion
         $chess = new ChessPublicator('8/2KP4/8/5k2/8/8/8/8 w - - 0 1');
@@ -297,7 +304,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        self::assertSame($undo->san, 'd8=R');
+        self::assertEquals('d8=R', $undo->san);
 
         // check
         $chess = new ChessPublicator('3R4/2K5/8/5k2/8/8/8/8 w - - 0 1');
@@ -310,7 +317,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        self::assertSame($undo->san, 'Rf8+');
+        self::assertEquals('Rf8+', $undo->san);
 
         // checkmate
         $chess = new ChessPublicator('5k2/8/1R3K2/8/8/8/8/8 w - - 0 1');
@@ -323,7 +330,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        self::assertSame($undo->san, 'Rb8#');
+        self::assertEquals('Rb8#', $undo->san);
 
         // ambiguous moves: row
         $chess = new ChessPublicator('2N2k2/8/3p4/8/2N5/8/1K6/8 w - - 0 1');
@@ -336,7 +343,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        self::assertSame($undo->san, 'N4xd6');
+        self::assertEquals('N4xd6', $undo->san);
 
         // ambiguous moves: rank > 0 & file > 0
         $chess = new ChessPublicator('8/8/8/2qqq3/2qPq3/2qqq3/1n6/K6k b - - 0 1'); // this one is really ambiguous haha
@@ -349,7 +356,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        self::assertSame($undo->san, 'Qd5xd4');
+        self::assertEquals('Qd5xd4', $undo->san);
 
         // ambiguous moves: col
         $chess = new ChessPublicator('5k2/8/3p4/8/2N1N3/8/1K6/8 w - - 0 1');
@@ -362,7 +369,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        self::assertSame($undo->san, 'Nexd6');
+        self::assertEquals('Nexd6', $undo->san);
 
         // ambiguous moves: col
         $chess = new ChessPublicator('5k2/8/3p4/8/2N1N3/8/1K6/8 w - - 0 1');
@@ -375,7 +382,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        self::assertSame($undo->san, 'Ncxd6');
+        self::assertEquals('Ncxd6', $undo->san);
 
         // ambiguous moves: normal capture
         $chess = new ChessPublicator('5k2/8/3p2R1/8/2N5/8/1K6/8 w - - 0 1');
@@ -388,7 +395,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        self::assertSame($undo->san, 'Nxd6');
+        self::assertEquals('Nxd6', $undo->san);
 
         // ambiguous moves: normal capture
         $chess = new ChessPublicator('5k2/8/3p2R1/8/2N5/8/1K6/8 w - - 0 1');
@@ -401,7 +408,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
-        self::assertSame($undo->san, 'Rxd6');
+        self::assertEquals('Rxd6', $undo->san);
 
         // generate moves test
         $chess = new ChessPublicator('8/ppp2P2/pkp5/ppp5/5PPP/5PKP/5PPP/8 w - - 0 1');
@@ -521,5 +528,11 @@ class MoveTest extends TestCase
         $chess = new ChessPublicator();
         $moves = $chess->generateMovesPublic(Board::SQUARES['a2'], false);
         self::assertCount(2, $moves);
+    }
+
+    public function testRemoveInvalidSquare(): void
+    {
+        $chess = new Chess();
+        self::assertFalse($chess->remove('invalid'));
     }
 }
