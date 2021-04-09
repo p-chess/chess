@@ -22,8 +22,6 @@ class Chess
     protected $moveNumber = 1;
     /** @var array<int, History> */
     protected $history = [];
-    /** @var array<string, string> */
-    protected $header = [];
     /** @var array<string, array> */
     protected $generateMovesCache = [];
     /** @var string */
@@ -56,25 +54,11 @@ class Chess
         $this->halfMoves = 0;
         $this->moveNumber = 1;
         $this->history = [];
-        $this->header = [];
         $this->generateMovesCache = [];
         $this->sanMoveCache = [];
 
         for ($i = 0; $i < 120; ++$i) {
             $this->board[$i] = null;
-        }
-    }
-
-    protected function updateSetup(string $fen): void
-    {
-        if (\count($this->history) > 0) {
-            return;
-        }
-        if ($fen !== Board::DEFAULT_POSITION) {
-            $this->header['SetUp'] = '1';
-            $this->header['FEN'] = $fen;
-        } else {
-            unset($this->header['SetUp'], $this->header['FEN']);
         }
     }
 
@@ -92,18 +76,6 @@ class Chess
         } else {
             $moves[] = Move::buildMove($turn, $board, $from, $to, $flags);
         }
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public function header(?string $key = null, string $value = ''): array
-    {
-        if ($key !== null) {
-            $this->header[$key] = $value;
-        }
-
-        return $this->header;
     }
 
     protected function load(string $fen): ?string
@@ -156,8 +128,6 @@ class Chess
 
         // move number
         $this->moveNumber = (int) $tokens[5];
-
-        $this->updateSetup($this->fen());
 
         return null;
     }
@@ -225,8 +195,6 @@ class Chess
             $this->kings[$piece->getColor()] = null;
         }
 
-        $this->updateSetup($this->fen());
-
         return true;
     }
 
@@ -258,8 +226,6 @@ class Chess
         if ($piece->isKing()) {
             $this->kings[$piece->getColor()] = $sq;
         }
-
-        $this->updateSetup($this->fen());
 
         return true;
     }
@@ -939,13 +905,5 @@ class Chess
     public function getHistory(): array
     {
         return $this->history;
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public function getHeader(): array
-    {
-        return $this->header;
     }
 }

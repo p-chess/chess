@@ -8,7 +8,6 @@ use PChess\Chess\Board;
 use PChess\Chess\Chess;
 use PChess\Chess\History;
 use PChess\Chess\Move;
-use PChess\Chess\Output\PgnOutput;
 
 // a proxy for testing protected method
 class ChessPublicator extends Chess
@@ -105,10 +104,5 @@ class ChessPublicator extends Chess
         }
 
         return \compact('nodes', 'captures', 'enPassants', 'castles', 'promotions', 'checks', 'checkmates');
-    }
-
-    public function pgn(): string
-    {
-        return (new PgnOutput())->render($this);
     }
 }
