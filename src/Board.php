@@ -26,20 +26,10 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
     ];
 
     public const ROOKS = [
-        Piece::WHITE => [['square' => self::SQUARES['a1'], 'flag' => self::BITS['QSIDE_CASTLE']],
-            ['square' => self::SQUARES['h1'], 'flag' => self::BITS['KSIDE_CASTLE']], ],
-        Piece::BLACK => [['square' => self::SQUARES['a8'], 'flag' => self::BITS['QSIDE_CASTLE']],
-            ['square' => self::SQUARES['h8'], 'flag' => self::BITS['KSIDE_CASTLE']], ],
-    ];
-
-    public const BITS = [
-        'NORMAL' => 1,
-        'CAPTURE' => 2,
-        'BIG_PAWN' => 4,
-        'EP_CAPTURE' => 8,
-        'PROMOTION' => 16,
-        'KSIDE_CASTLE' => 32,
-        'QSIDE_CASTLE' => 64,
+        Piece::WHITE => [['square' => self::SQUARES['a1'], 'flag' => Move::BITS['QSIDE_CASTLE']],
+            ['square' => self::SQUARES['h1'], 'flag' => Move::BITS['KSIDE_CASTLE']], ],
+        Piece::BLACK => [['square' => self::SQUARES['a8'], 'flag' => Move::BITS['QSIDE_CASTLE']],
+            ['square' => self::SQUARES['h8'], 'flag' => Move::BITS['KSIDE_CASTLE']], ],
     ];
 
     public const RANK_1 = 7;
