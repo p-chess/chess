@@ -6,6 +6,16 @@ namespace PChess\Chess;
 
 final class Move implements \JsonSerializable
 {
+    public const BITS = [
+        'NORMAL' => 1,
+        'CAPTURE' => 2,
+        'BIG_PAWN' => 4,
+        'EP_CAPTURE' => 8,
+        'PROMOTION' => 16,
+        'KSIDE_CASTLE' => 32,
+        'QSIDE_CASTLE' => 64,
+    ];
+
     /** @var string */
     public $turn;
 
@@ -65,11 +75,11 @@ final class Move implements \JsonSerializable
         $captured = null;
         if ($board[$to] !== null) {
             $captured = $board[$to]->getType();
-        } elseif ($flags & Board::BITS['EP_CAPTURE']) {
+        } elseif ($flags & self::BITS['EP_CAPTURE']) {
             $captured = Piece::PAWN;
         }
         if ($promotion !== null) {
-            $flags |= Board::BITS['PROMOTION'];
+            $flags |= self::BITS['PROMOTION'];
         }
         if (!isset($board[$from])) {
             throw new \InvalidArgumentException('Invalid from: '.$from);
