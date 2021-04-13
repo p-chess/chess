@@ -81,8 +81,8 @@ class Chess
     protected function load(string $fen): ?string
     {
         $result = Validation::validateFen($fen);
-        if (!$result['valid']) {
-            return $result['error'];
+        if ($result > 0) {
+            return Validation::getError($result);
         }
         $tokens = \explode(' ', $fen);
         $this->clear();
