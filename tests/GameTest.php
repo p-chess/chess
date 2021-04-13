@@ -30,6 +30,12 @@ class GameTest extends TestCase
         self::assertTrue($chess->gameOver() || $i > 50);
     }
 
+    public function testInvalidMove(): void
+    {
+        $chess = new Chess();
+        self::assertNull($chess->move('yxz'));
+    }
+
     public function testGetHistory(): void
     {
         $chess = new Chess();
