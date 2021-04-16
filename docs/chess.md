@@ -5,12 +5,12 @@ It represents a chess game.
 
 ## Main method
 
-### `__construct(?string $fen, ?array $history)`
+### `__construct(?string $fen, ?History $history)`
 
 This is the main method. If you invoke it without arguments, you simply get an instance of the class.
 If you decide to start a game from a particular position, you can pass it as first argument,
 in [FEN](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation) notation.
-Also, you can pass an array of [`\Pchess\Chess\History`](history.md) objects (that are supposed to be consistent
+Also, you can pass an [`\Pchess\Chess\History`](history.md) object (that is supposed to be consistent
 with the first argument, even if no check is performed).
   
 ## Move-related
@@ -85,9 +85,9 @@ Controls if game is over.
 
 Gets the current position in [FEN](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation) notation.
 
-### `getHistory(): array`
+### `getHistory(): History`
 
-Gets a list of moves as [`\Pchess\Chess\Board\History`](history.md) objects.
+Gets [`\Pchess\Chess\Board\History`](history.md) object.
 
 ## Public properties
 

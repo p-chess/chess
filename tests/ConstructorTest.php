@@ -6,6 +6,7 @@ namespace PChess\Chess\Test;
 
 use Imagine\Image\AbstractImagine;
 use PChess\Chess\Chess;
+use PChess\Chess\Entry;
 use PChess\Chess\History;
 use PChess\Chess\Move;
 use PChess\Chess\Output;
@@ -31,9 +32,11 @@ class ConstructorTest extends TestCase
     public function testBuildWithHistory(): void
     {
         $move = new Move('w', 0, new Piece('p', 'w'), 100, 68);
-        $history = new History($move, ['w' => 116, 'b' => 4], 'b', ['w' => 96, 'b' => 96], null, 0, 1);
-        $chess = new Chess('rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1', [$history]);
-        self::assertCount(1, $chess->getHistory());
+        $history = new History();
+        $entry = new Entry($move, null, ['w' => 116, 'b' => 4], ['w' => 96, 'b' => 96], null, 0, 1);
+        $history->add($entry);
+        $chess = new Chess('rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1', $history);
+        self::assertCount(1, $chess->getHistory()->getEntries());
     }
 
     public function testUnicodeOutput(): void

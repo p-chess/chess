@@ -20,8 +20,8 @@ class Chess
     protected $halfMoves = 0;
     /** @var int */
     protected $moveNumber = 1;
-    /** @var array<int, History> */
-    protected $history = [];
+    /** @var History */
+    protected $history;
     /** @var array<string, array<int, Move>> */
     protected $generateMovesCache = [];
     /** @var string */
@@ -29,18 +29,13 @@ class Chess
     /** @var array<string, string> */
     protected $sanMoveCache = [];
 
-    /**
-     * @param array<int, History>|null $history
-     */
-    public function __construct(?string $fen = Board::DEFAULT_POSITION, ?array $history = null)
+    public function __construct(?string $fen = Board::DEFAULT_POSITION, ?History $history = null)
     {
         $this->board = new Board();
         if (null !== $error = $this->load($fen ?? Board::DEFAULT_POSITION)) {
             throw new \InvalidArgumentException(\sprintf('Invalid fen: %s. Error: %s', $fen, $error));
         }
-        if (null !== $history) {
-            $this->history = $history;
-        }
+        $this->history = $history ?? new History();
     }
 
     protected function clear(): void
@@ -53,7 +48,6 @@ class Chess
         $this->epSquare = null;
         $this->halfMoves = 0;
         $this->moveNumber = 1;
-        $this->history = [];
         $this->generateMovesCache = [];
         $this->sanMoveCache = [];
 
@@ -318,29 +312,27 @@ class Chess
 
         $boardHash = \json_encode($this->board);
         $this->boardHash = false === $boardHash ? '' : $boardHash;
-        $this->history[$historyKey]->position = $this->boardHash;
+        $this->history->get($historyKey)->position = $this->boardHash;
     }
 
     protected function recordMove(Move $move): int
     {
-        $this->history[] = new History(
+        $this->history->add(new Entry(
             $move,
-            [Piece::WHITE => $this->kings[Piece::WHITE], Piece::BLACK => $this->kings[Piece::BLACK]],
-            $this->turn,
-            [Piece::WHITE => $this->castling[Piece::WHITE], Piece::BLACK => $this->castling[Piece::BLACK]],
+            $this->boardHash,
+            $this->kings,
+            $this->castling,
             $this->epSquare,
             $this->halfMoves,
             $this->moveNumber
-        );
+        ));
 
-        \end($this->history);
-
-        return \key($this->history);
+        return $this->history->key();
     }
 
     protected function undoMove(): ?Move
     {
-        $old = \array_pop($this->history);
+        $old = $this->history->pop();
         if ($old === null) {
             return null;
         }
@@ -752,14 +744,14 @@ class Chess
     public function inThreefoldRepetition(): bool
     {
         $hash = [];
-        foreach ($this->history as $history) {
-            if (isset($hash[$history->position])) {
-                ++$hash[$history->position];
+        foreach ($this->history->getEntries() as $entry) {
+            if (isset($hash[$entry->position])) {
+                ++$hash[$entry->position];
             } else {
-                $hash[$history->position] = 1;
+                $hash[$entry->position] = 1;
             }
 
-            if ($hash[$history->position] >= 3) {
+            if ($hash[$entry->position] >= 3) {
                 return true;
             }
         }
@@ -899,10 +891,7 @@ class Chess
         $move->san = $output;
     }
 
-    /**
-     * @return array<int, History>
-     */
-    public function getHistory(): array
+    public function getHistory(): History
     {
         return $this->history;
     }

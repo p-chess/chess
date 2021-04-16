@@ -6,7 +6,7 @@ namespace PChess\Chess\Test;
 
 use PChess\Chess\Board;
 use PChess\Chess\Chess;
-use PChess\Chess\History;
+use PChess\Chess\Entry;
 use PChess\Chess\Move;
 
 // a proxy for testing protected method
@@ -17,9 +17,9 @@ class ChessPublicator extends Chess
         return $this->board;
     }
 
-    public function getLastHistory(): History
+    public function getLastHistory(): Entry
     {
-        return $this->history[\count($this->history) - 1];
+        return $this->history->get(\count($this->history->getEntries()) - 1);
     }
 
     public function attackedPublic(string $color, int $square): bool
