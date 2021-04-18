@@ -40,7 +40,7 @@ class GameTest extends TestCase
     {
         $chess = new Chess();
         $chess->move('e4');
-        self::assertEquals('e4', $chess->getHistory()[0]->move->san);
-        self::assertEquals('e4', $chess->getHistory()[0]);
+        self::assertEquals('e4', $chess->getHistory()->get(0)->move->san);
+        self::assertEquals('e4', $chess->getHistory()->get(0));
     }
 }

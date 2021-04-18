@@ -1,9 +1,9 @@
 # History
 
-The `\Pchess\Chess\History` class is a simple value object representing an entry of 
-the history of moves in [`\Pchess\Chess\Chess`](chess.md).
+The `\Pchess\Chess\History` class contains instances of `\Pchess\Chess\Entry`.
+Each entry is a value object representing a record of a move in [`\Pchess\Chess\Chess`](chess.md).
 
-The object is composed by the following properties:
+The `Entry` object is composed by the following properties:
 
 |Property      | Type   | Description            |
 |--------------|--------|------------------------|
