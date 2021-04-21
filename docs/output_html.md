@@ -179,4 +179,4 @@ The output is something like the following:
 
 This is a preview of HTML displayed above, with a bit of styling applied:
 
-<img src="https://user-images.githubusercontent.com/179866/113510143-9b982700-9559-11eb-9152-a8e7977326fa.png">
+<img src="https://user-images.githubusercontent.com/179866/114995898-92cf1b80-9e9e-11eb-8e99-75a60bbba6bd.png">
