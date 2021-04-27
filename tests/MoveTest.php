@@ -460,16 +460,11 @@ class MoveTest extends TestCase
 
     /**
      * @dataProvider gameProvider
-     *
-     * @param string $match
-     * @param string $finalFen
      */
     public function testSANMoveFromRealGame(string $match, string $finalFen): void
     {
         $chess = new ChessPublicator();
-        $moves = \preg_replace('/(\d*)\./', '', $match);
-        $moves = \str_replace(["\t", "\n", "\r", '  '], ['', ' ', ' ', ' '], $moves);
-        $moves = \explode(' ', \trim($moves));
+        $moves = \explode(' ', $match);
         foreach ($moves as $move) {
             self::assertNotNull($chess->move($move), $move);
         }
@@ -477,31 +472,24 @@ class MoveTest extends TestCase
     }
 
     /**
-     * @return array<string, array>
+     * @return array<string, array<int, string>>
      */
     public function gameProvider(): array
     {
-        $match1 = '1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Nxd4 Nf6 5.Nc3 Bb4 6.Nxc6 bxc6 7.Qd4 Qe7 8.f3 d5 9.Bg5 O-O 10.O-O-O Bc5 11.Bxf6 gxf6 12.Qa4 Be3+ 13.Kb1 d4 14.Ne2 c5 15.Nc1 Be6 16.Bc4 Rfb8 17.Nd3 Rb6';
-        $match2 = '1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.O-O d6 5.c3 Nf6 6.d4 exd4 7.cxd4 Bb6 8.Nc3 O-O
-		9.h3 h6 10.Be3 Re8 11.d5 Ne5 12.Nxe5 dxe5 13.Bxb6 axb6 14.f4 Qd6 15.fxe5 Rxe5
-		16.Qe2 Rg5 17.Rf3 Qc5+ 18.Kh1 Ng4 19.Rg3 Ne5 20.Rxg5 hxg5 21.Bb3 g4 22.Rf1 Qe7
-		23.Qe3 Qh4 24.Qf4 Qh5 25.Nb5 gxh3 26.Qe3 hxg2+ 27.Kxg2 Qg6+ 28.Kh1 Bd7 29.Nxc7 Rc8
-		30.d6 Kh7';
-        $match3 = '1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Nxd4 Nf6 5.Nxc6 bxc6 6.e5 Qe7 7.Qe2 Nd5 8.c4 Nb6
-		9.Nd2 Qe6 10.b3 a5 11.Bb2 Bb4 12.a3 Bxd2+ 13.Qxd2 d5 14.cxd5 cxd5 15.Rc1 O-O
-		16.Rxc7 Qg6 17.f3 Bf5 18.g4 Bb1 19.Bb5 Rac8 20.Rxc8 Rxc8 21.O-O h5 22.h3 hxg4
-		23.hxg4 Bc2 24.Qd4 Qe6 25.Rf2 Rc7 26.Rh2 Nd7 27.b4 axb4 28.axb4 Nf8 29.Bf1 Bb3
-		30.Bd3 Bc4 31.Bf5 Qe7 32.Qd2 Rc6 33.Bd4 Ra6 34.Bb1 Ra3 35.Rh3 Rb3 36.Bc2 Qxb4
-		37.Qf2 Ng6 38.e6 Rb1+ 39.Bxb1 Qxb1+ 40.Kh2 fxe6 41.Qb2 Qxb2+ 42.Bxb2 Nf4
-		43.Rh4 Nd3 44.Bc3 e5 45.Kg3 d4 46.Bd2 Bd5 47.Rh5 Kf7 48.Ba5 Ke6 49.Rh8 Nb2
-		50.Re8+ Kd6 51.Bb4+ Kc6 52.Rc8+ Kd7 53.Rc5 Ke6 54.Rc7 g6 55.Re7+ Kf6 56.Rd7 Ba2
-		57.Ra7 Bc4 58.Ba5 Bd3 59.f4 exf4+ 60.Kxf4 Bc2 61.Ra6+ Kf7 62.Ke5 Nd3+ 63.Kxd4 Nf2
-		64.g5 Bf5 65.Bd2 Ke7 66.Kd5 Ne4 67.Ra7+ Ke8 68.Be3 Nc3+ 69.Ke5 Kd8 70.Bb6+ Ke8
-		71.Rc7 Ne4 72.Be3 Ng3 73.Bf4 Nh5 74.Ra7 Kf8 75.Bh2 Ng7 76.Bg1 Nh5 77.Bc5+ Kg8
-		78.Kd6 Kf8 79.Bd4 Bg4 80.Be5 Bf5 81.Rh7 Kg8 82.Rc7 Kf8 83.Kc6 Kg8 84.Re7 Kf8
-		85.Bd6 Kg8 86.Re8+ Kf7 87.Re7+ Kg8 88.Be5 Kf8 89.Ra7 Bg4 90.Kd6 Bh3 91.Ra3 Bg4
-		92.Re3 Bf5 93.Kc7 Kf7 94.Kd8 Bg4 95.Bb2 Be6 96.Bc3 Bf5 97.Re7+ Kf8 98.Be5 Bd3
-		99.Ra7 Be4 100.Rc7 Bb1 101.Bd6+ Kg8 102.Ke7';
+        $match1 = 'e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6 Nc3 Bb4 Nxc6 bxc6 Qd4 Qe7 f3 d5 Bg5 O-O O-O-O Bc5 Bxf6 gxf6 Qa4 '.
+            'Be3+ Kb1 d4 Ne2 c5 Nc1 Be6 Bc4 Rfb8 Nd3 Rb6';
+        $match2 = 'e4 e5 Nf3 Nc6 Bc4 Bc5 O-O d6 c3 Nf6 d4 exd4 cxd4 Bb6 Nc3 O-O h3 h6 Be3 Re8 d5 Ne5 Nxe5 dxe5 Bxb6 '.
+            'axb6 f4 Qd6 fxe5 Rxe5 Qe2 Rg5 Rf3 Qc5+ Kh1 Ng4 Rg3 Ne5 Rxg5 hxg5 Bb3 g4 Rf1 Qe7 Qe3 Qh4 Qf4 Qh5 Nb5 gxh3'.
+            ' Qe3 hxg2+ Kxg2 Qg6+ Kh1 Bd7 Nxc7 Rc8 d6 Kh7';
+        $match3 = 'e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6 Nxc6 bxc6 e5 Qe7 Qe2 Nd5 c4 Nb6 Nd2 Qe6 b3 a5 Bb2 Bb4 a3 Bxd2+ '.
+            'Qxd2 d5 cxd5 cxd5 Rc1 O-O Rxc7 Qg6 f3 Bf5 g4 Bb1 Bb5 Rac8 Rxc8 Rxc8 O-O h5 h3 hxg4 hxg4 Bc2 Qd4 Qe6 Rf2 '.
+            'Rc7 Rh2 Nd7 b4 axb4 axb4 Nf8 Bf1 Bb3 Bd3 Bc4 Bf5 Qe7 Qd2 Rc6 Bd4 Ra6 Bb1 Ra3 Rh3 Rb3 Bc2 Qxb4 Qf2 Ng6 '.
+            'e6 Rb1+ Bxb1 Qxb1+ Kh2 fxe6 Qb2 Qxb2+ Bxb2 Nf4 Rh4 Nd3 Bc3 e5 Kg3 d4 Bd2 Bd5 Rh5 Kf7 Ba5 Ke6 Rh8 Nb2 '.
+            'Re8+ Kd6 Bb4+ Kc6 Rc8+ Kd7 Rc5 Ke6 Rc7 g6 Re7+ Kf6 Rd7 Ba2 Ra7 Bc4 Ba5 Bd3 f4 exf4+ Kxf4 Bc2 Ra6+ Kf7 '.
+            'Ke5 Nd3+ Kxd4 Nf2 g5 Bf5 Bd2 Ke7 Kd5 Ne4 Ra7+ Ke8 Be3 Nc3+ Ke5 Kd8 Bb6+ Ke8 Rc7 Ne4 Be3 Ng3 Bf4 Nh5 Ra7 '.
+            'Kf8 Bh2 Ng7 Bg1 Nh5 Bc5+ Kg8 Kd6 Kf8 Bd4 Bg4 Be5 Bf5 Rh7 Kg8 Rc7 Kf8 Kc6 Kg8 Re7 Kf8 Bd6 Kg8 Re8+ Kf7 '.
+            'Re7+ Kg8 Be5 Kf8 Ra7 Bg4 Kd6 Bh3 Ra3 Bg4 Re3 Bf5 Kc7 Kf7 Kd8 Bg4 Bb2 Be6 Bc3 Bf5 Re7+ Kf8 Be5 Bd3 Ra7 '.
+            'Be4 Rc7 Bb1 Bd6+ Kg8 Ke7';
 
         return [
             'Alekhine - Ljubimov' => [$match1, 'r5k1/p1p1qp1p/1r2bp2/2p5/Q1BpP3/3NbP2/PPP3PP/1K1R3R w - - 6 18'],
