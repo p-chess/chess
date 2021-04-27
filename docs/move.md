@@ -36,7 +36,7 @@ public static function buildMove(
 
 The `$san` property is set in the `move()` method of [`\Pchess\Chess\Chess`](chess.md) class.
 
-The informations about move type, stored in `$flags` properties as bits, are:
+The information about move type, stored in `$flags` properties as bits, is:
 
 |Bit | Name         | Description         |
 |----|--------------|---------------------|

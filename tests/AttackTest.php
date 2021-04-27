@@ -194,16 +194,10 @@ class AttackTest extends TestCase
          * [BlackElo "?"]
          * [PlyCount "67"]
          */
-        $match = '1. e4 e6 2. d4 d5 3. Nc3 Nf6 4. Bg5 dxe4 5. Nxe4 Be7 6. Bxf6
-		gxf6 7. g3 f5 8. Nc3 Bf6 9. Nge2 Nc6 10. d5 exd5 11. Nxd5 Bxb2
-		12. Bg2 O-O 13. O-O Bh8 14. Nef4 Ne5 15. Qh5 Ng6 16. Rad1 c6
-		17. Ne3 Qf6 18. Kh1 Bg7 19. Bh3 Ne7 20. Rd3 Be6 21. Rfd1 Bh6
-		22. Rd4 Bxf4 23. Rxf4 Rad8 24. Rxd8 Rxd8 25. Bxf5 Nxf5
-		26. Nxf5 Rd5 27. g4 Bxf5 28. gxf5 h6 29. h3 Kh7 30. Qe2 Qe5
-		31. Qh5 Qf6 32. Qe2 Re5 33.Qd3 Rd5 34.Qe2';
-        $moves = \preg_replace("/(\d*)\./", '', $match);
-        $moves = \str_replace(["\t", "\n", "\r", '  '], ['', ' ', ' ', ' '], $moves);
-        $moves = \explode(' ', \trim($moves));
+        $match = 'e4 e6 d4 d5 Nc3 Nf6 Bg5 dxe4 Nxe4 Be7 Bxf6 gxf6 g3 f5 Nc3 Bf6 Nge2 Nc6 d5 exd5 Nxd5 Bxb2 Bg2 '.
+            'O-O O-O Bh8 Nef4 Ne5 Qh5 Ng6 Rad1 c6 Ne3 Qf6 Kh1 Bg7 Bh3 Ne7 Rd3 Be6 Rfd1 Bh6 Rd4 Bxf4 Rxf4 Rad8 '.
+            'Rxd8 Rxd8 Bxf5 Nxf5 Nxf5 Rd5 g4 Bxf5 gxf5 h6 h3 Kh7 Qe2 Qe5 Qh5 Qf6 Qe2 Re5 Qd3 Rd5 Qe2';
+        $moves = \explode(' ', \trim($match));
         foreach ($moves as $move) {
             self::assertNotNull($chess->move($move), $move);
         }
