@@ -1,18 +1,18 @@
 <?php
 
-return PhpCsFixer\Config::create()
+return (new PhpCsFixer\Config())
     ->setRules([
         '@PSR2' => true,
         'array_syntax' => ['syntax' => 'short'],
-        'binary_operator_spaces' => ['align_double_arrow' => false, 'align_equals' => false],
+        'binary_operator_spaces' => ['operators' => ['=>' => 'single_space', '=' => 'single_space']],
         'blank_line_after_opening_tag' => true,
-        'blank_line_before_return' => true,
+        'blank_line_before_statement' => ['statements' => ['return']],
         'cast_spaces' => true,
         'concat_space' => ['spacing' => 'none'],
         'declare_strict_types' => true,
         'fully_qualified_strict_types' => true,
-        'method_separation' => true,
-        'native_function_invocation' => true,
+        'phpdoc_separation' => true,
+        'native_function_invocation' => ['include' => ['@all']],
         'new_with_braces' => true,
         'no_blank_lines_after_class_opening' => true,
         'no_extra_blank_lines' => true,
@@ -23,14 +23,12 @@ return PhpCsFixer\Config::create()
         'ordered_imports' => true,
         'phpdoc_align' => true,
         'phpdoc_no_access' => true,
-        'phpdoc_separation' => true,
         'php_unit_fqcn_annotation' => true,
-        'pre_increment' => true,
         'self_accessor' => true,
         'single_blank_line_before_namespace' => true,
         'single_quote' => true,
         'return_type_declaration' => true,
-        'trailing_comma_in_multiline_array' => true,
+        'trailing_comma_in_multiline' => true,
         'trim_array_spaces' => true,
         'void_return' => true,
     ])

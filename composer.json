@@ -22,10 +22,10 @@
         "ext-json": "*"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.18",
+        "friendsofphp/php-cs-fixer": "^3.0",
         "imagine/imagine": "^1.2",
-        "johnkary/phpunit-speedtrap": "^3.3",
-        "phpbench/phpbench": "^1.0@alpha",
+        "johnkary/phpunit-speedtrap": "^4.0",
+        "phpbench/phpbench": "^1.0",
         "phpstan/phpstan": "^0.12",
         "phpunit/phpunit": "^8.5 || ^9.5"
     },
@@ -61,8 +61,8 @@
           "@phpstan",
           "@test-ci"
         ],
-        "check-cs": "./vendor/bin/php-cs-fixer fix --dry-run",
-        "fix-cs": "./vendor/bin/php-cs-fixer fix",
+        "check-cs": "./vendor/bin/php-cs-fixer fix -v --dry-run",
+        "fix-cs": "./vendor/bin/php-cs-fixer fix -v",
         "phpstan": "./vendor/bin/phpstan analyze",
         "test": "./vendor/bin/phpunit",
         "test-ci": "./vendor/bin/phpunit --coverage-clover 'clover.xml'"
