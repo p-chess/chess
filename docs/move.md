@@ -31,7 +31,7 @@ public static function buildMove(
     int $to,
     int $flags,
     ?string $promotion = null
-);
+): self
 ```
 
 The `$san` property is set in the `move()` method of [`\Pchess\Chess\Chess`](chess.md) class.
@@ -46,4 +46,4 @@ The information about move type, stored in `$flags` properties as bits, is:
 | 8  | EP_CAPTURE   | En passant          |
 | 16 | PROMOTION    | Promotion           |
 | 32 | KSIDE_CASTLE | Short castling      |
-| 64 | QSITE_CASTLE | Long castling       |
+| 64 | QSIDE_CASTLE | Long castling       |
