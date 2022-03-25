@@ -35,7 +35,7 @@ final class Validation
             return 1;
         }
 
-        // 2nd criterion: move number field is a integer value > 0
+        // 2nd criterion: move number field is an integer value > 0
         if (!\ctype_digit($tokens[5]) || (int) $tokens[5] <= 0) {
             return 2;
         }
@@ -50,13 +50,13 @@ final class Validation
             return 4;
         }
 
-        // 5th criterion: 3th field is a valid castle-string
-        if (!(\preg_match('/(^-$)|(^[K|Q|k|q]+$)/', $tokens[2]) === 1)) {
+        // 5th criterion: 3rd field is a valid castle-string
+        if (!(\preg_match('/(^-$)|(^[KQkq]+$)/', $tokens[2]) === 1)) {
             return 5;
         }
 
         // 6th criterion: 2nd field is "w" (white) or "b" (black)
-        if ($tokens[1] !== 'w' && $tokens[1] !== 'b') {
+        if ($tokens[1] !== Piece::WHITE && $tokens[1] !== Piece::BLACK) {
             return 6;
         }
 
@@ -95,8 +95,8 @@ final class Validation
 
         // 11th criterion: en-passant if last is black's move, then its must be white turn
         if (\strlen($tokens[3]) > 1) {
-            if (($tokens[3][1] === '3' && $tokens[1] === 'w') ||
-                ($tokens[3][1] === '6' && $tokens[1] === 'b')) {
+            if (($tokens[3][1] === '3' && $tokens[1] === Piece::WHITE) ||
+                ($tokens[3][1] === '6' && $tokens[1] === Piece::BLACK)) {
                 return 11;
             }
         }
