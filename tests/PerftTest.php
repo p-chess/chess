@@ -21,7 +21,7 @@ class PerftTest extends TestCase
     }
 
     /**
-     * @return array<string, array>
+     * @return array<string, array<int, int|string>>
      */
     public function provider(): array
     {

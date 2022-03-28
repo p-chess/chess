@@ -27,7 +27,7 @@
         "imagine/imagine": "^1.2",
         "johnkary/phpunit-speedtrap": "^4.0",
         "phpbench/phpbench": "^1.0",
-        "phpstan/phpstan": "^0.12",
+        "phpstan/phpstan": "^1.5",
         "phpunit/phpunit": "^8.5 || ^9.5"
     },
     "suggest": {
