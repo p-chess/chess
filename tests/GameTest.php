@@ -21,7 +21,10 @@ class GameTest extends TestCase
             }
 
             $moves = $chess->moves();
-            $rnd = \random_int(0, \count($moves) - 1);
+            if (($movesNumber = \count($moves)) < 2) {
+                break;
+            }
+            $rnd = \random_int(0, $movesNumber - 1);
             $moveRandom = $moves[$rnd];
             $move = $chess->move(['from' => $moveRandom->from, 'to' => $moveRandom->to]);
             self::assertNotNull($move);
