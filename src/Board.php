@@ -119,12 +119,9 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
         return \current($this->squares) !== false ? \current($this->squares): null;
     }
 
-    /**
-     * @return Piece|null|false
-     */
-    public function next()
+    public function next(): void
     {
-        return \next($this->squares);
+        \next($this->squares);
     }
 
     public function key(): ?int
@@ -137,9 +134,9 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
         return null !== $this->key();
     }
 
-    public function rewind(): ?Piece
+    public function rewind(): void
     {
-        return empty($this->squares) ? null : \reset($this->squares);
+        \reset($this->squares);
     }
 
     public function jsonSerialize(): string
