@@ -91,7 +91,7 @@ Gets [`\Pchess\Chess\Board\History`](history.md) object.
 
 ## Public properties
 
-|Property  | Type   | Description               |
+| Property | Type   | Description               |
 |----------|--------|---------------------------|
-|`$board`  | Board  | [Board object](board.md)  |
-|`$turn`   | string | current turn ("w" or "b") |
+| `$board` | Board  | [Board object](board.md)  |
+| `$turn`  | string | current turn ("w" or "b") |

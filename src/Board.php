@@ -74,10 +74,9 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
     ];
 
     /** @var array<int, ?Piece> */
-    private $squares = [];
+    private array $squares = [];
 
-    /** @var bool */
-    private $reversed = false;
+    private bool $reversed = false;
 
     /**
      * @param int $offset

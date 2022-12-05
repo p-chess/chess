@@ -9,6 +9,11 @@ use PHPUnit\Framework\TestCase;
 
 class GameTest extends TestCase
 {
+    /**
+     * TODO re-check this test.
+     * This test has a failure percentage around 10%, sometime the move is not good (null move),
+     * some other times (more often) the game is not ended after the loop.
+     */
     public function testRandomMove(): void
     {
         $chess = new Chess();
@@ -21,16 +26,16 @@ class GameTest extends TestCase
             }
 
             $moves = $chess->moves();
-            if (($movesNumber = \count($moves)) < 2) {
+            if (($movesNumber = \count($moves)) < 1) {
                 break;
             }
-            $rnd = \random_int(0, $movesNumber - 1);
+            $rnd = $movesNumber > 1 ? \random_int(0, $movesNumber - 1) : 0;
             $moveRandom = $moves[$rnd];
             $move = $chess->move(['from' => $moveRandom->from, 'to' => $moveRandom->to]);
-            self::assertNotNull($move);
+            self::assertNotNull($move, 'Invalid move. Moves left '.$movesNumber);
         }
 
-        self::assertTrue($chess->gameOver() || $i > 50);
+        self::assertTrue($chess->gameOver() || $i > 50, 'Game prematurely ended at move '.$i);
     }
 
     public function testInvalidMove(): void
