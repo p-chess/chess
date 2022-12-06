@@ -18,7 +18,7 @@ use PChess\Chess\Output\Link;
 
 final class MyHtmlOutput extends HtmlOutput
 {
-    public function generateLinks(Chess $chess, ?string $from = null): array
+    public function generateLinks(Chess $chess, ?string $from = null, $identifier = null): array
     {
         $links = [];
         $allowedMoves = $this->getAllowedMoves($chess);
