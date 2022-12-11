@@ -40,11 +40,9 @@ final class Piece implements \JsonSerializable
         self::KING => 5,
     ];
 
-    /** @var string */
-    private $type;
+    private string $type;
 
-    /** @var string */
-    private $color;
+    private string $color;
 
     /** @var array<string> */
     private static $types = [

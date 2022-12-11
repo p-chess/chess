@@ -37,7 +37,7 @@ header('Content-Type: image/png');
 echo $output->render($chess);
 ```
 
-<img src="https://user-images.githubusercontent.com/179866/113125801-4685a980-9217-11eb-9e0a-0acf54c4ea88.png">
+<img src="https://user-images.githubusercontent.com/179866/113125801-4685a980-9217-11eb-9e0a-0acf54c4ea88.png" alt="">
 
 A complete list of arguments:
 

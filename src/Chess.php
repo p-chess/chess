@@ -7,27 +7,26 @@ namespace PChess\Chess;
 class Chess
 {
     /** @var Board&\ArrayAccess<int, ?Piece> */
-    public $board;
+    public Board $board;
     /** @var array<string, ?int> */
-    protected $kings = [Piece::WHITE => null, Piece::BLACK => null];
-    /** @var string */
-    public $turn = Piece::WHITE;
+    protected array $kings = [Piece::WHITE => null, Piece::BLACK => null];
+
+    public string $turn = Piece::WHITE;
     /** @var array<string, int> */
-    protected $castling = [Piece::WHITE => 0, Piece::BLACK => 0];
-    /** @var int|null */
-    protected $epSquare;
-    /** @var int */
-    protected $halfMoves = 0;
-    /** @var int */
-    protected $moveNumber = 1;
-    /** @var History */
-    protected $history;
+    protected array $castling = [Piece::WHITE => 0, Piece::BLACK => 0];
+
+    protected ?int $epSquare;
+
+    protected int $halfMoves = 0;
+    protected int $moveNumber = 1;
+
+    protected History $history;
     /** @var array<string, array<int, Move>> */
-    protected $generateMovesCache = [];
-    /** @var string */
-    protected $boardHash = '';
+    protected array $generateMovesCache = [];
+
+    protected string $boardHash = '';
     /** @var array<string, string> */
-    protected $sanMoveCache = [];
+    protected array $sanMoveCache = [];
 
     public function __construct(?string $fen = Board::DEFAULT_POSITION, ?History $history = null)
     {
@@ -40,8 +39,7 @@ class Chess
 
     protected function clear(): void
     {
-        $boardHash = \json_encode($this->board);
-        $this->boardHash = false === $boardHash ? '' : $boardHash;
+        $this->boardHash = \json_encode($this->board, JSON_THROW_ON_ERROR);
         $this->kings = [Piece::WHITE => null, Piece::BLACK => null];
         $this->turn = Piece::WHITE;
         $this->castling = [Piece::WHITE => 0, Piece::BLACK => 0];
@@ -310,8 +308,7 @@ class Chess
         }
         $this->turn = $them;
 
-        $boardHash = \json_encode($this->board);
-        $this->boardHash = false === $boardHash ? '' : $boardHash;
+        $this->boardHash = \json_encode($this->board, JSON_THROW_ON_ERROR);
         $this->history->get($historyKey)->position = $this->boardHash;
     }
 
@@ -378,8 +375,7 @@ class Chess
             $this->board[$castlingFrom] = null;
         }
 
-        $boardHash = \json_encode($this->board);
-        $this->boardHash = false === $boardHash ? '' : $boardHash;
+        $this->boardHash = \json_encode($this->board, JSON_THROW_ON_ERROR);
 
         return $move;
     }
@@ -565,7 +561,7 @@ class Chess
                 }
             }
         } elseif (\is_array($sanOrArray)) {
-            $sanOrArray['promotion'] = $sanOrArray['promotion'] ?? null;
+            $sanOrArray['promotion'] ??= null;
 
             foreach ($moves as $move) {
                 if (
@@ -724,7 +720,7 @@ class Chess
         // k(b){0,} vs k(b){0,}  , because maybe you are a programmer we talk in regex (preg) :-p
         if ($numPieces === $pieces[Piece::BISHOP] + 2) {
             $sum = 0;
-            $len = \count($bishops);
+            $len = $bishops === null ? 0 : \count($bishops);
             foreach ($bishops as $bishop) {
                 $sum += $bishop;
             }
@@ -842,7 +838,7 @@ class Chess
     // calculate SAN for Move
     protected function moveToSAN(Move $move): void
     {
-        $cacheKey = \json_encode($move).$this->boardHash;
+        $cacheKey = \json_encode($move, JSON_THROW_ON_ERROR).$this->boardHash;
         if (isset($this->sanMoveCache[$cacheKey])) {
             $move->san = $this->sanMoveCache[$cacheKey];
 

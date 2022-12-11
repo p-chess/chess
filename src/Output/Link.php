@@ -10,11 +10,9 @@ namespace PChess\Chess\Output;
  */
 final class Link
 {
-    /** @var string|null */
-    private $class;
+    private ?string $class = null;
 
-    /** @var string|null */
-    private $url;
+    private ?string $url = null;
 
     public function __construct(?string $class, ?string $url)
     {

@@ -15,40 +15,19 @@ use PChess\Chess\Chess;
 
 final class ImagineOutput implements OutputInterface
 {
-    /**
-     * @var AbstractImagine
-     */
-    private $imagine;
+    private AbstractImagine $imagine;
 
-    /**
-     * @var string
-     */
-    private $darkSquareColor;
+    private string $darkSquareColor;
 
-    /**
-     * @var string
-     */
-    private $liteSquareColor;
+    private string $liteSquareColor;
 
-    /**
-     * @var int
-     */
-    private $boardSize;
+    private int $boardSize;
 
-    /**
-     * @var int
-     */
-    private $squareSize;
+    private int $squareSize;
 
-    /**
-     * @var string
-     */
-    private $spritesPath;
+    private string $spritesPath;
 
-    /**
-     * @var int|null
-     */
-    private $coordSize;
+    private ?int $coordSize = null;
 
     public function __construct(
         AbstractImagine $imagine,
@@ -61,10 +40,11 @@ final class ImagineOutput implements OutputInterface
         $this->imagine = $imagine;
         $this->spritesPath = $spritesPath;
         $this->boardSize = $size;
-        $this->squareSize = $this->boardSize / 8;
-        if (!\is_int($this->squareSize)) {
+        $squareSize = $this->boardSize / 8;
+        if (!\is_int($squareSize)) {
             throw new \InvalidArgumentException(\sprintf('Size must be multiple of 8, %d given.', $this->boardSize));
         }
+        $this->squareSize = $squareSize;
         $this->darkSquareColor = $darkSquareColor;
         $this->liteSquareColor = $liteSquareColor;
         $this->coordSize = $coords ? (int) \floor($this->squareSize / 6) : null;
