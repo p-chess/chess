@@ -27,7 +27,7 @@ final class FenTest extends TestCase
     /**
      * @return array<int|string, array<int, int|string>>
      */
-    public function provider(): array
+    public static function provider(): array
     {
         return [
             'default position' => [Board::DEFAULT_POSITION, 0],

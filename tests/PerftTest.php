@@ -12,7 +12,7 @@ class PerftTest extends TestCase
     /**
      * @dataProvider provider
      */
-    public function testPerft(string $fen, int $expectedDeep1, int $expectedDeep2): void
+    public static function testPerft(string $fen, int $expectedDeep1, int $expectedDeep2): void
     {
         $chess = new ChessPublicator($fen);
         self::assertEquals($expectedDeep1, $chess->perft(1));

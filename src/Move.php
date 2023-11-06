@@ -16,35 +16,25 @@ final class Move implements \JsonSerializable
         'QSIDE_CASTLE' => 64,
     ];
 
-    /** @var string */
-    public $turn;
+    public string $turn;
 
-    /** @var int */
-    public $flags;
+    public int $flags;
 
-    /** @var Piece */
-    public $piece;
+    public Piece $piece;
 
-    /** @var string */
-    public $from;
+    public string $from;
 
-    /** @var string */
-    public $to;
+    public string $to;
 
-    /** @var int */
-    public $fromSquare;
+    public int $fromSquare;
 
-    /** @var int */
-    public $toSquare;
+    public int $toSquare;
 
-    /** @var string|null */
-    public $captured;
+    public ?string $captured;
 
-    /** @var string|null */
-    public $promotion;
+    public ?string $promotion;
 
-    /** @var string|null */
-    public $san;
+    public ?string $san;
 
     public function __construct(string $turn, int $flags, Piece $piece, int $from, int $to, ?string $captured = null, ?string $promotion = null)
     {
