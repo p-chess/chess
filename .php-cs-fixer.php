@@ -2,10 +2,9 @@
 
 return (new PhpCsFixer\Config())
     ->setRules([
-        '@PSR2' => true,
+        '@PSR12' => true,
         'array_syntax' => ['syntax' => 'short'],
         'binary_operator_spaces' => ['operators' => ['=>' => 'single_space', '=' => 'single_space']],
-        'blank_line_after_opening_tag' => true,
         'blank_line_before_statement' => ['statements' => ['return']],
         'cast_spaces' => true,
         'concat_space' => ['spacing' => 'none'],
@@ -20,12 +19,10 @@ return (new PhpCsFixer\Config())
         'no_unneeded_control_parentheses' => true,
         'no_unused_imports' => true,
         'no_whitespace_in_blank_line' => true,
-        'ordered_imports' => true,
         'phpdoc_align' => true,
         'phpdoc_no_access' => true,
         'php_unit_fqcn_annotation' => true,
         'self_accessor' => true,
-        'single_blank_line_before_namespace' => true,
         'single_quote' => true,
         'return_type_declaration' => true,
         'trailing_comma_in_multiline' => true,

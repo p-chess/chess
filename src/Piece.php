@@ -18,6 +18,9 @@ final class Piece implements \JsonSerializable
     public const BLACK = 'b';
     public const WHITE = 'w';
 
+    /**
+     * @var array<string, int[]>
+     */
     public const PAWN_OFFSETS = [
         self::BLACK => [16,  32,  17,  15],
         self::WHITE => [-16, -32, -17, -15],

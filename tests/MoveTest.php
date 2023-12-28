@@ -416,7 +416,7 @@ class MoveTest extends TestCase
         \array_walk($moves, static function (Move $move) use ($chess): void {
             $chess->moveToSANPublic($move);
         });
-        $sans = \array_map(static function (Move $move): string {
+        $sans = \array_map(static function (Move $move): ?string {
             return $move->san;
         }, $moves);
         self::assertContains('f8=Q', $sans);
@@ -461,7 +461,7 @@ class MoveTest extends TestCase
     /**
      * @dataProvider gameProvider
      */
-    public function testSANMoveFromRealGame(string $match, string $finalFen): void
+    public static function testSANMoveFromRealGame(string $match, string $finalFen): void
     {
         $chess = new ChessPublicator();
         $moves = \explode(' ', $match);

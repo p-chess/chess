@@ -8,8 +8,7 @@ use PChess\Chess\Board;
 
 abstract class BasicOutput
 {
-    /** @var string */
-    protected static $line = '   +---+---+---+---+---+---+---+---+'.PHP_EOL;
+    protected static string $line = '   +---+---+---+---+---+---+---+---+'.PHP_EOL;
 
     protected static function getLines(bool $reversed, int $position): string
     {

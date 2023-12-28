@@ -14,10 +14,7 @@ use PhpBench\Benchmark\Metadata\Annotations\Revs;
  */
 final class MoveBench
 {
-    /**
-     * @var Chess
-     */
-    private $chess;
+    private Chess $chess;
 
     public function init(): void
     {
@@ -26,6 +23,7 @@ final class MoveBench
 
     /**
      * @Revs(1000)
+     *
      * @Iterations(5)
      */
     public function benchMove(): void
@@ -35,6 +33,7 @@ final class MoveBench
 
     /**
      * @Revs(1000)
+     *
      * @Iterations(5)
      */
     public function benchMoves(): void
