@@ -6,13 +6,13 @@ namespace PChess\Chess\Output;
 
 /**
  * This is a simple value object used by HtmlOutput to represent
- * a CSS class and an URL (both can be null).
+ * a CSS class and a URL (both can be null).
  */
 final class Link
 {
-    private ?string $class = null;
+    private ?string $class;
 
-    private ?string $url = null;
+    private ?string $url;
 
     public function __construct(?string $class, ?string $url)
     {

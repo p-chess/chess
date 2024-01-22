@@ -27,7 +27,7 @@ with [SAN](https://en.wikipedia.org/wiki/Algebraic_notation_(chess)):
 * `algebraic()`: get the SAN of a square, as string (e.g. "e2").
    This should be the same as calling `Board::SQUARES[$square]`
 
-Such methods accept a integer square (see `SQUARES` constant). 
+Such methods accept an integer square (see `SQUARES` constant). 
 
 Useful constants represent starting board (`Board::DEFAULT_POSITION`) and empty board (`Board::EMPTY`)
 in [FEN](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation) notation.

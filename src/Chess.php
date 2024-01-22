@@ -395,7 +395,7 @@ class Chess
      */
     protected function generateMoves(int $square = null, bool $legal = true): array
     {
-        $cacheKey = $this->boardHash.\json_encode($square.($legal ? '1' : '0'));
+        $cacheKey = $this->boardHash.\json_encode($square.($legal ? '1' : '0'), JSON_THROW_ON_ERROR);
 
         // check cache first
         if (isset($this->generateMovesCache[$cacheKey])) {

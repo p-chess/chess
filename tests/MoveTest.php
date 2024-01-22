@@ -475,7 +475,7 @@ class MoveTest extends TestCase
     /**
      * @dataProvider gameProvider
      */
-    public function testSANMoveFromRealGame(string $match, string $finalFen): void
+    public static function testSANMoveFromRealGame(string $match, string $finalFen): void
     {
         $chess = new ChessPublicator();
         $moves = \explode(' ', $match);

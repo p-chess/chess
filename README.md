@@ -125,4 +125,4 @@ There is still a lot to do in this topic.
 
 ## Other documentation
 
-All classes are documented in [docs directory](docs/index.md).
+All classes are documented in the [docs directory](docs/index.md).
