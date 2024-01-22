@@ -237,6 +237,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
+        self::assertNotNull($undo);
         self::assertEquals('e4', $undo->san);
         self::assertEquals('e4', (string) $undo);
 
@@ -251,6 +252,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
+        self::assertNotNull($undo);
         self::assertEquals('Nf6', $undo->san);
 
         // normal pawn capture
@@ -264,6 +266,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
+        self::assertNotNull($undo);
         self::assertEquals('exd5', $undo->san);
 
         // en passant capture
@@ -277,6 +280,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
+        self::assertNotNull($undo);
         self::assertEquals('dxe6', $undo->san);
 
         // normal knight capture
@@ -290,6 +294,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
+        self::assertNotNull($undo);
         self::assertEquals('Nxd5', $undo->san);
 
         // promotion
@@ -304,6 +309,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
+        self::assertNotNull($undo);
         self::assertEquals('d8=R', $undo->san);
 
         // check
@@ -317,6 +323,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
+        self::assertNotNull($undo);
         self::assertEquals('Rf8+', $undo->san);
 
         // checkmate
@@ -330,6 +337,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
+        self::assertNotNull($undo);
         self::assertEquals('Rb8#', $undo->san);
 
         // ambiguous moves: row
@@ -343,6 +351,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
+        self::assertNotNull($undo);
         self::assertEquals('N4xd6', $undo->san);
 
         // ambiguous moves: rank > 0 & file > 0
@@ -356,6 +365,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
+        self::assertNotNull($undo);
         self::assertEquals('Qd5xd4', $undo->san);
 
         // ambiguous moves: col
@@ -369,6 +379,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
+        self::assertNotNull($undo);
         self::assertEquals('Nexd6', $undo->san);
 
         // ambiguous moves: col
@@ -382,6 +393,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
+        self::assertNotNull($undo);
         self::assertEquals('Ncxd6', $undo->san);
 
         // ambiguous moves: normal capture
@@ -395,6 +407,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
+        self::assertNotNull($undo);
         self::assertEquals('Nxd6', $undo->san);
 
         // ambiguous moves: normal capture
@@ -408,6 +421,7 @@ class MoveTest extends TestCase
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
+        self::assertNotNull($undo);
         self::assertEquals('Rxd6', $undo->san);
 
         // generate moves test
