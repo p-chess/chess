@@ -56,7 +56,7 @@ class ChessPublicator extends Chess
         return $this->undoMove();
     }
 
-    public function moveToSANPublic(?Move $move): void
+    public function moveToSANPublic(Move $move): void
     {
         $this->moveToSAN($move);
     }
@@ -81,17 +81,17 @@ class ChessPublicator extends Chess
 
             if (!$this->kingAttacked($color)) {
                 if ($depth - 1 > 0) {
-                    $childs = $this->perft($depth - 1, true);
-                    if (!\is_array($childs)) {
+                    $children = $this->perft($depth - 1, true);
+                    if (!\is_array($children)) {
                         continue;
                     }
-                    $nodes += $childs['nodes'];
-                    $captures += $childs['captures'];
-                    $enPassants += $childs['enPassants'];
-                    $castles += $childs['castles'];
-                    $promotions += $childs['promotions'];
-                    $checks += $childs['checks'];
-                    $checkmates += $childs['checkmates'];
+                    $nodes += $children['nodes'];
+                    $captures += $children['captures'];
+                    $enPassants += $children['enPassants'];
+                    $castles += $children['castles'];
+                    $promotions += $children['promotions'];
+                    $checks += $children['checks'];
+                    $checkmates += $children['checkmates'];
                 } else {
                     ++$nodes;
                 }

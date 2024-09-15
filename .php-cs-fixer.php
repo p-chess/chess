@@ -3,7 +3,7 @@
 return (new PhpCsFixer\Config())
     ->setRules([
         '@PSR12' => true,
-        'array_syntax' => ['syntax' => 'short'],
+        '@PHP74Migration' => true,
         'binary_operator_spaces' => ['operators' => ['=>' => 'single_space', '=' => 'single_space']],
         'blank_line_before_statement' => ['statements' => ['return']],
         'cast_spaces' => true,
@@ -12,8 +12,6 @@ return (new PhpCsFixer\Config())
         'fully_qualified_strict_types' => true,
         'phpdoc_separation' => true,
         'native_function_invocation' => ['include' => ['@all']],
-        'new_with_braces' => true,
-        'no_blank_lines_after_class_opening' => true,
         'no_extra_blank_lines' => true,
         'no_spaces_around_offset' => ['positions' => ['inside', 'outside']],
         'no_unneeded_control_parentheses' => true,

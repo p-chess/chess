@@ -7,7 +7,6 @@ detection - basically everything but the AI.
 NOTE: this started as a port of [chess.js](https://github.com/jhlywa/chess.js) for php, forked from [ryanhs/chess.php](https://github.com/ryanhs/chess.php)
 
 [![Latest Stable Version](https://poser.pugx.org/p-chess/chess/v/stable)](https://packagist.org/p-chess/chess)
-[![buddy branch](https://app.buddy.works/akondas/chess/repository/branch/master/badge.svg?token=bfd952ec0cee0cb4db84dbd50ded487354ee6c9f37a7034f7c46425fed70dea7 "buddy branch")](https://app.buddy.works/akondas/chess/repository/branch/master)
 [![MIT License](https://poser.pugx.org/p-chess/chess/license)](https://packagist.org/packages/p-chess/chess)  
 
 ## Installation
@@ -116,13 +115,13 @@ There is still a lot to do in this topic.
 
 ### Chess::move()
 
-| iteration | mean  | comment |
-|-----------|-------|---------|
-| 1 | 548.819μs | initial |
-| 2 | 447.973μs | replace fen with json_encode in history position (inThreefoldRepetition cache) |
-| 3 | 340.375μs | replace fen with json_encode in generateMoves |
-| 4 | 333.145μs | add boardHash calculation on make/undo move |
-| 5 | 25.917μs | :fire: add cache for moveToSAN method |
+| iteration |   mean    | comment                                                                        |
+|:---------:|:---------:|--------------------------------------------------------------------------------|
+|     1     | 548.819μs | initial                                                                        |
+|     2     | 447.973μs | replace fen with json_encode in history position (inThreefoldRepetition cache) |
+|     3     | 340.375μs | replace fen with json_encode in generateMoves                                  |
+|     4     | 333.145μs | add boardHash calculation on make/undo move                                    |
+|     5     | 25.917μs  | :fire: add cache for moveToSAN method                                          |
 
 ## Other documentation
 
