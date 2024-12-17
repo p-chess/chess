@@ -17,17 +17,18 @@ foreach ($board as $offset => $piece) {
 ```
 
 The only method that can be directly used is `$board->reverse()`, useful to toggle sides (e.g. to see
-the board from black point of view, and then from white again).
+the board from the black point of view, and then from the white again).
 
 The following static methods can be used if you need to deal
 with [SAN](https://en.wikipedia.org/wiki/Algebraic_notation_(chess)):
 
-* `rank()`: get the rank of a square, as number between 1 and 8
-* `file()`: get the file of a square, as number between 1 and 8
-* `algebraic()`: get the SAN of a square, as string (e.g. "e2").
+* `rank()`: get the rank of a square, as a number between 1 and 8
+* `file()`: get the file of a square, as a number between 1 and 8
+* `algebraic()`: get the SAN of a square, as a string (e.g. "e2").
    This should be the same as calling `Board::SQUARES[$square]`
 
 Such methods accept an integer square (see `SQUARES` constant). 
 
 Useful constants represent starting board (`Board::DEFAULT_POSITION`) and empty board (`Board::EMPTY`)
 in [FEN](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation) notation.
+

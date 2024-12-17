@@ -1,10 +1,10 @@
 # Chess
 
-Chess is a PHP chess library that is used for chess move
+Chess is a PHP chess library used for chess move
 generation/validation, piece placement/movement, and check/checkmate/stalemate
 detection - basically everything but the AI. 
 
-NOTE: this started as a port of [chess.js](https://github.com/jhlywa/chess.js) for php, forked from [ryanhs/chess.php](https://github.com/ryanhs/chess.php)
+NOTE: this started as a port of [chess.js](https://github.com/jhlywa/chess.js) for PHP, forked from [ryanhs/chess.php](https://github.com/ryanhs/chess.php)
 
 [![Latest Stable Version](https://poser.pugx.org/p-chess/chess/v/stable)](https://packagist.org/p-chess/chess)
 [![MIT License](https://poser.pugx.org/p-chess/chess/license)](https://packagist.org/packages/p-chess/chess)  
@@ -100,13 +100,13 @@ echo $output->render($chess);
 
 <img src="https://user-images.githubusercontent.com/179866/112304837-411be280-8c9e-11eb-8333-c2489f9bef05.png">        
 
-See [dedicated documentation](docs/output_imagine.md) for a detailed instructions.
+See [dedicated documentation](docs/output_imagine.md) for detailed instructions.
 
 ### HTML
 
 Pieces are displayed inside an HTML table.
 
-See [dedicated documentation](docs/output_html.md) for a detailed instructions.
+See [dedicated documentation](docs/output_html.md) for detailed instructions.
 
 ## Performance
 
@@ -126,3 +126,4 @@ There is still a lot to do in this topic.
 ## Other documentation
 
 All classes are documented in the [docs directory](docs/index.md).
+

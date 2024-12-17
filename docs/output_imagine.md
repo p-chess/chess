@@ -52,5 +52,5 @@ public function __construct(
 );
 ```
 
-In this directory, you can find a utility script, named [get-resources.sh](get-resources.sh), that downloads
+In this directory, you can find a utility script, named [get-resources.sh](get-resources.sh), which downloads
 all pieces images from Wikimedia, plus a free font to use.
