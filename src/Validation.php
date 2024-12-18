@@ -93,7 +93,7 @@ final class Validation
             }
         }
 
-        // 11th criterion: en-passant if last is black's move, then its must be white turn
+        // 11th criterion: en-passant if last is black's move, then it must be white turn
         if (\strlen($tokens[3]) > 1) {
             if (($tokens[3][1] === '3' && $tokens[1] === Piece::WHITE) ||
                 ($tokens[3][1] === '6' && $tokens[1] === Piece::BLACK)) {

@@ -176,7 +176,7 @@ class AttackTest extends TestCase
         self::assertTrue($chess->insufficientMaterial());
     }
 
-    public function testinThreefoldRepetition(): void
+    public function testInThreefoldRepetition(): void
     {
         $chess = new ChessPublicator();
 

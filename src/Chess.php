@@ -197,7 +197,7 @@ class Chess
             return null;
         }
 
-        return $this->board[Board::SQUARES[$square]]; // shorcut?
+        return $this->board[Board::SQUARES[$square]]; // shortcut?
     }
 
     public function put(Piece $piece, string $square): bool
@@ -733,7 +733,7 @@ class Chess
     }
 
     /* TODO: while this function is fine for casual use, a better
-     * implementation would use a Zobrist key (instead of FEN). the
+     * implementation would use a Zobrist key (instead of FEN). The
      * Zobrist key would be maintained in the make_move/undo_move functions,
      * avoiding the costly that we do below.
      */

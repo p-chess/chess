@@ -20,8 +20,8 @@ The following public properties are available:
 Squares are coded like in keys and/or values of `\Pchess\Chess\Board::SQUARES`
 Notation is [SAN](https://en.wikipedia.org/wiki/Algebraic_notation_(chess))
 
-Move can be built directly with is contructor, passing all arguments in respective order.
-Or it can be built using static method `Move::buildMove()`:
+`Move` can be built directly with its constructor, passing all arguments in respective order.
+Or it can be built using the static method `Move::buildMove()`:
 
 ```php
 public static function buildMove(
@@ -47,3 +47,4 @@ The information about move type, stored in `$flags` properties as bits, is:
 | 16  | PROMOTION    | Promotion           |
 | 32  | KSIDE_CASTLE | Short castling      |
 | 64  | QSIDE_CASTLE | Long castling       |
+
