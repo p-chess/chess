@@ -48,7 +48,7 @@ final class Piece implements \JsonSerializable
     private string $color;
 
     /** @var array<string> */
-    private static $types = [
+    private static array $types = [
         self::PAWN,
         self::KNIGHT,
         self::BISHOP,
@@ -58,10 +58,10 @@ final class Piece implements \JsonSerializable
     ];
 
     /** @var array<string> */
-    private static $colors = [self::BLACK, self::WHITE];
+    private static array $colors = [self::BLACK, self::WHITE];
 
     /** @var array<string, string[]> */
-    private static $pieces = [
+    private static array $pieces = [
         self::BLACK => [
             self::PAWN => '♟',
             self::KNIGHT => '♞',

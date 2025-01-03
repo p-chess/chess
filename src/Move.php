@@ -34,7 +34,7 @@ final class Move implements \JsonSerializable
 
     public ?string $promotion;
 
-    public ?string $san;
+    public ?string $san = null;
 
     public function __construct(string $turn, int $flags, Piece $piece, int $from, int $to, ?string $captured = null, ?string $promotion = null)
     {

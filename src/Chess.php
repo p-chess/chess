@@ -393,7 +393,7 @@ class Chess
     /**
      * @return array<int, Move>
      */
-    protected function generateMoves(int $square = null, bool $legal = true): array
+    protected function generateMoves(?int $square = null, bool $legal = true): array
     {
         $cacheKey = $this->boardHash.\json_encode($square.($legal ? '1' : '0'), JSON_THROW_ON_ERROR);
 
@@ -593,7 +593,7 @@ class Chess
      *
      * @return array<int, Move>
      */
-    public function moves(int $square = null): array
+    public function moves(?int $square = null): array
     {
         $moves = [];
         foreach ($this->generateMoves($square) as $key => $move) {

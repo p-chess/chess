@@ -30,7 +30,7 @@ class ChessPublicator extends Chess
     /**
      * @return array<int, Move>
      */
-    public function generateMovesPublic(int $square = null, bool $legal = true): array
+    public function generateMovesPublic(?int $square = null, bool $legal = true): array
     {
         return $this->generateMoves($square, $legal);
     }

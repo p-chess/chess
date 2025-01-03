@@ -23,7 +23,7 @@ class PerftTest extends TestCase
     /**
      * @return array<string, array<int, int|string>>
      */
-    public function provider(): array
+    public static function provider(): array
     {
         return [
             'initial position' => ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 20, 400],
