@@ -488,7 +488,7 @@ class MoveTest extends TestCase
     /**
      * @return array<string, array<int, string>>
      */
-    public function gameProvider(): array
+    public static function gameProvider(): array
     {
         $match1 = 'e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6 Nc3 Bb4 Nxc6 bxc6 Qd4 Qe7 f3 d5 Bg5 O-O O-O-O Bc5 Bxf6 gxf6 Qa4 '.
             'Be3+ Kb1 d4 Ne2 c5 Nc1 Be6 Bc4 Rfb8 Nd3 Rb6';
