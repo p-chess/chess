@@ -6,29 +6,23 @@ namespace PChess\Chess;
 
 class Entry
 {
-    /** @var Move */
-    public $move;
+    public Move $move;
 
-    /** @var string|null */
-    public $position;
+    public ?string $position;
 
     /** @var array<string, ?int> */
-    public $kings;
+    public array $kings;
 
-    /** @var string */
-    public $turn;
+    public string $turn;
 
     /** @var array<string, ?int> */
-    public $castling;
+    public array $castling;
 
-    /** @var int|null */
-    public $epSquare;
+    public ?int $epSquare;
 
-    /** @var int */
-    public $halfMoves;
+    public int $halfMoves;
 
-    /** @var int */
-    public $moveNumber;
+    public int $moveNumber;
 
     /**
      * @param array<string, ?int> $kings

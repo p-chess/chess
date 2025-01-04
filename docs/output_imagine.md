@@ -6,7 +6,7 @@ and one extension between GD and Imagick.
 You need to provide an instance of Imagine, and a path of images for pieces.
 Names of such images need to match a color/name code.
 For example, a black pawn image must be named `bp.png` (_b_ for black and _p_ for pawn), a
-white queen image must me named `wq.png` (_w_ for white and _q_ for queen).
+white queen image must be named `wq.png` (_w_ for white and _q_ for queen).
 Refer to `Piece` class source code to get all abbreviations.
 A good source for free images is [Wikimedia](https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces).
 
@@ -52,5 +52,5 @@ public function __construct(
 );
 ```
 
-In this directory, you can find an utility script, named [get-resources.sh](get-resources.sh), that downloads
+In this directory, you can find a utility script, named [get-resources.sh](get-resources.sh), which downloads
 all pieces images from Wikimedia, plus a free font to use.

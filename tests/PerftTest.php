@@ -12,7 +12,7 @@ class PerftTest extends TestCase
     /**
      * @dataProvider provider
      */
-    public function testPerft(string $fen, int $expectedDeep1, int $expectedDeep2): void
+    public static function testPerft(string $fen, int $expectedDeep1, int $expectedDeep2): void
     {
         $chess = new ChessPublicator($fen);
         self::assertEquals($expectedDeep1, $chess->perft(1));
@@ -23,7 +23,7 @@ class PerftTest extends TestCase
     /**
      * @return array<string, array<int, int|string>>
      */
-    public function provider(): array
+    public static function provider(): array
     {
         return [
             'initial position' => ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 20, 400],

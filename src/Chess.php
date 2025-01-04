@@ -197,7 +197,7 @@ class Chess
             return null;
         }
 
-        return $this->board[Board::SQUARES[$square]]; // shorcut?
+        return $this->board[Board::SQUARES[$square]]; // shortcut?
     }
 
     public function put(Piece $piece, string $square): bool
@@ -393,9 +393,9 @@ class Chess
     /**
      * @return array<int, Move>
      */
-    protected function generateMoves(int $square = null, bool $legal = true): array
+    protected function generateMoves(?int $square = null, bool $legal = true): array
     {
-        $cacheKey = $this->boardHash.\json_encode($square.($legal ? '1' : '0'));
+        $cacheKey = $this->boardHash.\json_encode($square.($legal ? '1' : '0'), JSON_THROW_ON_ERROR);
 
         // check cache first
         if (isset($this->generateMovesCache[$cacheKey])) {
@@ -593,7 +593,7 @@ class Chess
      *
      * @return array<int, Move>
      */
-    public function moves(int $square = null): array
+    public function moves(?int $square = null): array
     {
         $moves = [];
         foreach ($this->generateMoves($square) as $key => $move) {
@@ -733,7 +733,7 @@ class Chess
     }
 
     /* TODO: while this function is fine for casual use, a better
-     * implementation would use a Zobrist key (instead of FEN). the
+     * implementation would use a Zobrist key (instead of FEN). The
      * Zobrist key would be maintained in the make_move/undo_move functions,
      * avoiding the costly that we do below.
      */

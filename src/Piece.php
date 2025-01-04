@@ -18,6 +18,9 @@ final class Piece implements \JsonSerializable
     public const BLACK = 'b';
     public const WHITE = 'w';
 
+    /**
+     * @var array<string, int[]>
+     */
     public const PAWN_OFFSETS = [
         self::BLACK => [16,  32,  17,  15],
         self::WHITE => [-16, -32, -17, -15],
@@ -45,7 +48,7 @@ final class Piece implements \JsonSerializable
     private string $color;
 
     /** @var array<string> */
-    private static $types = [
+    private static array $types = [
         self::PAWN,
         self::KNIGHT,
         self::BISHOP,
@@ -55,10 +58,10 @@ final class Piece implements \JsonSerializable
     ];
 
     /** @var array<string> */
-    private static $colors = [self::BLACK, self::WHITE];
+    private static array $colors = [self::BLACK, self::WHITE];
 
     /** @var array<string, string[]> */
-    private static $pieces = [
+    private static array $pieces = [
         self::BLACK => [
             self::PAWN => '♟',
             self::KNIGHT => '♞',

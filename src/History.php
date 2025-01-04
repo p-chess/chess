@@ -7,10 +7,10 @@ namespace PChess\Chess;
 final class History
 {
     /** @var array<int, Entry> */
-    private $entries;
+    private array $entries;
 
     /** @param array<int, Entry>|null $entries */
-    public function __construct(array $entries = null)
+    public function __construct(?array $entries = null)
     {
         $this->entries = $entries ?? [];
     }

@@ -46,7 +46,7 @@ class ConstructorTest extends TestCase
         self::assertStringContainsString('♙ ', $output->render($chess));
     }
 
-    public function testReversedeOutput(): void
+    public function testReversedOutput(): void
     {
         $chess = new Chess();
         $output = new Output\AsciiOutput();

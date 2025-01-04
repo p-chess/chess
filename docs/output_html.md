@@ -1,6 +1,6 @@
 # Output with HTML
 
-This option requires extending provided `HtmlOutput` class, since you need to define
+This option requires extending provided the `HtmlOutput` class, since you need to define
 a way to build links for pieces.
 
 The following is an example of a possible extension.

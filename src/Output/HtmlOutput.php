@@ -46,7 +46,7 @@ abstract class HtmlOutput implements OutputInterface
     }
 
     /**
-     * Generete an array of 64 Link objects to use in render() method.
+     * Generate an array of 64 Link objects to use in render() method.
      * Basically, you should cycle the board, assigning values to Link for pieces that can actually move.
      * There are two possible situations: 1) $from is null (move has to start); 2) $from is not null (move started).
      * In first case, you should assign a "start move" link to every piece that is allowed to move
