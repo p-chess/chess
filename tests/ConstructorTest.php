@@ -90,6 +90,13 @@ class ConstructorTest extends TestCase
         self::assertNotEmpty($output->render($chess));
     }
 
+    public function testSvgOutput(): void
+    {
+        $chess = new Chess();
+        $output = new Output\SvgOutput();
+        self::assertStringStartsWith('<svg', $output->render($chess));
+    }
+
     private static function getImagine(): AbstractImagine
     {
         if (\extension_loaded('gd')) {
