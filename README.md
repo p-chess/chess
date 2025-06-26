@@ -33,7 +33,7 @@ $chess = new Chess();
 while (!$chess->gameOver()) {
     $moves = $chess->moves();
     $move = $moves[random_int(0, count($moves) - 1)];
-    $chess->move($move);
+    $chess->move($move->san);
 }
 
 echo (new UnicodeOutput())->render($chess) . PHP_EOL;
