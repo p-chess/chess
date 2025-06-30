@@ -6,13 +6,12 @@ namespace PChess\Chess\Test;
 
 use PChess\Chess\Board;
 use PChess\Chess\Validation;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class FenTest extends TestCase
 {
-    /**
-     * @dataProvider provider
-     */
+    #[DataProvider('provider')]
     public function testValidate(string $fen, int $code): void
     {
         self::assertEquals($code, Validation::validateFen($fen));

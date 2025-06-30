@@ -6,13 +6,9 @@ namespace PChess\Chess;
 
 final class History
 {
-    /** @var array<int, Entry> */
-    private array $entries;
-
-    /** @param array<int, Entry>|null $entries */
-    public function __construct(?array $entries = null)
+    /** @param array<int, Entry> $entries */
+    public function __construct(private array $entries = [])
     {
-        $this->entries = $entries ?? [];
     }
 
     public function add(Entry $entry): void

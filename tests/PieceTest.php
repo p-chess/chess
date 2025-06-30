@@ -7,7 +7,7 @@ namespace PChess\Chess\Test;
 use PChess\Chess\Piece;
 use PHPUnit\Framework\TestCase;
 
-class PieceTest extends TestCase
+final class PieceTest extends TestCase
 {
     public function testPieceString(): void
     {
@@ -18,7 +18,7 @@ class PieceTest extends TestCase
     public function testJson(): void
     {
         $piece = new Piece('p', 'w');
-        self::assertEquals('"P"', \json_encode($piece));
+        self::assertEquals('"P"', \json_encode($piece, JSON_THROW_ON_ERROR));
     }
 
     public function testInvalidPieceType(): void

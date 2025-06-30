@@ -6,7 +6,6 @@
 /tests export-ignore
 /.gitattributes export-ignore
 /.gitignore export-ignore
-/buddy.yml export-ignore
 /.php-cs-fixer.php export-ignore
 /phpstan.neon export-ignore
 /phpunit.xml export-ignore

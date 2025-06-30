@@ -35,7 +35,7 @@ final class ImagineOutput implements OutputInterface
         int $size = 400,
         bool $coords = false,
         string $darkSquareColor = '#8ca2ad',
-        string $liteSquareColor = '#dee3e6'
+        string $liteSquareColor = '#dee3e6',
     ) {
         $this->imagine = $imagine;
         $this->spritesPath = $spritesPath;

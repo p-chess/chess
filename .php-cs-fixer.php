@@ -3,7 +3,7 @@
 return (new PhpCsFixer\Config())
     ->setRules([
         '@PSR12' => true,
-        '@PHP74Migration' => true,
+        '@PHP81Migration' => true,
         'binary_operator_spaces' => ['operators' => ['=>' => 'single_space', '=' => 'single_space']],
         'blank_line_before_statement' => ['statements' => ['return']],
         'cast_spaces' => true,
@@ -23,7 +23,7 @@ return (new PhpCsFixer\Config())
         'self_accessor' => true,
         'single_quote' => true,
         'return_type_declaration' => true,
-        'trailing_comma_in_multiline' => true,
+        'trailing_comma_in_multiline' => ['elements' => ['arguments', 'arrays', 'match', 'parameters']],
         'trim_array_spaces' => true,
         'void_return' => true,
     ])

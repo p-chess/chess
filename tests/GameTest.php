@@ -7,7 +7,7 @@ namespace PChess\Chess\Test;
 use PChess\Chess\Chess;
 use PHPUnit\Framework\TestCase;
 
-class GameTest extends TestCase
+final class GameTest extends TestCase
 {
     /**
      * TODO re-check this test.

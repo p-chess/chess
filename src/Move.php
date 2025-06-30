@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PChess\Chess;
 
-final class Move implements \JsonSerializable
+final class Move implements \JsonSerializable, \Stringable
 {
     public const BITS = [
         'NORMAL' => 1,
@@ -16,12 +16,6 @@ final class Move implements \JsonSerializable
         'QSIDE_CASTLE' => 64,
     ];
 
-    public string $turn;
-
-    public int $flags;
-
-    public Piece $piece;
-
     public string $from;
 
     public string $to;
@@ -30,23 +24,21 @@ final class Move implements \JsonSerializable
 
     public int $toSquare;
 
-    public ?string $captured;
-
-    public ?string $promotion;
-
     public ?string $san = null;
 
-    public function __construct(string $turn, int $flags, Piece $piece, int $from, int $to, ?string $captured = null, ?string $promotion = null)
-    {
-        $this->turn = $turn;
-        $this->flags = $flags;
-        $this->piece = $piece;
+    public function __construct(
+        public string $turn,
+        public int $flags,
+        public Piece $piece,
+        int $from,
+        int $to,
+        public ?string $captured = null,
+        public ?string $promotion = null,
+    ) {
         $this->fromSquare = $from;
         $this->toSquare = $to;
         $this->from = self::getSquare($from);
         $this->to = self::getSquare($to);
-        $this->captured = $captured;
-        $this->promotion = $promotion;
     }
 
     public function __toString(): string
@@ -60,7 +52,7 @@ final class Move implements \JsonSerializable
         int $from,
         int $to,
         int $flags,
-        ?string $promotion = null
+        ?string $promotion = null,
     ): self {
         $captured = null;
         if ($board[$to] !== null) {
@@ -82,7 +74,7 @@ final class Move implements \JsonSerializable
             $from,
             $to,
             $captured,
-            $promotion
+            $promotion,
         );
     }
 

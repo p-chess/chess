@@ -8,7 +8,7 @@ use PChess\Chess\Board;
 use PChess\Chess\Piece;
 use PHPUnit\Framework\TestCase;
 
-class AttackTest extends TestCase
+final class AttackTest extends TestCase
 {
     public function testAttackedPawn(): void
     {
