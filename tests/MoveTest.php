@@ -8,6 +8,7 @@ use PChess\Chess\Board;
 use PChess\Chess\Chess;
 use PChess\Chess\Move;
 use PChess\Chess\Piece;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class MoveTest extends TestCase
@@ -24,7 +25,7 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['a2'],
             Board::SQUARES['a4'],
-            Move::BITS['NORMAL']
+            Move::BITS['NORMAL'],
         ));
 
         self::assertEquals(Piece::PAWN, $move->piece->getType());
@@ -65,7 +66,7 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['a2'],
             Board::SQUARES['a4'],
-            Move::BITS['NORMAL']
+            Move::BITS['NORMAL'],
         ));
         $chess->makeMovePublic($move);
 
@@ -87,7 +88,7 @@ class MoveTest extends TestCase
             Board::SQUARES['a7'],
             Board::SQUARES['a8'],
             Move::BITS['PROMOTION'],
-            Piece::QUEEN
+            Piece::QUEEN,
         ));
         $chess->makeMovePublic($move);
         self::assertSame($chess->fen(), 'Q7/8/8/8/8/8/8/K6k b - - 0 1');
@@ -109,7 +110,7 @@ class MoveTest extends TestCase
             Board::SQUARES['a7'],
             Board::SQUARES['a8'],
             Move::BITS['PROMOTION'],
-            Piece::QUEEN
+            Piece::QUEEN,
         ));
         $chess->makeMovePublic($move);
         $chess->undoMovePublic();
@@ -125,7 +126,7 @@ class MoveTest extends TestCase
             Board::SQUARES['d2'],
             Board::SQUARES['d4'],
             Move::BITS['BIG_PAWN'],
-            Piece::QUEEN
+            Piece::QUEEN,
         ));
         $chess->makeMovePublic($move);
         $chess->undoMovePublic();
@@ -142,7 +143,7 @@ class MoveTest extends TestCase
             Board::SQUARES['d4'],
             Board::SQUARES['e5'],
             Move::BITS['CAPTURE'],
-            Piece::QUEEN
+            Piece::QUEEN,
         ));
         $chess->makeMovePublic($move);
         $chess->undoMovePublic();
@@ -158,8 +159,8 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['h2'],
             Board::SQUARES['h4'],
-            Move::BITS['NORMAL']//,
-            //~ Chess::QUEEN
+            Move::BITS['NORMAL'],
+            //~ Piece::QUEEN,
         ));
         $chess->makeMovePublic($move);
         $fenTmp1 = $chess->fen();
@@ -169,7 +170,7 @@ class MoveTest extends TestCase
             Board::SQUARES['g4'],
             Board::SQUARES['h3'],
             Move::BITS['EP_CAPTURE'],
-            Piece::QUEEN
+            Piece::QUEEN,
         ));
         $chess->makeMovePublic($move);
         $chess->undoMovePublic();
@@ -188,8 +189,8 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['e1'],
             Board::SQUARES['g1'],
-            Move::BITS['KSIDE_CASTLE']//,
-            //~ Piece::QUEEN
+            Move::BITS['KSIDE_CASTLE'],
+            //~ Piece::QUEEN,
         ));
         $chess->makeMovePublic($move);
         self::assertSame($chess->fen(), 'r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 5 4');
@@ -206,8 +207,8 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['e8'],
             Board::SQUARES['c8'],
-            Move::BITS['QSIDE_CASTLE']//,
-            //~ Piece::QUEEN
+            Move::BITS['QSIDE_CASTLE'],
+            //~ Piece::QUEEN,
         ));
         $chess->makeMovePublic($move);
         self::assertSame($chess->fen(), '2kr1b1r/pppq1ppp/2np1n2/1B2p2b/4P3/3P1N1P/PPPB1PP1/RN1QR1K1 w - - 3 9');
@@ -233,7 +234,7 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['e2'],
             Board::SQUARES['e4'],
-            Move::BITS['NORMAL']
+            Move::BITS['NORMAL'],
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
@@ -248,7 +249,7 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['g8'],
             Board::SQUARES['f6'],
-            Move::BITS['NORMAL']
+            Move::BITS['NORMAL'],
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
@@ -262,7 +263,7 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['e4'],
             Board::SQUARES['d5'],
-            Move::BITS['CAPTURE']
+            Move::BITS['CAPTURE'],
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
@@ -276,7 +277,7 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['d5'],
             Board::SQUARES['e6'],
-            Move::BITS['EP_CAPTURE']
+            Move::BITS['EP_CAPTURE'],
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
@@ -290,7 +291,7 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['f6'],
             Board::SQUARES['d5'],
-            Move::BITS['CAPTURE']
+            Move::BITS['CAPTURE'],
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
@@ -305,7 +306,7 @@ class MoveTest extends TestCase
             Board::SQUARES['d7'],
             Board::SQUARES['d8'],
             Move::BITS['PROMOTION'],
-            Piece::ROOK
+            Piece::ROOK,
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
@@ -319,7 +320,7 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['d8'],
             Board::SQUARES['f8'],
-            Move::BITS['NORMAL']
+            Move::BITS['NORMAL'],
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
@@ -333,7 +334,7 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['b6'],
             Board::SQUARES['b8'],
-            Move::BITS['NORMAL']
+            Move::BITS['NORMAL'],
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
@@ -347,7 +348,7 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['c4'],
             Board::SQUARES['d6'],
-            Move::BITS['CAPTURE']
+            Move::BITS['CAPTURE'],
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
@@ -361,7 +362,7 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['d5'],
             Board::SQUARES['d4'],
-            Move::BITS['CAPTURE']
+            Move::BITS['CAPTURE'],
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
@@ -375,7 +376,7 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['e4'],
             Board::SQUARES['d6'],
-            Move::BITS['CAPTURE']
+            Move::BITS['CAPTURE'],
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
@@ -389,7 +390,7 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['c4'],
             Board::SQUARES['d6'],
-            Move::BITS['CAPTURE']
+            Move::BITS['CAPTURE'],
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
@@ -403,7 +404,7 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['c4'],
             Board::SQUARES['d6'],
-            Move::BITS['CAPTURE']
+            Move::BITS['CAPTURE'],
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
@@ -417,7 +418,7 @@ class MoveTest extends TestCase
             $chess->getBoard(),
             Board::SQUARES['g6'],
             Board::SQUARES['d6'],
-            Move::BITS['CAPTURE']
+            Move::BITS['CAPTURE'],
         ));
         $chess->makeMovePublic($move);
         $undo = $chess->undo();
@@ -472,9 +473,7 @@ class MoveTest extends TestCase
         self::assertSame($chess->fen(), 'r1bqk1nr/1ppp1ppp/p1n5/2b1p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 5');
     }
 
-    /**
-     * @dataProvider gameProvider
-     */
+    #[DataProvider('gameProvider')]
     public static function testSANMoveFromRealGame(string $match, string $finalFen): void
     {
         $chess = new ChessPublicator();

@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace PChess\Chess\Test;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 // source: https://chessprogramming.wikispaces.com/Perft+Results
-class PerftTest extends TestCase
+final class PerftTest extends TestCase
 {
-    /**
-     * @dataProvider provider
-     */
+    #[DataProvider('provider')]
     public static function testPerft(string $fen, int $expectedDeep1, int $expectedDeep2): void
     {
         $chess = new ChessPublicator($fen);

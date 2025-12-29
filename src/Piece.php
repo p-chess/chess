@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PChess\Chess;
 
-final class Piece implements \JsonSerializable
+final class Piece implements \JsonSerializable, \Stringable
 {
     public const SYMBOLS = 'pnbrqkPNBRQK';
 
@@ -43,10 +43,6 @@ final class Piece implements \JsonSerializable
         self::KING => 5,
     ];
 
-    private string $type;
-
-    private string $color;
-
     /** @var array<string> */
     private static array $types = [
         self::PAWN,
@@ -80,7 +76,7 @@ final class Piece implements \JsonSerializable
         ],
     ];
 
-    public function __construct(string $type, string $color)
+    public function __construct(private string $type, private string $color)
     {
         if (!\in_array($type, self::$types, true)) {
             throw new \InvalidArgumentException('Invalid piece type');
@@ -88,8 +84,6 @@ final class Piece implements \JsonSerializable
         if (!\in_array($color, self::$colors, true)) {
             throw new \InvalidArgumentException('Invalid piece color');
         }
-        $this->type = $type;
-        $this->color = $color;
     }
 
     public function __toString(): string

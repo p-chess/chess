@@ -10,14 +10,8 @@ namespace PChess\Chess\Output;
  */
 final class Link
 {
-    private ?string $class;
-
-    private ?string $url;
-
-    public function __construct(?string $class, ?string $url)
+    public function __construct(public ?string $class, public ?string $url)
     {
-        $this->class = $class;
-        $this->url = $url;
     }
 
     public function getClass(): ?string

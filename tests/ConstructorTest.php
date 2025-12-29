@@ -13,7 +13,7 @@ use PChess\Chess\Output;
 use PChess\Chess\Piece;
 use PHPUnit\Framework\TestCase;
 
-class ConstructorTest extends TestCase
+final class ConstructorTest extends TestCase
 {
     public function testDefaultPosition(): void
     {

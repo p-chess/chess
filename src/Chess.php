@@ -321,7 +321,7 @@ class Chess
             $this->castling,
             $this->epSquare,
             $this->halfMoves,
-            $this->moveNumber
+            $this->moveNumber,
         ));
 
         return $this->history->key();

@@ -8,7 +8,7 @@ use PChess\Chess\Chess;
 use PChess\Chess\Piece;
 use PHPUnit\Framework\TestCase;
 
-class PiecePlacementTest extends TestCase
+final class PiecePlacementTest extends TestCase
 {
     public function testAll(): void
     {

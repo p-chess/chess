@@ -6,7 +6,7 @@ namespace PChess\Chess\Test;
 
 use PHPUnit\Framework\TestCase;
 
-class MiscTest extends TestCase
+final class MiscTest extends TestCase
 {
     public function testHistorySAN(): void
     {

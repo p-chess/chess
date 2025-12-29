@@ -10,7 +10,7 @@ use PChess\Chess\Entry;
 use PChess\Chess\Move;
 
 // a proxy for testing protected method
-class ChessPublicator extends Chess
+final class ChessPublicator extends Chess
 {
     public function getBoard(): Board
     {
@@ -41,7 +41,7 @@ class ChessPublicator extends Chess
         int $from,
         int $to,
         int $flags,
-        ?string $promotion = null
+        ?string $promotion = null,
     ): Move {
         return Move::buildMove($turn, $board, $from, $to, $flags, $promotion);
     }
