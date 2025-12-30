@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace PChess\Chess\Test;
 
 use Imagine\Image\AbstractImagine;
+use Imagine\Image\ImagineInterface;
 use PChess\Chess\Chess;
 use PChess\Chess\Entry;
 use PChess\Chess\History;
 use PChess\Chess\Move;
 use PChess\Chess\Output;
 use PChess\Chess\Piece;
+use PHPUnit\Framework\Attributes\RequiresMethod;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
 final class ConstructorTest extends TestCase
@@ -57,9 +60,7 @@ final class ConstructorTest extends TestCase
  1', $output->render($chess));
     }
 
-    /**
-     * @requires \Imagine\Image\ImagineInterface::create
-     */
+    #[RequiresMethod(ImagineInterface::class, 'create')]
     public function testImagineOutputWithWrongSize(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -67,9 +68,7 @@ final class ConstructorTest extends TestCase
         new Output\ImagineOutput(self::getImagine(), 'fakedir', 47);
     }
 
-    /**
-     * @requires extension gd
-     */
+    #[RequiresPhpExtension('gd')]
     public function testImagineOutput(): void
     {
         $dir = __DIR__.'/../resources/';
@@ -77,7 +76,7 @@ final class ConstructorTest extends TestCase
             self::markTestSkipped('No resources dir found.');
         }
         $chess = new Chess();
-        $output = new Output\ImagineOutput(self::getImagine(), $dir, 400, true);
+        $output = new Output\ImagineOutput(self::getImagine(), $dir, 400, false);
         self::assertNotEmpty($output->render($chess));
         $chess->board->reverse();
         self::assertNotEmpty($output->render($chess));

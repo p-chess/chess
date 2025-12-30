@@ -9,6 +9,7 @@ use PChess\Chess\Chess;
 use PChess\Chess\Move;
 use PChess\Chess\Piece;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 
 class MoveTest extends TestCase
@@ -51,9 +52,7 @@ class MoveTest extends TestCase
         self::assertFalse($result);
     }
 
-    /**
-     * @depends testBuildMove
-     */
+    #[Depends('testBuildMove')]
     public function testMakeMoveAndCheckHistory(): void
     {
         $chess = new ChessPublicator(Board::EMPTY);

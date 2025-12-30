@@ -26,7 +26,7 @@ abstract class HtmlOutput implements OutputInterface
                 $output .= '<tr><td class="'.$this->getFileClass().'">'.\substr('87654321', Board::rank($i), 1).'</td>';
             }
             if (null !== $piece || null !== $links[$i]->getClass()) {
-                $aClass = $piece ? ' class="'.$piece->getColor().$piece->getType().'"' : '';
+                $aClass = null !== $piece ? ' class="'.$piece->getColor().$piece->getType().'"' : '';
                 $output .= \sprintf('<td%s><a%s%s></a></td>', $links[$i]->getClass(), $aClass, $links[$i]->getUrl());
             } else {
                 $output .= \sprintf('<td%s></td>', $links[$i]->getClass());

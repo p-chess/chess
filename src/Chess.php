@@ -99,16 +99,16 @@ class Chess
         $this->turn = $tokens[1];
 
         // castling options
-        if (\strpos($tokens[2], 'K') !== false) {
+        if (\str_contains($tokens[2], 'K')) {
             $this->castling[Piece::WHITE] |= Move::BITS['KSIDE_CASTLE'];
         }
-        if (\strpos($tokens[2], 'Q') !== false) {
+        if (\str_contains($tokens[2], 'Q')) {
             $this->castling[Piece::WHITE] |= Move::BITS['QSIDE_CASTLE'];
         }
-        if (\strpos($tokens[2], 'k') !== false) {
+        if (\str_contains($tokens[2], 'k')) {
             $this->castling[Piece::BLACK] |= Move::BITS['KSIDE_CASTLE'];
         }
-        if (\strpos($tokens[2], 'q') !== false) {
+        if (\str_contains($tokens[2], 'q')) {
             $this->castling[Piece::BLACK] |= Move::BITS['QSIDE_CASTLE'];
         }
 
@@ -139,7 +139,7 @@ class Chess
                 $fen .= $piece->toAscii();
             }
 
-            if (($i + 1) & 0x88) {
+            if ((($i + 1) & 0x88) > 0) {
                 if ($empty > 0) {
                     $fen .= $empty;
                 }
@@ -152,16 +152,16 @@ class Chess
         }
 
         $cFlags = '';
-        if ($this->castling[Piece::WHITE] & Move::BITS['KSIDE_CASTLE']) {
+        if (($this->castling[Piece::WHITE] & Move::BITS['KSIDE_CASTLE']) > 0) {
             $cFlags .= 'K';
         }
-        if ($this->castling[Piece::WHITE] & Move::BITS['QSIDE_CASTLE']) {
+        if (($this->castling[Piece::WHITE] & Move::BITS['QSIDE_CASTLE']) > 0) {
             $cFlags .= 'Q';
         }
-        if ($this->castling[Piece::BLACK] & Move::BITS['KSIDE_CASTLE']) {
+        if (($this->castling[Piece::BLACK] & Move::BITS['KSIDE_CASTLE']) > 0) {
             $cFlags .= 'k';
         }
-        if ($this->castling[Piece::BLACK] & Move::BITS['QSIDE_CASTLE']) {
+        if (($this->castling[Piece::BLACK] & Move::BITS['QSIDE_CASTLE']) > 0) {
             $cFlags .= 'q';
         }
         if ($cFlags === '') {
@@ -232,17 +232,17 @@ class Chess
         $this->board[$move->fromSquare] = null;
 
         // if flags:EP_CAPTURE (en passant), remove the captured pawn
-        if ($move->flags & Move::BITS['EP_CAPTURE']) {
+        if (($move->flags & Move::BITS['EP_CAPTURE']) > 0) {
             $this->board[$move->toSquare + ($us === Piece::BLACK ? -16 : 16)] = null;
         }
 
         // if pawn promotion, replace with new piece
-        if ($move->flags & Move::BITS['PROMOTION']) {
+        if (($move->flags & Move::BITS['PROMOTION']) > 0) {
             $this->board[$move->toSquare] = new Piece($move->promotion, $us);
         }
 
         // if big pawn move, update the en passant square
-        if ($move->flags & Move::BITS['BIG_PAWN']) {
+        if (($move->flags & Move::BITS['BIG_PAWN']) > 0) {
             $this->epSquare = $move->toSquare + ($us === Piece::BLACK ? -16 : 16);
         } else {
             $this->epSquare = null;
@@ -251,7 +251,7 @@ class Chess
         // reset the 50 move counter if a pawn is moved or piece is captured
         if ($move->piece->isPawn()) {
             $this->halfMoves = 0;
-        } elseif ($move->flags & (Move::BITS['CAPTURE'] | Move::BITS['EP_CAPTURE'])) {
+        } elseif (($move->flags & (Move::BITS['CAPTURE'] | Move::BITS['EP_CAPTURE'])) > 0) {
             $this->halfMoves = 0;
         } else {
             ++$this->halfMoves;
@@ -262,12 +262,12 @@ class Chess
             $this->kings[$us] = $move->toSquare;
 
             // if we castled, move the rook next to the king
-            if ($move->flags & Move::BITS['KSIDE_CASTLE']) {
+            if (($move->flags & Move::BITS['KSIDE_CASTLE']) > 0) {
                 $castlingTo = $move->toSquare - 1;
                 $castlingFrom = $move->toSquare + 1;
                 $this->board[$castlingTo] = $this->board[$castlingFrom];
                 $this->board[$castlingFrom] = null;
-            } elseif ($move->flags & Move::BITS['QSIDE_CASTLE']) {
+            } elseif (($move->flags & Move::BITS['QSIDE_CASTLE']) > 0) {
                 $castlingTo = $move->toSquare + 1;
                 $castlingFrom = $move->toSquare - 2;
                 $this->board[$castlingTo] = $this->board[$castlingFrom];
@@ -281,8 +281,8 @@ class Chess
         if ($this->castling[$us] > 0) {
             for ($i = 0, $len = \count(Board::ROOKS[$us]); $i < $len; ++$i) {
                 if (
-                    $move->fromSquare === Board::ROOKS[$us][$i]['square'] &&
-                    $this->castling[$us] & Board::ROOKS[$us][$i]['flag']
+                    ($move->fromSquare === Board::ROOKS[$us][$i]['square']) > 0 &&
+                    ($this->castling[$us] & Board::ROOKS[$us][$i]['flag']) > 0
                 ) {
                     $this->castling[$us] ^= Board::ROOKS[$us][$i]['flag'];
                     break;
@@ -295,7 +295,7 @@ class Chess
             for ($i = 0, $len = \count(Board::ROOKS[$them]); $i < $len; ++$i) {
                 if (
                     $move->toSquare === Board::ROOKS[$them][$i]['square'] &&
-                    $this->castling[$them] & Board::ROOKS[$them][$i]['flag']
+                    ($this->castling[$them] & Board::ROOKS[$them][$i]['flag']) > 0
                 ) {
                     $this->castling[$them] ^= Board::ROOKS[$them][$i]['flag'];
                     break;
@@ -354,21 +354,21 @@ class Chess
         $this->board[$move->toSquare] = null;
 
         // if capture
-        if ($move->flags & Move::BITS['CAPTURE']) {
+        if (($move->flags & Move::BITS['CAPTURE']) > 0) {
             $this->board[$move->toSquare] = new Piece($move->captured, $them);
-        } elseif ($move->flags & Move::BITS['EP_CAPTURE']) {
+        } elseif (($move->flags & Move::BITS['EP_CAPTURE']) > 0) {
             $index = $move->toSquare + ($us === Piece::BLACK ? -16 : 16);
             $this->board[$index] = new Piece(Piece::PAWN, $them);
         }
 
         // if castling
-        if ($move->flags & Move::BITS['KSIDE_CASTLE']) {
+        if (($move->flags & Move::BITS['KSIDE_CASTLE']) > 0) {
             $castlingTo = $move->toSquare + 1;
             $castlingFrom = $move->toSquare - 1;
             $this->board[$castlingTo] = $this->board[$castlingFrom];
             $this->board[$castlingFrom] = null;
         }
-        if ($move->flags & Move::BITS['QSIDE_CASTLE']) {
+        if (($move->flags & Move::BITS['QSIDE_CASTLE']) > 0) {
             $castlingTo = $move->toSquare - 2;
             $castlingFrom = $move->toSquare + 1;
             $this->board[$castlingTo] = $this->board[$castlingFrom];
@@ -418,7 +418,7 @@ class Chess
 
         // legal moves only?
         for ($i = $firstSquare; $i <= $lastSquare; ++$i) {
-            if ($i & 0x88) {
+            if (($i & 0x88) > 0) {
                 $i += 7;
                 continue;
             } // check edge of board
@@ -444,7 +444,7 @@ class Chess
                 // pawn captures
                 for ($j = 2; $j < 4; ++$j) {
                     $square = $i + Piece::PAWN_OFFSETS[$us][$j];
-                    if ($square & 0x88) {
+                    if (($square & 0x88) > 0) {
                         continue;
                     }
                     if ($this->board[$square] !== null) {
@@ -462,7 +462,7 @@ class Chess
 
                     while (true) {
                         $square += $offset;
-                        if ($square & 0x88) {
+                        if (($square & 0x88) > 0) {
                             break;
                         }
 
@@ -488,7 +488,7 @@ class Chess
         // a) we're generating all moves
         // b) we're doing single square move generation on king's square
         if (!$singleSquare || $lastSquare === $this->kings[$us]) {
-            if ($this->castling[$us] & Move::BITS['KSIDE_CASTLE']) {
+            if (($this->castling[$us] & Move::BITS['KSIDE_CASTLE']) > 0) {
                 $castlingFrom = $this->kings[$us];
                 $castlingTo = $castlingFrom + 2;
 
@@ -503,7 +503,7 @@ class Chess
                 }
             }
 
-            if ($this->castling[$us] & Move::BITS['QSIDE_CASTLE']) {
+            if (($this->castling[$us] & Move::BITS['QSIDE_CASTLE']) > 0) {
                 $castlingFrom = $this->kings[$us];
                 $castlingTo = $castlingFrom - 2;
 
@@ -607,7 +607,7 @@ class Chess
     protected function attacked(string $color, int $square): bool
     {
         for ($i = Board::SQUARES['a8']; $i <= Board::SQUARES['h1']; ++$i) {
-            if ($i & 0x88) {
+            if (($i & 0x88) > 0) {
                 $i += 7;
                 continue;
             }
@@ -620,7 +620,7 @@ class Chess
             $difference = $i - $square;
             $index = $difference + 119;
 
-            if (Board::ATTACKS[$index] & (1 << Piece::SHIFTS[$piece->getType()])) {
+            if ((Board::ATTACKS[$index] & (1 << Piece::SHIFTS[$piece->getType()])) > 0) {
                 if ($piece->isPawn()) {
                     if ($difference > 0) {
                         if ($piece->getColor() === Piece::WHITE) {
@@ -692,7 +692,7 @@ class Chess
 
         for ($i = Board::SQUARES['a8']; $i <= Board::SQUARES['h1']; ++$i) {
             $sqColor = ($sqColor + 1) % 2;
-            if ($i & 0x88) {
+            if (($i & 0x88) > 0) {
                 $i += 7;
                 continue;
             }
@@ -846,9 +846,9 @@ class Chess
         }
 
         $output = '';
-        if ($move->flags & Move::BITS['KSIDE_CASTLE']) {
+        if (($move->flags & Move::BITS['KSIDE_CASTLE']) > 0) {
             $output = 'O-O';
-        } elseif ($move->flags & Move::BITS['QSIDE_CASTLE']) {
+        } elseif (($move->flags & Move::BITS['QSIDE_CASTLE']) > 0) {
             $output = 'O-O-O';
         } else {
             $disambiguator = $this->getDisambiguator($move);
@@ -859,7 +859,7 @@ class Chess
             }
 
             // x on capture
-            if ($move->flags & (Move::BITS['CAPTURE'] | Move::BITS['EP_CAPTURE'])) {
+            if (($move->flags & (Move::BITS['CAPTURE'] | Move::BITS['EP_CAPTURE'])) > 0) {
                 // pawn e5->d6 is "exd6"
                 if ($move->piece->isPawn()) {
                     $output .= $move->from[0];
@@ -871,7 +871,7 @@ class Chess
             $output .= $move->to;
 
             // promotion example: e8=Q
-            if ($move->flags & Move::BITS['PROMOTION']) {
+            if (($move->flags & Move::BITS['PROMOTION']) > 0) {
                 $output .= '='.\strtoupper($move->promotion);
             }
         }

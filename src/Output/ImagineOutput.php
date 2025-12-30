@@ -84,7 +84,7 @@ final class ImagineOutput implements OutputInterface
                 $file = 7 - $file;
                 $rank = 7 - $rank;
             }
-            $x = $file * $this->squareSize + ($this->coordSize ?: 0);
+            $x = $file * $this->squareSize + ($this->coordSize ?? 0);
             $y = $rank * $this->squareSize;
             $boardImage->paste($pieceImages[(string) $piece], new Point($x, $y));
         }
@@ -94,14 +94,14 @@ final class ImagineOutput implements OutputInterface
 
     private function createBoard(Board $board): ImageInterface
     {
-        $size = $this->coordSize ? $this->boardSize + $this->coordSize : $this->boardSize;
+        $size = null !== $this->coordSize ? $this->boardSize + $this->coordSize : $this->boardSize;
         $image = $this->imagine->create(new Box($size, $size));
         $palette = new RGB();
         foreach ($board as $i => $piece) {
             $rank = Board::rank($i);
             $file = Board::file($i);
             $hex = (($rank + $file) % 2 === 1) ? $this->darkSquareColor : $this->liteSquareColor;
-            $x1 = $rank * $this->squareSize + ($this->coordSize ?: 0);
+            $x1 = $rank * $this->squareSize + ($this->coordSize ?? 0);
             $y1 = $file * $this->squareSize;
             $x2 = $x1 + $this->squareSize - 1;
             $y2 = $y1 + $this->squareSize - 1;
