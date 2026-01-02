@@ -17,26 +17,20 @@ final class SvgOutput implements OutputInterface
 
     private bool $coords;
 
-    private string $darkSquareColor;
-
-    private string $liteSquareColor;
-
     public function __construct(
         int $size = 626,
         bool $coords = true,
-        string $darkSquareColor = 'LightSteelBlue',
-        string $liteSquareColor = 'Gainsboro'
+        private readonly string $darkSquareColor = 'LightSteelBlue',
+        private readonly string $liteSquareColor = 'Gainsboro',
     ) {
         $this->boardSize = $size;
         $this->coords = $coords;
-        $this->darkSquareColor = $darkSquareColor;
-        $this->liteSquareColor = $liteSquareColor;
     }
 
     public function render(Chess $chess): string
     {
         $reversed = $chess->board->isReversed();
-        $output = \file_get_contents(__DIR__.'/template.svg');
+        $output = (string) \file_get_contents(__DIR__.'/template.svg');
         $pieces = '';
         foreach ($chess->board as $i => $piece) {
             if (null === $piece) {
@@ -55,13 +49,13 @@ final class SvgOutput implements OutputInterface
         $coords = '';
         if ($this->coords) {
             $file = $reversed ? '/coordinates_reversed.svg' : '/coordinates.svg';
-            $coords = \file_get_contents(__DIR__.$file);
+            $coords = (string) \file_get_contents(__DIR__.$file);
         }
 
         return \str_replace(
             ['{{ size }}', '{{ dark }}', '{{ light }}', '{{ coordinates }}', '{{ pieces }}'],
-            [$this->boardSize, $this->darkSquareColor, $this->liteSquareColor, $coords, $pieces],
-            $output
+            [(string) $this->boardSize, $this->darkSquareColor, $this->liteSquareColor, $coords, $pieces],
+            $output,
         );
     }
 }

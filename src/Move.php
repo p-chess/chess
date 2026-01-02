@@ -57,7 +57,7 @@ final class Move implements \JsonSerializable, \Stringable
         $captured = null;
         if ($board[$to] !== null) {
             $captured = $board[$to]->getType();
-        } elseif ($flags & self::BITS['EP_CAPTURE']) {
+        } elseif (($flags & self::BITS['EP_CAPTURE']) > 0) {
             $captured = Piece::PAWN;
         }
         if ($promotion !== null) {

@@ -6,7 +6,7 @@ namespace PChess\Chess;
 
 /**
  * @implements \ArrayAccess<int, ?Piece>
- * @implements \Iterator<int, ?Piece>
+ * @implements \Iterator<?int, ?Piece>
  */
 class Board implements \ArrayAccess, \Iterator, \JsonSerializable
 {
@@ -78,37 +78,24 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
 
     private bool $reversed = false;
 
-    /**
-     * @param int $offset
-     */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->squares[$offset]);
     }
 
-    /**
-     * @param int $offset
-     */
-    public function offsetGet($offset): ?Piece
+    public function offsetGet(mixed $offset): ?Piece
     {
         return $this->squares[$offset] ?? null;
     }
 
-    /**
-     * @param int    $offset
-     * @param ?Piece $value
-     */
-    public function offsetSet($offset, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         if (\in_array($offset, self::SQUARES, true)) {
             $this->squares[$offset] = $value;
         }
     }
 
-    /**
-     * @param int $offset
-     */
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->squares[$offset]);
     }

@@ -16,11 +16,11 @@ final class Link
 
     public function getClass(): ?string
     {
-        return $this->class ? ' class="'.$this->class.'"' : null;
+        return null !== $this->class ? ' class="'.$this->class.'"' : null;
     }
 
     public function getUrl(): ?string
     {
-        return $this->url ? ' href="'.$this->url.'"' : null;
+        return null !== $this->url ? ' href="'.$this->url.'"' : null;
     }
 }

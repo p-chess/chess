@@ -3,7 +3,7 @@
 return (new PhpCsFixer\Config())
     ->setRules([
         '@PSR12' => true,
-        '@PHP81Migration' => true,
+        '@PHP8x1Migration' => true,
         'binary_operator_spaces' => ['operators' => ['=>' => 'single_space', '=' => 'single_space']],
         'blank_line_before_statement' => ['statements' => ['return']],
         'cast_spaces' => true,
