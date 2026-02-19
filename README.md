@@ -6,8 +6,9 @@ detection - basically everything but the AI.
 
 NOTE: this started as a port of [chess.js](https://github.com/jhlywa/chess.js) for PHP, forked from [ryanhs/chess.php](https://github.com/ryanhs/chess.php)
 
-[![Latest Stable Version](https://poser.pugx.org/p-chess/chess/v/stable)](https://packagist.org/p-chess/chess)
-[![MIT License](https://poser.pugx.org/p-chess/chess/license)](https://packagist.org/packages/p-chess/chess)  
+[![Latest Stable Version](https://poser.pugx.org/p-chess/chess/v/stable)](https://packagist.org/packages/p-chess/chess)
+[![MIT License](https://poser.pugx.org/p-chess/chess/license)](LICENSE.md)  
+[![Build Status](https://github.com/p-chess/chess/workflows/run-tests/badge.svg)](https://github.com/p-chess/chess/actions)
 
 ## Installation
 
@@ -20,7 +21,7 @@ or put in your composer.json
 ```
 
 ## Example Code
-The code below plays a complete game of chess ... randomly.
+The code below plays a complete game of chess... randomly.
 
 ```php
 <?php
@@ -110,11 +111,10 @@ Pieces are displayed inside an SVG image.
 <?php
 // use...
 $chess = new Chess();
-$output = new SvgOutput();
-echo $output->render($chess);
+echo (new SvgOutput())->render($chess);
 ```
 
-<img src="https://private-user-images.githubusercontent.com/179866/457647250-34bae1e1-83c5-47b1-a997-0b5bf4041d2a.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTEyODYyNTgsIm5iZiI6MTc1MTI4NTk1OCwicGF0aCI6Ii8xNzk4NjYvNDU3NjQ3MjUwLTM0YmFlMWUxLTgzYzUtNDdiMS1hOTk3LTBiNWJmNDA0MWQyYS5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwNjMwJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDYzMFQxMjE5MThaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0wYzFlOTFiNjcxZjYzMDViZGIyNmNkOGRmZmJmZmM2ZWRjZmI3YzMxODFiNWI5ZGFjZjQ1ZTM1ZGQzMjU4OTdkJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.Rqfjlhx-qVfMpo09u0s9Lf4Wk3X9OnkZ1n0VsNOznX0">
+<img src="https://github.com/user-attachments/assets/cbce21e0-8ebd-47b3-9140-b31c09f55ce9">
 
 ### HTML
 
