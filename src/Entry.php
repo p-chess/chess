@@ -10,7 +10,7 @@ class Entry implements \Stringable
 
     /**
      * @param array<string, ?int> $kings
-     * @param array<string, ?int> $castling
+     * @param array<string, int>  $castling
      */
     public function __construct(
         public Move $move,

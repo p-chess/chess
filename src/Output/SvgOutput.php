@@ -33,7 +33,7 @@ final class SvgOutput implements OutputInterface
         $output = (string) \file_get_contents(__DIR__.'/template.svg');
         $pieces = '';
         foreach ($chess->board as $i => $piece) {
-            if (null === $piece) {
+            if (null === $piece || null === $i) {
                 continue;
             }
             if ($reversed) {

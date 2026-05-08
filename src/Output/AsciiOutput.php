@@ -13,6 +13,9 @@ final class AsciiOutput extends BasicOutput implements OutputInterface
         $output = self::$line;
         $reversed = $chess->board->isReversed();
         foreach ($chess->board as $i => $piece) {
+            if (null === $i) {
+                continue;
+            }
             $output .= self::getLines($reversed, $i);
             if (null === $piece) {
                 $output .= '   |';

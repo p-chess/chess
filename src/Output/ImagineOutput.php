@@ -75,7 +75,7 @@ final class ImagineOutput implements OutputInterface
         }
         $pieceImages = $this->createPieceImages($chess->board);
         foreach ($chess->board as $i => $piece) {
-            if (null === $piece) {
+            if (null === $piece || null === $i) {
                 continue;
             }
             $rank = Board::rank($i);
@@ -98,6 +98,9 @@ final class ImagineOutput implements OutputInterface
         $image = $this->imagine->create(new Box($size, $size));
         $palette = new RGB();
         foreach ($board as $i => $piece) {
+            if (null === $i) {
+                continue;
+            }
             $rank = Board::rank($i);
             $file = Board::file($i);
             $hex = (($rank + $file) % 2 === 1) ? $this->darkSquareColor : $this->liteSquareColor;
@@ -134,6 +137,7 @@ final class ImagineOutput implements OutputInterface
      */
     private function createRankImages(): array
     {
+        \assert(null !== $this->coordSize);
         $images = [];
         $ranks = \range(8, 1);
         $size = new Box($this->coordSize, $this->squareSize);
@@ -152,6 +156,7 @@ final class ImagineOutput implements OutputInterface
      */
     private function createFileImages(): array
     {
+        \assert(null !== $this->coordSize);
         $images = [];
         $files = \range('a', 'h');
         $size = new Box($this->squareSize, $this->coordSize);
