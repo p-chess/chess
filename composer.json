@@ -22,11 +22,11 @@
         "ext-ctype": "*"
     },
     "require-dev": {
-        "ergebnis/phpunit-slow-test-detector": "^2.20",
-        "friendsofphp/php-cs-fixer": "^3.92",
+        "ergebnis/phpunit-slow-test-detector": "^2.23",
+        "friendsofphp/php-cs-fixer": "^3.95",
         "imagine/imagine": "^1.5",
         "phpbench/phpbench": "^1.4",
-        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpunit/phpunit": "^10.5 || ^11.5 || ^12.5"
     },

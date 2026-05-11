@@ -238,6 +238,7 @@ class Chess
 
         // if pawn promotion, replace with new piece
         if (($move->flags & Move::BITS['PROMOTION']) > 0) {
+            \assert(null !== $move->promotion);
             $this->board[$move->toSquare] = new Piece($move->promotion, $us);
         }
 
@@ -324,7 +325,7 @@ class Chess
             $this->moveNumber,
         ));
 
-        return $this->history->key();
+        return \count($this->history->getEntries()) - 1;
     }
 
     protected function undoMove(): ?Move
@@ -355,6 +356,7 @@ class Chess
 
         // if capture
         if (($move->flags & Move::BITS['CAPTURE']) > 0) {
+            \assert(null !== $move->captured);
             $this->board[$move->toSquare] = new Piece($move->captured, $them);
         } elseif (($move->flags & Move::BITS['EP_CAPTURE']) > 0) {
             $index = $move->toSquare + ($us === Piece::BLACK ? -16 : 16);
@@ -489,6 +491,7 @@ class Chess
         // b) we're doing single square move generation on king's square
         if (!$singleSquare || $lastSquare === $this->kings[$us]) {
             if (($this->castling[$us] & Move::BITS['KSIDE_CASTLE']) > 0) {
+                \assert(null !== $this->kings[$us]);
                 $castlingFrom = $this->kings[$us];
                 $castlingTo = $castlingFrom + 2;
 
@@ -504,6 +507,7 @@ class Chess
             }
 
             if (($this->castling[$us] & Move::BITS['QSIDE_CASTLE']) > 0) {
+                \assert(null !== $this->kings[$us]);
                 $castlingFrom = $this->kings[$us];
                 $castlingTo = $castlingFrom - 2;
 
@@ -658,7 +662,7 @@ class Chess
 
     protected function kingAttacked(string $color): bool
     {
-        return $this->attacked(self::swapColor($color), $this->kings[$color]);
+        return null !== $this->kings[$color] && $this->attacked(self::swapColor($color), $this->kings[$color]);
     }
 
     public function inCheck(): bool
@@ -686,7 +690,7 @@ class Chess
             Piece::QUEEN => 0,
             Piece::KING => 0,
         ];
-        $bishops = null;
+        $bishops = [];
         $numPieces = 0;
         $sqColor = 0;
 
@@ -720,11 +724,10 @@ class Chess
         // k(b){0,} vs k(b){0,}  , because maybe you are a programmer we talk in regex (preg) :-p
         if ($numPieces === $pieces[Piece::BISHOP] + 2) {
             $sum = 0;
-            $len = $bishops === null ? 0 : \count($bishops);
             foreach ($bishops as $bishop) {
                 $sum += $bishop;
             }
-            if ($sum === 0 || $sum === $len) {
+            if ($sum === 0 || $sum === \count($bishops)) {
                 return true;
             }
         }
@@ -741,6 +744,10 @@ class Chess
     {
         $hash = [];
         foreach ($this->history->getEntries() as $entry) {
+            if ($entry->position === null) {
+                continue;
+            }
+
             if (isset($hash[$entry->position])) {
                 ++$hash[$entry->position];
             } else {
@@ -872,6 +879,7 @@ class Chess
 
             // promotion example: e8=Q
             if (($move->flags & Move::BITS['PROMOTION']) > 0) {
+                \assert(null !== $move->promotion);
                 $output .= '='.\strtoupper($move->promotion);
             }
         }
