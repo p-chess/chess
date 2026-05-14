@@ -20,6 +20,39 @@ or put in your composer.json
 }
 ```
 
+## Local development
+
+This project is designed to run inside Docker via `docker compose`, with helper targets in `Makefile`.
+
+### Prerequisites
+
+- Docker + Docker Compose
+- GNU Make
+
+### First-time setup
+
+```bash
+make build
+make start
+make install
+```
+
+### Common development commands
+
+```bash
+make test
+make stan
+make cs
+make coverage
+make stop
+```
+
+You can list all available targets with:
+
+```bash
+make help
+```
+
 ## Example Code
 The code below plays a complete game of chess... randomly.
 

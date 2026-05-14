@@ -1,0 +1,8 @@
+services:
+    php:
+        build:
+            context: docker
+        volumes:
+            - ./:/srv/chess
+        working_dir: /srv/chess
+        tty: true
