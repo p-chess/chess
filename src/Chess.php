@@ -121,6 +121,8 @@ class Chess
         // move number
         $this->moveNumber = (int) $tokens[5];
 
+        $this->boardHash = \json_encode($this->board, JSON_THROW_ON_ERROR);
+
         return null;
     }
 
