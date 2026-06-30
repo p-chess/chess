@@ -28,4 +28,22 @@ final class MiscTest extends TestCase
             self::assertNotNull($move->san);
         }
     }
+
+    public function testBoardHashIsCurrentAfterLoad(): void
+    {
+        $chess = new ChessPublicator();
+        self::assertSame(
+            \json_encode($chess->getBoard(), JSON_THROW_ON_ERROR),
+            $chess->getBoardHash(),
+            'boardHash must reflect the actual board after construction',
+        );
+
+        $fen = 'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3';
+        $chess2 = new ChessPublicator($fen);
+        self::assertSame(
+            \json_encode($chess2->getBoard(), JSON_THROW_ON_ERROR),
+            $chess2->getBoardHash(),
+            'boardHash must reflect the actual board after loading a non-default FEN',
+        );
+    }
 }

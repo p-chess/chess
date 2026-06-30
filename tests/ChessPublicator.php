@@ -17,6 +17,11 @@ final class ChessPublicator extends Chess
         return $this->board;
     }
 
+    public function getBoardHash(): string
+    {
+        return $this->boardHash;
+    }
+
     public function getLastHistory(): Entry
     {
         return $this->history->get(\count($this->history->getEntries()) - 1);
