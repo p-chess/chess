@@ -7,6 +7,7 @@ namespace PChess\Chess;
 class Entry implements \Stringable
 {
     public string $turn;
+    public ?string $previousPosition;
 
     /**
      * @param array<string, ?int> $kings
@@ -22,6 +23,7 @@ class Entry implements \Stringable
         public int $moveNumber,
     ) {
         $this->turn = $move->turn;
+        $this->previousPosition = $position;
     }
 
     public function __toString(): string
