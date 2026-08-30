@@ -19,6 +19,7 @@ abstract class HtmlOutput implements OutputInterface
     {
         $links = $this->generateLinks($chess, $from, $identifier);
         $reversed = $chess->board->isReversed();
+        $unsafe = false;
         $output = '<table id="'.$this->getBoardId().'">';
         /** @var int $i */
         foreach ($chess->board as $i => $piece) {
@@ -27,7 +28,8 @@ abstract class HtmlOutput implements OutputInterface
             }
             if (null !== $piece || null !== $links[$i]->getClass()) {
                 $aClass = null !== $piece ? ' class="'.$piece->getColor().$piece->getType().'"' : '';
-                $output .= \sprintf('<td%s><a%s%s></a></td>', $links[$i]->getClass(), $aClass, $links[$i]->getUrl());
+                $unsafe = $unsafe || $links[$i]->unsafe;
+                $output .= \sprintf('<td%s>%s</td>', $links[$i]->getClass(), self::renderControl($links[$i], $aClass));
             } else {
                 $output .= \sprintf('<td%s></td>', $links[$i]->getClass());
             }
@@ -42,7 +44,7 @@ abstract class HtmlOutput implements OutputInterface
         }
         $output .= '</tr></table>';
 
-        return $output;
+        return $unsafe ? $this->wrapInForm($output, $identifier) : $output;
     }
 
     /**
@@ -55,6 +57,8 @@ abstract class HtmlOutput implements OutputInterface
      * the piece which SAN is identical to $from, and a Link to end move to every legal ending position
      * (according to the results of $chess->moves($from) method). You must pay attention to special case of
      * promotion (when piece is a pawn and is in rank 7).
+     * Links that actually change the state of the game (i.e. links ending a move) should be flagged as unsafe,
+     * so that they get rendered as submit buttons of a POST form.
      * A possible identifier can be passed, to make a distinction between different Chess objects.
      *
      * @param mixed $identifier
@@ -62,6 +66,19 @@ abstract class HtmlOutput implements OutputInterface
      * @return array<int, Link>
      */
     abstract public function generateLinks(Chess $chess, ?string $from = null, $identifier = null): array;
+
+    /**
+     * Hidden fields (name => value) added to the form wrapping the board, typically a CSRF token.
+     * They are used only when at least one of the links is unsafe.
+     *
+     * @param mixed $identifier
+     *
+     * @return array<string, string>
+     */
+    protected function getHiddenFields($identifier = null): array
+    {
+        return [];
+    }
 
     protected function getBoardId(): string
     {
@@ -76,5 +93,33 @@ abstract class HtmlOutput implements OutputInterface
     protected function getRankClass(): string
     {
         return 'rank';
+    }
+
+    private static function renderControl(Link $link, string $class): string
+    {
+        if (!$link->unsafe) {
+            return \sprintf('<a%s%s></a>', $class, $link->getUrl());
+        }
+
+        return \sprintf('<button type="submit"%s%s></button>', $class, $link->getFormAction());
+    }
+
+    /**
+     * Every unsafe link carries its own "formaction", hence the form needs no action of its own.
+     *
+     * @param mixed $identifier
+     */
+    private function wrapInForm(string $board, $identifier): string
+    {
+        $fields = '';
+        foreach ($this->getHiddenFields($identifier) as $name => $value) {
+            $fields .= \sprintf(
+                '<input type="hidden" name="%s" value="%s">',
+                \htmlspecialchars($name, \ENT_QUOTES),
+                \htmlspecialchars($value, \ENT_QUOTES),
+            );
+        }
+
+        return '<form method="post">'.$fields.$board.'</form>';
     }
 }

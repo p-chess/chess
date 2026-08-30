@@ -3,6 +3,12 @@
 This option requires extending the provided `HtmlOutput` class, since you need to define
 a way to build links for pieces.
 
+A link can be flagged as *unsafe*, meaning that following it changes the state of the game.
+Ending a move is the only such link: it is rendered as the submit button of a `POST` form
+wrapping the board, so that it cannot be triggered by a `GET` request (a prefetch, a crawler,
+or a cross-site request would otherwise be enough to move a piece).
+All the other links only display something, hence they stay plain anchors.
+
 The following is an example of a possible extension.
 Some methods are omitted, but names should be self-explanatory:
 
@@ -26,6 +32,7 @@ final class MyHtmlOutput extends HtmlOutput
         foreach ($chess->board as $i => $piece) {
             $url = null;
             $class = null;
+            $unsafe = false;
             $san = Board::algebraic($i);
             if (null === $from) {
                 // move not started
@@ -39,7 +46,9 @@ final class MyHtmlOutput extends HtmlOutput
                         if ('p' === $movingPiece->getType() && (0 === Board::rank($i) || 7 === Board::rank($i))) {
                             $url = $this->generateLinkForMovePromotion($from, $san);
                         } else {
+                            // this is the only link that changes the game
                             $url = $this->generateLinkForMoveEnd($from, $san);
+                            $unsafe = true;
                         }
                     }
                     $class = 'target';
@@ -49,11 +58,22 @@ final class MyHtmlOutput extends HtmlOutput
                 $url = $this->generateLinkForMoveRestart();
                 $class = 'current';
             }
-            $links[$i] = new Link($class, $url);
+            $links[$i] = new Link($class, $url, $unsafe);
         }
 
         return $links;
     }
+}
+```
+
+If your framework requires a CSRF token (or any other hidden field) to accept the `POST`,
+override `getHiddenFields()`: its entries are added to the form wrapping the board, and
+escaped for you.
+
+```php
+protected function getHiddenFields($identifier = null): array
+{
+    return ['_token' => $this->getCsrfTokenSomehow()];
 }
 ```
 
@@ -73,7 +93,8 @@ echo $output->render($chess);
 The output is something like the following:
 
 ```html
-<!-- pawn in b2 started move -->
+<!-- pawn in b2 started move: the board is wrapped in a form, since a move can end here -->
+<form method="post">
 <table id="board">
     <tr>
         <td class="file">8</td>
@@ -122,7 +143,7 @@ The output is something like the following:
     <tr>
         <td class="file">4</td>
         <td></td>
-        <td class="target"><a href="/move/b2/b4"></a></td>
+        <td class="target"><button type="submit" formaction="/move/b2/b4"></button></td>
         <td><a class="wn"></a></td>
         <td><a class="bn"></a></td>
         <td><a class="wp"></a></td>
@@ -133,7 +154,7 @@ The output is something like the following:
     <tr>
         <td class="file">3</td>
         <td></td>
-        <td class="target"><a href="/move/b2/b3"></a></td>
+        <td class="target"><button type="submit" formaction="/move/b2/b3"></button></td>
         <td></td>
         <td><a class="wp"></a></td>
         <td></td>
@@ -175,6 +196,7 @@ The output is something like the following:
         <td class="rank">h</td>
     </tr>
 </table>
+</form>
 ```
 
 This is a preview of HTML displayed above, with a bit of styling applied:
