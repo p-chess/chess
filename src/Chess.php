@@ -25,12 +25,17 @@ class Chess
     protected array $generateMovesCache = [];
 
     protected string $boardHash = '';
+    protected ZobristHasher $zobristHasher;
     /** @var array<string, string> */
     protected array $sanMoveCache = [];
 
-    public function __construct(?string $fen = Board::DEFAULT_POSITION, ?History $history = null)
-    {
+    public function __construct(
+        ?string $fen = Board::DEFAULT_POSITION,
+        ?History $history = null,
+        ?ZobristHasher $zobristHasher = null,
+    ) {
         $this->board = new Board();
+        $this->zobristHasher = $zobristHasher ?? new ZobristHasher();
         if (null !== $error = $this->load($fen ?? Board::DEFAULT_POSITION)) {
             throw new \InvalidArgumentException(\sprintf('Invalid fen: %s. Error: %s', $fen, $error));
         }
@@ -39,7 +44,6 @@ class Chess
 
     protected function clear(): void
     {
-        $this->boardHash = \json_encode($this->board, JSON_THROW_ON_ERROR);
         $this->kings = [Piece::WHITE => null, Piece::BLACK => null];
         $this->turn = Piece::WHITE;
         $this->castling = [Piece::WHITE => 0, Piece::BLACK => 0];
@@ -52,6 +56,8 @@ class Chess
         foreach (Board::SQUARES as $square) {
             $this->board[$square] = null;
         }
+
+        $this->refreshBoardHash();
     }
 
     /**
@@ -121,7 +127,7 @@ class Chess
         // move number
         $this->moveNumber = (int) $tokens[5];
 
-        $this->boardHash = \json_encode($this->board, JSON_THROW_ON_ERROR);
+        $this->refreshBoardHash();
 
         return null;
     }
@@ -229,6 +235,10 @@ class Chess
         $us = $this->turn;
         $them = self::swapColor($us);
         $historyKey = $this->recordMove($move);
+        $previousEpSquare = $this->epSquare;
+        $previousUsCastling = $this->castling[$us];
+        $previousThemCastling = $this->castling[$them];
+        $hashablePreviousEpSquare = $this->hashableEpSquare($previousEpSquare, $us);
 
         $this->board[$move->toSquare] = $this->board[$move->fromSquare];
         $this->board[$move->fromSquare] = null;
@@ -311,7 +321,19 @@ class Chess
         }
         $this->turn = $them;
 
-        $this->boardHash = \json_encode($this->board, JSON_THROW_ON_ERROR);
+        $hashableCurrentEpSquare = $this->hashableEpSquare($this->epSquare, $this->turn);
+
+        $this->boardHash = $this->zobristHasher->applyMove(
+            $move,
+            $us,
+            $them,
+            $hashablePreviousEpSquare,
+            $hashableCurrentEpSquare,
+            $previousUsCastling,
+            $this->castling[$us],
+            $previousThemCastling,
+            $this->castling[$them],
+        );
         $this->history->get($historyKey)->position = $this->boardHash;
     }
 
@@ -379,7 +401,11 @@ class Chess
             $this->board[$castlingFrom] = null;
         }
 
-        $this->boardHash = \json_encode($this->board, JSON_THROW_ON_ERROR);
+        if ($old->previousPosition === null) {
+            $this->refreshBoardHash();
+        } else {
+            $this->boardHash = $this->zobristHasher->restore($old->previousPosition);
+        }
 
         return $move;
     }
@@ -399,7 +425,7 @@ class Chess
      */
     protected function generateMoves(?int $square = null, bool $legal = true): array
     {
-        $cacheKey = $this->boardHash.$square.($legal ? '1' : '0');
+        $cacheKey = $this->boardHash.'|'.($square === null ? 'all' : (string) $square).'|'.($legal ? '1' : '0');
 
         // check cache first
         if (isset($this->generateMovesCache[$cacheKey])) {
@@ -900,5 +926,38 @@ class Chess
     public function getHistory(): History
     {
         return $this->history;
+    }
+
+    private function refreshBoardHash(): void
+    {
+        $this->boardHash = $this->zobristHasher->rebuild(
+            $this->board,
+            $this->turn,
+            $this->castling,
+            $this->hashableEpSquare($this->epSquare, $this->turn),
+        );
+    }
+
+    /**
+     * Returns the EP square only when a pawn of the given turn can actually
+     * capture en passant, so that identical positions always hash the same.
+     */
+    private function hashableEpSquare(?int $epSquare, string $turn): ?int
+    {
+        if ($epSquare === null) {
+            return null;
+        }
+
+        foreach ([2, 3] as $j) {
+            $from = $epSquare - Piece::PAWN_OFFSETS[$turn][$j];
+            if (($from & 0x88) === 0) {
+                $piece = $this->board[$from];
+                if ($piece !== null && $piece->getType() === Piece::PAWN && $piece->getColor() === $turn) {
+                    return $epSquare;
+                }
+            }
+        }
+
+        return null;
     }
 }

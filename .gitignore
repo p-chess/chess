@@ -1,4 +1,5 @@
-*.cache
-composer.lock
-resources/
-vendor/
+/*.cache
+/build/
+/composer.lock
+/resources/
+/vendor/
