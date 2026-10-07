@@ -27,11 +27,6 @@ final class ChessPublicator extends Chess
         return $this->history->get(\count($this->history->getEntries()) - 1);
     }
 
-    public function attackedPublic(string $color, int $square): bool
-    {
-        return $this->attacked($color, $square);
-    }
-
     /**
      * @return array<int, Move>
      */

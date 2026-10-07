@@ -19,7 +19,7 @@ install:	## install vendors
 	docker compose exec php composer install
 
 stan:	## static analysis via phpstan
-	docker compose exec php php vendor/bin/phpstan analyse -v
+	docker compose exec php php vendor/bin/phpstan analyse -v --memory-limit=-1
 
 start:	## start docker image
 	docker compose up -d
