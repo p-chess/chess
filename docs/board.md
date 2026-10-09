@@ -16,8 +16,13 @@ foreach ($board as $offset => $piece) {
 }
 ```
 
-The only method that can be directly used is `$board->reverse()`, useful to toggle sides (e.g. to see
-the board from the black point of view, and then from the white again).
+The following methods can be used directly:
+
+* `reverse()`: toggle sides (e.g. to see the board from the black point of view, and then from the white again)
+* `isAttacked(string $color, int $square): bool`: check if a square is attacked by any piece of the given color
+  (e.g. `$chess->board->isAttacked(Piece::WHITE, Board::SQUARES['e4'])`)
+* `hasInsufficientMaterial(): bool`: check if material is insufficient to continue the game.
+  Same as `Chess::insufficientMaterial()`
 
 The following static methods can be used if you need to deal
 with [SAN](https://en.wikipedia.org/wiki/Algebraic_notation_(chess)):

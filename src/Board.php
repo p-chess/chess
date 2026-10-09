@@ -142,6 +142,113 @@ class Board implements \ArrayAccess, \Iterator, \JsonSerializable
         return $this->reversed;
     }
 
+    public function isAttacked(string $color, int $square): bool
+    {
+        for ($i = self::SQUARES['a8']; $i <= self::SQUARES['h1']; ++$i) {
+            if (($i & 0x88) > 0) {
+                $i += 7;
+                continue;
+            }
+            $piece = $this->squares[$i] ?? null;
+            // check empty square and color
+            if (null === $piece || $piece->getColor() !== $color) {
+                continue;
+            }
+
+            $difference = $i - $square;
+            $index = $difference + 119;
+
+            if ((self::ATTACKS[$index] & (1 << Piece::SHIFTS[$piece->getType()])) > 0) {
+                if ($piece->isPawn()) {
+                    if ($difference > 0) {
+                        if ($piece->getColor() === Piece::WHITE) {
+                            return true;
+                        }
+                    } elseif ($piece->getColor() === Piece::BLACK) {
+                        return true;
+                    }
+                    continue;
+                }
+
+                if ($piece->isKnight() || $piece->isKing()) {
+                    return true;
+                }
+
+                $offset = self::RAYS[$index];
+                $j = $i + $offset;
+                $blocked = false;
+                while ($j !== $square) {
+                    if (($this->squares[$j] ?? null) !== null) {
+                        $blocked = true;
+                        break;
+                    }
+                    $j += $offset;
+                }
+
+                if (!$blocked) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function hasInsufficientMaterial(): bool
+    {
+        $pieces = [
+            Piece::PAWN => 0,
+            Piece::KNIGHT => 0,
+            Piece::BISHOP => 0,
+            Piece::ROOK => 0,
+            Piece::QUEEN => 0,
+            Piece::KING => 0,
+        ];
+        $bishops = [];
+        $numPieces = 0;
+        $sqColor = 0;
+
+        for ($i = self::SQUARES['a8']; $i <= self::SQUARES['h1']; ++$i) {
+            $sqColor = ($sqColor + 1) % 2;
+            if (($i & 0x88) > 0) {
+                $i += 7;
+                continue;
+            }
+
+            $piece = $this->squares[$i] ?? null;
+            if ($piece !== null) {
+                ++$pieces[$piece->getType()];
+                if ($piece->isBishop()) {
+                    $bishops[] = $sqColor;
+                }
+                ++$numPieces;
+            }
+        }
+
+        // k vs k
+        if ($numPieces === 2) {
+            return true;
+        }
+
+        // k vs kn / k vs kb
+        if ($numPieces === 3 && ($pieces[Piece::BISHOP] === 1 || $pieces[Piece::KNIGHT] === 1)) {
+            return true;
+        }
+
+        // k(b){0,} vs k(b){0,}  , because maybe you are a programmer we talk in regex (preg) :-p
+        if ($numPieces === $pieces[Piece::BISHOP] + 2) {
+            $sum = 0;
+            foreach ($bishops as $bishop) {
+                $sum += $bishop;
+            }
+            if ($sum === 0 || $sum === \count($bishops)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static function rank(int $i): int
     {
         return $i >> 4;

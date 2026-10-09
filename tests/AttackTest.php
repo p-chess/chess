@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PChess\Chess\Test;
 
 use PChess\Chess\Board;
+use PChess\Chess\Chess;
 use PChess\Chess\Piece;
 use PHPUnit\Framework\TestCase;
 
@@ -12,110 +13,110 @@ final class AttackTest extends TestCase
 {
     public function testAttackedPawn(): void
     {
-        $chess = new ChessPublicator(Board::EMPTY);
+        $chess = new Chess(Board::EMPTY);
         $chess->put(new Piece(Piece::PAWN, Piece::WHITE), 'e4');
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e3']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d3']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['e3']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f3']));
 
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']));
-        //~ self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e4']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d4']));
+        //~ self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['e4']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f4']));
 
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e5']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d5']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['e5']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f5']));
     }
 
     public function testAttackedKnight(): void
     {
-        $chess = new ChessPublicator(Board::EMPTY);
+        $chess = new Chess(Board::EMPTY);
         $chess->put(new Piece(Piece::KNIGHT, Piece::WHITE), 'e4');
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d2']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d6']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f2']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f6']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d2']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d6']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f2']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f6']));
 
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d1']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d7']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d8']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d1']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d3']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d4']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d5']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d7']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d8']));
 
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f1']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f7']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f8']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f1']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f3']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f4']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f5']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f7']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f8']));
     }
 
     public function testAttackedBishop(): void
     {
-        $chess = new ChessPublicator(Board::EMPTY);
+        $chess = new Chess(Board::EMPTY);
         $chess->put(new Piece(Piece::BISHOP, Piece::WHITE), 'e4');
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d3']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d5']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f3']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f5']));
 
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e3']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e5']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d4']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['e3']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['e5']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f4']));
     }
 
     public function testAttackedRook(): void
     {
-        $chess = new ChessPublicator(Board::EMPTY);
+        $chess = new Chess(Board::EMPTY);
         $chess->put(new Piece(Piece::ROOK, Piece::WHITE), 'e4');
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f7']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f8']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d3']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d5']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f3']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f5']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f7']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f8']));
 
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e3']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e5']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d4']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['e3']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['e5']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f4']));
     }
 
     public function testAttackedQueen(): void
     {
-        $chess = new ChessPublicator(Board::EMPTY);
+        $chess = new Chess(Board::EMPTY);
         $chess->put(new Piece(Piece::QUEEN, Piece::WHITE), 'e4');
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e3']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e4']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e5']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d3']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d4']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d5']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['e3']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['e4']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['e5']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f3']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f4']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f5']));
     }
 
     public function testAttackedKing(): void
     {
-        $chess = new ChessPublicator(Board::EMPTY);
+        $chess = new Chess(Board::EMPTY);
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e4');
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d3']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d4']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['d5']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e3']));
-        self::assertFalse($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e4']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['e5']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f3']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f4']));
-        self::assertTrue($chess->attackedPublic(Piece::WHITE, Board::SQUARES['f5']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d3']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d4']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['d5']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['e3']));
+        self::assertFalse($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['e4']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['e5']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f3']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f4']));
+        self::assertTrue($chess->board->isAttacked(Piece::WHITE, Board::SQUARES['f5']));
     }
 
     public function testInCheck(): void
     {
-        $chess = new ChessPublicator(Board::EMPTY);
+        $chess = new Chess(Board::EMPTY);
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e7');
         $chess->put(new Piece(Piece::QUEEN, Piece::BLACK), 'e4');
         self::assertSame(Piece::WHITE, $chess->turn);
@@ -128,7 +129,7 @@ final class AttackTest extends TestCase
 
     public function testInCheckmate(): void
     {
-        $chess = new ChessPublicator('r1bqk1nr/pppp1Qpp/2n5/2b1p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4');
+        $chess = new Chess('r1bqk1nr/pppp1Qpp/2n5/2b1p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4');
         self::assertTrue($chess->inCheckmate());
     }
 
@@ -136,34 +137,34 @@ final class AttackTest extends TestCase
     {
         // fen source: https://www.redhotpawn.com/forum/only-chess/interesting-stalemate-position.152109
         // start fen : 3b3k/p6p/1p5P/3q4/8/n7/PP6/K4Q2 w - - 0 1
-        $chess = new ChessPublicator('7k/p6p/1p3b1P/3q4/8/n7/PP6/K7 w - - 0 2');
+        $chess = new Chess('7k/p6p/1p3b1P/3q4/8/n7/PP6/K7 w - - 0 2');
         self::assertTrue($chess->inStalemate());
     }
 
     public function testInsufficientMaterial(): void
     {
         // k vs k
-        $chess = new ChessPublicator(Board::EMPTY);
+        $chess = new Chess(Board::EMPTY);
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
         self::assertTrue($chess->insufficientMaterial());
 
         // k vs kn
-        $chess = new ChessPublicator(Board::EMPTY);
+        $chess = new Chess(Board::EMPTY);
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
         $chess->put(new Piece(Piece::KNIGHT, Piece::WHITE), 'e4');
         self::assertTrue($chess->insufficientMaterial());
 
         // k vs kb
-        $chess = new ChessPublicator(Board::EMPTY);
+        $chess = new Chess(Board::EMPTY);
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
         $chess->put(new Piece(Piece::BISHOP, Piece::WHITE), 'e4');
         self::assertTrue($chess->insufficientMaterial());
 
         // k vs k(b){0,} << bishop(s) in same color
-        $chess = new ChessPublicator(Board::EMPTY);
+        $chess = new Chess(Board::EMPTY);
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
         $chess->put(new Piece(Piece::BISHOP, Piece::BLACK), 'e5');
@@ -174,11 +175,28 @@ final class AttackTest extends TestCase
         self::assertTrue($chess->insufficientMaterial());
         $chess->put(new Piece(Piece::BISHOP, Piece::BLACK), 'b8');
         self::assertTrue($chess->insufficientMaterial());
+
+        // k vs kbb << bishops on opposite colours
+        $chess = new Chess(Board::EMPTY);
+        $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
+        $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
+        $chess->put(new Piece(Piece::BISHOP, Piece::BLACK), 'e5');
+        $chess->put(new Piece(Piece::BISHOP, Piece::BLACK), 'd5');
+        self::assertFalse($chess->insufficientMaterial());
+
+        // k vs kr
+        $chess = new Chess(Board::EMPTY);
+        $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e1');
+        $chess->put(new Piece(Piece::KING, Piece::BLACK), 'e8');
+        $chess->put(new Piece(Piece::ROOK, Piece::WHITE), 'a1');
+        self::assertFalse($chess->insufficientMaterial());
+
+        self::assertFalse((new Chess())->board->hasInsufficientMaterial());
     }
 
     public function testInThreefoldRepetition(): void
     {
-        $chess = new ChessPublicator();
+        $chess = new Chess();
 
         /*
          * [Event "Fischer - Petrosian Candidates Final"]

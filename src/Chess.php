@@ -526,9 +526,9 @@ class Chess
                 if (
                     $this->board[$castlingFrom + 1] === null &&
                     $this->board[$castlingTo] === null &&
-                    !$this->attacked($them, $this->kings[$us]) &&
-                    !$this->attacked($them, $castlingFrom + 1) &&
-                    !$this->attacked($them, $castlingTo)
+                    !$this->board->isAttacked($them, $this->kings[$us]) &&
+                    !$this->board->isAttacked($them, $castlingFrom + 1) &&
+                    !$this->board->isAttacked($them, $castlingTo)
                 ) {
                     self::addMove($us, $this->board, $moves, $this->kings[$us], $castlingTo, Move::BITS['KSIDE_CASTLE']);
                 }
@@ -543,9 +543,9 @@ class Chess
                     $this->board[$castlingFrom - 1] === null &&
                     $this->board[$castlingFrom - 2] === null && // $castlingTo
                     $this->board[$castlingFrom - 3] === null && // col "b", next to rock
-                    !$this->attacked($them, $this->kings[$us]) &&
-                    !$this->attacked($them, $castlingFrom - 1) &&
-                    !$this->attacked($them, $castlingTo)
+                    !$this->board->isAttacked($them, $this->kings[$us]) &&
+                    !$this->board->isAttacked($them, $castlingFrom - 1) &&
+                    !$this->board->isAttacked($them, $castlingTo)
                 ) {
                     self::addMove($us, $this->board, $moves, $this->kings[$us], $castlingTo, Move::BITS['QSIDE_CASTLE']);
                 }
@@ -638,59 +638,12 @@ class Chess
 
     protected function attacked(string $color, int $square): bool
     {
-        for ($i = Board::SQUARES['a8']; $i <= Board::SQUARES['h1']; ++$i) {
-            if (($i & 0x88) > 0) {
-                $i += 7;
-                continue;
-            }
-            $piece = $this->board[$i];
-            // check empty square and color
-            if (null === $piece || $piece->getColor() !== $color) {
-                continue;
-            }
-
-            $difference = $i - $square;
-            $index = $difference + 119;
-
-            if ((Board::ATTACKS[$index] & (1 << Piece::SHIFTS[$piece->getType()])) > 0) {
-                if ($piece->isPawn()) {
-                    if ($difference > 0) {
-                        if ($piece->getColor() === Piece::WHITE) {
-                            return true;
-                        }
-                    } elseif ($piece->getColor() === Piece::BLACK) {
-                        return true;
-                    }
-                    continue;
-                }
-
-                if ($piece->isKnight() || $piece->isKing()) {
-                    return true;
-                }
-
-                $offset = Board::RAYS[$index];
-                $j = $i + $offset;
-                $blocked = false;
-                while ($j !== $square) {
-                    if ($this->board[$j] !== null) {
-                        $blocked = true;
-                        break;
-                    }
-                    $j += $offset;
-                }
-
-                if (!$blocked) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return $this->board->isAttacked($color, $square);
     }
 
     protected function kingAttacked(string $color): bool
     {
-        return null !== $this->kings[$color] && $this->attacked(self::swapColor($color), $this->kings[$color]);
+        return null !== $this->kings[$color] && $this->board->isAttacked(self::swapColor($color), $this->kings[$color]);
     }
 
     public function inCheck(): bool
@@ -710,57 +663,7 @@ class Chess
 
     public function insufficientMaterial(): bool
     {
-        $pieces = [
-            Piece::PAWN => 0,
-            Piece::KNIGHT => 0,
-            Piece::BISHOP => 0,
-            Piece::ROOK => 0,
-            Piece::QUEEN => 0,
-            Piece::KING => 0,
-        ];
-        $bishops = [];
-        $numPieces = 0;
-        $sqColor = 0;
-
-        for ($i = Board::SQUARES['a8']; $i <= Board::SQUARES['h1']; ++$i) {
-            $sqColor = ($sqColor + 1) % 2;
-            if (($i & 0x88) > 0) {
-                $i += 7;
-                continue;
-            }
-
-            $piece = $this->board[$i];
-            if ($piece !== null) {
-                ++$pieces[$piece->getType()];
-                if ($piece->isBishop()) {
-                    $bishops[] = $sqColor;
-                }
-                ++$numPieces;
-            }
-        }
-
-        // k vs k
-        if ($numPieces === 2) {
-            return true;
-        }
-
-        // k vs kn / k vs kb
-        if ($numPieces === 3 && ($pieces[Piece::BISHOP] === 1 || $pieces[Piece::KNIGHT] === 1)) {
-            return true;
-        }
-
-        // k(b){0,} vs k(b){0,}  , because maybe you are a programmer we talk in regex (preg) :-p
-        if ($numPieces === $pieces[Piece::BISHOP] + 2) {
-            $sum = 0;
-            foreach ($bishops as $bishop) {
-                $sum += $bishop;
-            }
-            if ($sum === 0 || $sum === \count($bishops)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->board->hasInsufficientMaterial();
     }
 
     /* TODO: while this function is fine for casual use, a better
