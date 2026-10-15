@@ -9,25 +9,24 @@ use PChess\Chess\Chess;
 use PChess\Chess\Move;
 use PChess\Chess\Piece;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 
 class MoveTest extends TestCase
 {
     public function testBuildMove(): void
     {
-        $chess = new ChessPublicator(Board::EMPTY);
+        $chess = new Chess(Board::EMPTY);
         $chess->put(new Piece(Piece::PAWN, Piece::WHITE), 'a2');
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e7');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'a7');
         $chess->put(new Piece(Piece::QUEEN, Piece::BLACK), 'f4');
-        $move = (ChessPublicator::buildMovePublic(
+        $move = Move::buildMove(
             $chess->turn,
-            $chess->getBoard(),
+            $chess->board,
             Board::SQUARES['a2'],
             Board::SQUARES['a4'],
             Move::BITS['NORMAL'],
-        ));
+        );
 
         self::assertEquals(Piece::PAWN, $move->piece->getType());
         self::assertSame($move->turn, $chess->turn);
@@ -47,392 +46,191 @@ class MoveTest extends TestCase
 
     public function testPutOnInvalidSquare(): void
     {
-        $chess = new ChessPublicator();
+        $chess = new Chess();
         $result = $chess->put(new Piece(Piece::PAWN, Piece::WHITE), 'a9');
         self::assertFalse($result);
     }
 
-    #[Depends('testBuildMove')]
     public function testMakeMoveAndCheckHistory(): void
     {
-        $chess = new ChessPublicator(Board::EMPTY);
+        $chess = new Chess(Board::EMPTY);
         $chess->put(new Piece(Piece::PAWN, Piece::WHITE), 'a2');
         $chess->put(new Piece(Piece::KING, Piece::WHITE), 'e7');
         $chess->put(new Piece(Piece::KING, Piece::BLACK), 'a7');
         $chess->put(new Piece(Piece::QUEEN, Piece::BLACK), 'f4');
-        $move = (ChessPublicator::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['a2'],
-            Board::SQUARES['a4'],
-            Move::BITS['NORMAL'],
-        ));
-        $chess->makeMovePublic($move);
+        $move = $chess->move(['from' => 'a2', 'to' => 'a4']);
+        self::assertNotNull($move);
+        self::assertSame(Move::BITS['BIG_PAWN'], $move->flags);
+        self::assertSame('a4', $move->san);
 
-        $lastHistory = $chess->getLastHistory();
+        $history = $chess->getHistory();
+        $lastHistory = $history->get(\count($history->getEntries()) - 1);
         self::assertSame($lastHistory->move, $move);
         self::assertSame($lastHistory->turn, Piece::WHITE);
         self::assertSame($lastHistory->kings[Piece::WHITE], Board::SQUARES['e7']);
         self::assertSame($lastHistory->kings[Piece::BLACK], Board::SQUARES['a7']);
         self::assertEquals(0, $lastHistory->castling[Piece::WHITE]);
         self::assertEquals(0, $lastHistory->castling[Piece::BLACK]);
+        self::assertNull($lastHistory->epSquare);
         self::assertSame($lastHistory->halfMoves, 0);
         self::assertSame($lastHistory->moveNumber, 1);
 
-        // promotions
-        $chess = new ChessPublicator('8/P7/8/8/8/8/8/K6k w - - 0 1');
-        $move = (ChessPublicator::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['a7'],
-            Board::SQUARES['a8'],
-            Move::BITS['PROMOTION'],
-            Piece::QUEEN,
-        ));
-        $chess->makeMovePublic($move);
+        // promotions (a8-h1 diagonal is open, so the queen gives check)
+        $chess = new Chess('8/P7/8/8/8/8/8/K6k w - - 0 1');
+        $move = $chess->move(['from' => 'a7', 'to' => 'a8', 'promotion' => Piece::QUEEN]);
+        self::assertNotNull($move);
+        self::assertGreaterThan(0, $move->flags & Move::BITS['PROMOTION']);
+        self::assertSame('a8=Q+', $move->san);
         self::assertSame($chess->fen(), 'Q7/8/8/8/8/8/8/K6k b - - 0 1');
     }
 
-    public function testUndoMoveAndCheckHistory(): void
+    /**
+     * @param array<int, array{from: string, to: string, promotion?: string}> $moves
+     * @param array<int, string>                                              $fensAfter
+     */
+    #[DataProvider('undoProvider')]
+    public function testUndoMove(string $fenStart, array $moves, array $fensAfter, int $lastFlags): void
     {
-        $chess = new ChessPublicator(Board::EMPTY);
-        $chess->put(new Piece(Piece::KING, Piece::WHITE), 'a1');
-        $chess->put(new Piece(Piece::KING, Piece::BLACK), 'h1');
-        $chess->put(new Piece(Piece::PAWN, Piece::WHITE), 'a7');
-        $fenStart = $chess->fen();
+        $chess = new Chess($fenStart);
+        $fens = [$fenStart];
+        $move = null;
+        foreach ($moves as $key => $array) {
+            $move = $chess->move($array);
+            self::assertNotNull($move, $array['from'].'-'.$array['to']);
+            self::assertSame($fensAfter[$key], $chess->fen());
+            $fens[] = $chess->fen();
+        }
+        self::assertNotNull($move);
+        self::assertGreaterThan(0, $move->flags & $lastFlags);
 
-        // normal move
-        $chess = new ChessPublicator($fenStart);
-        $move = (ChessPublicator::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['a7'],
-            Board::SQUARES['a8'],
-            Move::BITS['PROMOTION'],
-            Piece::QUEEN,
-        ));
-        $chess->makeMovePublic($move);
-        $chess->undoMovePublic();
-        self::assertSame($chess->fen(), $fenStart);
+        \array_pop($fens);
+        while (null !== $chess->undo()) {
+            self::assertSame(\array_pop($fens), $chess->fen());
+        }
+        self::assertSame([], $fens);
+        self::assertSame($fenStart, $chess->fen());
+    }
 
-        // big pawn
-        $chess = new ChessPublicator($fenStart);
-        $chess->put(new Piece(Piece::PAWN, Piece::WHITE), 'd2');
-        $fenStart = $chess->fen();
-        $move = (ChessPublicator::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['d2'],
-            Board::SQUARES['d4'],
-            Move::BITS['BIG_PAWN'],
-            Piece::QUEEN,
-        ));
-        $chess->makeMovePublic($move);
-        $chess->undoMovePublic();
-        self::assertSame($chess->fen(), $fenStart);
-
-        // capture
-        $chess = new ChessPublicator($fenStart);
-        $chess->put(new Piece(Piece::PAWN, Piece::BLACK), 'e5');
-        $chess->put(new Piece(Piece::PAWN, Piece::WHITE), 'd4');
-        $fenStart = $chess->fen();
-        $move = (ChessPublicator::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['d4'],
-            Board::SQUARES['e5'],
-            Move::BITS['CAPTURE'],
-            Piece::QUEEN,
-        ));
-        $chess->makeMovePublic($move);
-        $chess->undoMovePublic();
-        self::assertSame($chess->fen(), $fenStart);
-
-        // en passant
-        $chess = new ChessPublicator($fenStart);
-        $chess->put(new Piece(Piece::PAWN, Piece::BLACK), 'g4');
-        $chess->put(new Piece(Piece::PAWN, Piece::WHITE), 'h2');
-        $fenTmp = $chess->fen();
-        $move = (ChessPublicator::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['h2'],
-            Board::SQUARES['h4'],
-            Move::BITS['NORMAL'],
-            //~ Piece::QUEEN,
-        ));
-        $chess->makeMovePublic($move);
-        $fenTmp1 = $chess->fen();
-        $move = (ChessPublicator::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['g4'],
-            Board::SQUARES['h3'],
-            Move::BITS['EP_CAPTURE'],
-            Piece::QUEEN,
-        ));
-        $chess->makeMovePublic($move);
-        $chess->undoMovePublic();
-        self::assertSame($chess->fen(), $fenTmp1);
-        $chess->undoMovePublic();
-        self::assertSame($chess->fen(), $fenTmp);
-        $chess->remove('g4');
-        $chess->remove('h2');
-        self::assertSame($chess->fen(), $fenStart);
-
-        // castling king side
-        $fenTmp = 'r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4';
-        $chess = new ChessPublicator($fenTmp);
-        $move = (ChessPublicator::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['e1'],
-            Board::SQUARES['g1'],
-            Move::BITS['KSIDE_CASTLE'],
-            //~ Piece::QUEEN,
-        ));
-        $chess->makeMovePublic($move);
-        self::assertSame($chess->fen(), 'r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 5 4');
-        $chess->undoMovePublic();
-        self::assertSame($chess->fen(), $fenTmp);
-        $chess = new ChessPublicator($fenStart);
-        self::assertSame($chess->fen(), $fenStart);
-
-        // castling queen side
-        $fenTmp = 'r3kb1r/pppq1ppp/2np1n2/1B2p2b/4P3/3P1N1P/PPPB1PP1/RN1QR1K1 b kq - 2 8';
-        $chess = new ChessPublicator($fenTmp);
-        $move = (ChessPublicator::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['e8'],
-            Board::SQUARES['c8'],
-            Move::BITS['QSIDE_CASTLE'],
-            //~ Piece::QUEEN,
-        ));
-        $chess->makeMovePublic($move);
-        self::assertSame($chess->fen(), '2kr1b1r/pppq1ppp/2np1n2/1B2p2b/4P3/3P1N1P/PPPB1PP1/RN1QR1K1 w - - 3 9');
-        $chess->undoMovePublic();
-        self::assertSame($chess->fen(), $fenTmp);
-        $chess = new ChessPublicator($fenStart);
-        self::assertSame($chess->fen(), $fenStart);
+    /**
+     * @return array<string, array{string, array<int, array<string, string>>, array<int, string>, int}>
+     */
+    public static function undoProvider(): array
+    {
+        return [
+            'promotion' => [
+                '8/P7/8/8/8/8/8/K6k w - - 0 1',
+                [['from' => 'a7', 'to' => 'a8', 'promotion' => Piece::QUEEN]],
+                ['Q7/8/8/8/8/8/8/K6k b - - 0 1'],
+                Move::BITS['PROMOTION'],
+            ],
+            'big pawn' => [
+                '8/8/8/8/8/8/3P4/K6k w - - 0 1',
+                [['from' => 'd2', 'to' => 'd4']],
+                ['8/8/8/8/3P4/8/8/K6k b - d3 0 1'],
+                Move::BITS['BIG_PAWN'],
+            ],
+            'capture' => [
+                '8/8/8/4p3/3P4/8/8/K6k w - - 0 1',
+                [['from' => 'd4', 'to' => 'e5']],
+                ['8/8/8/4P3/8/8/8/K6k b - - 0 1'],
+                Move::BITS['CAPTURE'],
+            ],
+            'en passant' => [
+                '8/8/8/8/6p1/8/7P/K5k1 w - - 0 1',
+                [['from' => 'h2', 'to' => 'h4'], ['from' => 'g4', 'to' => 'h3']],
+                ['8/8/8/8/6pP/8/8/K5k1 b - h3 0 1', '8/8/8/8/8/7p/8/K5k1 w - - 0 2'],
+                Move::BITS['EP_CAPTURE'],
+            ],
+            'castling king side' => [
+                'r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',
+                [['from' => 'e1', 'to' => 'g1']],
+                ['r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 5 4'],
+                Move::BITS['KSIDE_CASTLE'],
+            ],
+            'castling queen side' => [
+                'r3kb1r/pppq1ppp/2np1n2/1B2p2b/4P3/3P1N1P/PPPB1PP1/RN1QR1K1 b kq - 2 8',
+                [['from' => 'e8', 'to' => 'c8']],
+                ['2kr1b1r/pppq1ppp/2np1n2/1B2p2b/4P3/3P1N1P/PPPB1PP1/RN1QR1K1 w - - 3 9'],
+                Move::BITS['QSIDE_CASTLE'],
+            ],
+        ];
     }
 
     public function testUndoMoveWithEmptyHistory(): void
     {
-        $chess = new ChessPublicator();
-        self::assertNull($chess->undoMovePublic());
+        $chess = new Chess();
+        self::assertNull($chess->undo());
     }
 
-    public function testMoveToSAN(): void
+    public function testUndoReturnsSan(): void
     {
-        $chess = new ChessPublicator();
-
-        // normal pawn move
-        $move = ($chess::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['e2'],
-            Board::SQUARES['e4'],
-            Move::BITS['NORMAL'],
-        ));
-        $chess->makeMovePublic($move);
+        $chess = new Chess();
+        $chess->move(['from' => 'e2', 'to' => 'e4']);
         $undo = $chess->undo();
         self::assertNotNull($undo);
         self::assertEquals('e4', $undo->san);
         self::assertEquals('e4', (string) $undo);
+    }
 
-        // normal knight move
-        $chess->makeMovePublic($move);
-        $move = ($chess::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['g8'],
-            Board::SQUARES['f6'],
-            Move::BITS['NORMAL'],
-        ));
-        $chess->makeMovePublic($move);
-        $undo = $chess->undo();
-        self::assertNotNull($undo);
-        self::assertEquals('Nf6', $undo->san);
+    /**
+     * @param array{from: string, to: string, promotion?: string} $array
+     */
+    #[DataProvider('sanProvider')]
+    public function testMoveToSAN(string $fen, array $array, string $expectedSan): void
+    {
+        $chess = new Chess($fen);
+        $move = $chess->move($array);
+        self::assertNotNull($move);
+        self::assertSame($expectedSan, $move->san);
+    }
 
-        // normal pawn capture
-        $chess = new ChessPublicator('rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2');
-        $move = ($chess::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['e4'],
-            Board::SQUARES['d5'],
-            Move::BITS['CAPTURE'],
-        ));
-        $chess->makeMovePublic($move);
-        $undo = $chess->undo();
-        self::assertNotNull($undo);
-        self::assertEquals('exd5', $undo->san);
+    /**
+     * @return array<string, array{string, array<string, string>, string}>
+     */
+    public static function sanProvider(): array
+    {
+        return [
+            'normal pawn move' => [Board::DEFAULT_POSITION, ['from' => 'e2', 'to' => 'e4'], 'e4'],
+            'normal knight move' => [
+                'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+                ['from' => 'g8', 'to' => 'f6'],
+                'Nf6',
+            ],
+            'normal pawn capture' => [
+                'rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2',
+                ['from' => 'e4', 'to' => 'd5'],
+                'exd5',
+            ],
+            'en passant capture' => [
+                'rnbqkbnr/ppp2ppp/8/3Pp3/8/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 3',
+                ['from' => 'd5', 'to' => 'e6'],
+                'dxe6',
+            ],
+            'normal knight capture' => [
+                'rnbqkb1r/ppp1pppp/5n2/3P4/8/5N2/PPPP1PPP/RNBQKB1R b KQkq - 2 3',
+                ['from' => 'f6', 'to' => 'd5'],
+                'Nxd5',
+            ],
+            'promotion' => ['8/2KP4/8/5k2/8/8/8/8 w - - 0 1', ['from' => 'd7', 'to' => 'd8', 'promotion' => Piece::ROOK], 'd8=R'],
+            'check' => ['3R4/2K5/8/5k2/8/8/8/8 w - - 0 1', ['from' => 'd8', 'to' => 'f8'], 'Rf8+'],
+            'checkmate' => ['5k2/8/1R3K2/8/8/8/8/8 w - - 0 1', ['from' => 'b6', 'to' => 'b8'], 'Rb8#'],
+            'ambiguous: rank' => ['2N2k2/8/3p4/8/2N5/8/1K6/8 w - - 0 1', ['from' => 'c4', 'to' => 'd6'], 'N4xd6'],
+            'ambiguous: rank and file' => [
+                '8/8/8/2qqq3/2qPq3/2qqq3/1n6/K6k b - - 0 1',
+                ['from' => 'd5', 'to' => 'd4'],
+                'Qd5xd4',
+            ],
+            'ambiguous: file e' => ['5k2/8/3p4/8/2N1N3/8/1K6/8 w - - 0 1', ['from' => 'e4', 'to' => 'd6'], 'Nexd6'],
+            'ambiguous: file c' => ['5k2/8/3p4/8/2N1N3/8/1K6/8 w - - 0 1', ['from' => 'c4', 'to' => 'd6'], 'Ncxd6'],
+            'different pieces: knight' => ['5k2/8/3p2R1/8/2N5/8/1K6/8 w - - 0 1', ['from' => 'c4', 'to' => 'd6'], 'Nxd6'],
+            'different pieces: rook' => ['5k2/8/3p2R1/8/2N5/8/1K6/8 w - - 0 1', ['from' => 'g6', 'to' => 'd6'], 'Rxd6'],
+        ];
+    }
 
-        // en passant capture
-        $chess = new ChessPublicator('rnbqkbnr/ppp2ppp/8/3Pp3/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1');
-        $move = ($chess::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['d5'],
-            Board::SQUARES['e6'],
-            Move::BITS['EP_CAPTURE'],
-        ));
-        $chess->makeMovePublic($move);
-        $undo = $chess->undo();
-        self::assertNotNull($undo);
-        self::assertEquals('dxe6', $undo->san);
-
-        // normal knight capture
-        $chess = new ChessPublicator('rnbqkb1r/ppp1pppp/5n2/3P4/8/5N2/PPPP1PPP/RNBQKB1R b KQkq - 2 3');
-        $move = ($chess::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['f6'],
-            Board::SQUARES['d5'],
-            Move::BITS['CAPTURE'],
-        ));
-        $chess->makeMovePublic($move);
-        $undo = $chess->undo();
-        self::assertNotNull($undo);
-        self::assertEquals('Nxd5', $undo->san);
-
-        // promotion
-        $chess = new ChessPublicator('8/2KP4/8/5k2/8/8/8/8 w - - 0 1');
-        $move = ($chess::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['d7'],
-            Board::SQUARES['d8'],
-            Move::BITS['PROMOTION'],
-            Piece::ROOK,
-        ));
-        $chess->makeMovePublic($move);
-        $undo = $chess->undo();
-        self::assertNotNull($undo);
-        self::assertEquals('d8=R', $undo->san);
-
-        // check
-        $chess = new ChessPublicator('3R4/2K5/8/5k2/8/8/8/8 w - - 0 1');
-        $move = ($chess::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['d8'],
-            Board::SQUARES['f8'],
-            Move::BITS['NORMAL'],
-        ));
-        $chess->makeMovePublic($move);
-        $undo = $chess->undo();
-        self::assertNotNull($undo);
-        self::assertEquals('Rf8+', $undo->san);
-
-        // checkmate
-        $chess = new ChessPublicator('5k2/8/1R3K2/8/8/8/8/8 w - - 0 1');
-        $move = ($chess::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['b6'],
-            Board::SQUARES['b8'],
-            Move::BITS['NORMAL'],
-        ));
-        $chess->makeMovePublic($move);
-        $undo = $chess->undo();
-        self::assertNotNull($undo);
-        self::assertEquals('Rb8#', $undo->san);
-
-        // ambiguous moves: row
-        $chess = new ChessPublicator('2N2k2/8/3p4/8/2N5/8/1K6/8 w - - 0 1');
-        $move = ($chess::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['c4'],
-            Board::SQUARES['d6'],
-            Move::BITS['CAPTURE'],
-        ));
-        $chess->makeMovePublic($move);
-        $undo = $chess->undo();
-        self::assertNotNull($undo);
-        self::assertEquals('N4xd6', $undo->san);
-
-        // ambiguous moves: rank > 0 & file > 0
-        $chess = new ChessPublicator('8/8/8/2qqq3/2qPq3/2qqq3/1n6/K6k b - - 0 1'); // this one is really ambiguous haha
-        $move = ($chess::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['d5'],
-            Board::SQUARES['d4'],
-            Move::BITS['CAPTURE'],
-        ));
-        $chess->makeMovePublic($move);
-        $undo = $chess->undo();
-        self::assertNotNull($undo);
-        self::assertEquals('Qd5xd4', $undo->san);
-
-        // ambiguous moves: col
-        $chess = new ChessPublicator('5k2/8/3p4/8/2N1N3/8/1K6/8 w - - 0 1');
-        $move = ($chess::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['e4'],
-            Board::SQUARES['d6'],
-            Move::BITS['CAPTURE'],
-        ));
-        $chess->makeMovePublic($move);
-        $undo = $chess->undo();
-        self::assertNotNull($undo);
-        self::assertEquals('Nexd6', $undo->san);
-
-        // ambiguous moves: col
-        $chess = new ChessPublicator('5k2/8/3p4/8/2N1N3/8/1K6/8 w - - 0 1');
-        $move = ($chess::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['c4'],
-            Board::SQUARES['d6'],
-            Move::BITS['CAPTURE'],
-        ));
-        $chess->makeMovePublic($move);
-        $undo = $chess->undo();
-        self::assertNotNull($undo);
-        self::assertEquals('Ncxd6', $undo->san);
-
-        // ambiguous moves: normal capture
-        $chess = new ChessPublicator('5k2/8/3p2R1/8/2N5/8/1K6/8 w - - 0 1');
-        $move = ($chess::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['c4'],
-            Board::SQUARES['d6'],
-            Move::BITS['CAPTURE'],
-        ));
-        $chess->makeMovePublic($move);
-        $undo = $chess->undo();
-        self::assertNotNull($undo);
-        self::assertEquals('Nxd6', $undo->san);
-
-        // ambiguous moves: normal capture
-        $chess = new ChessPublicator('5k2/8/3p2R1/8/2N5/8/1K6/8 w - - 0 1');
-        $move = ($chess::buildMovePublic(
-            $chess->turn,
-            $chess->getBoard(),
-            Board::SQUARES['g6'],
-            Board::SQUARES['d6'],
-            Move::BITS['CAPTURE'],
-        ));
-        $chess->makeMovePublic($move);
-        $undo = $chess->undo();
-        self::assertNotNull($undo);
-        self::assertEquals('Rxd6', $undo->san);
-
-        // generate moves test
-        $chess = new ChessPublicator('8/ppp2P2/pkp5/ppp5/5PPP/5PKP/5PPP/8 w - - 0 1');
-        $moves = $chess->generateMovesPublic();
-        \array_walk($moves, static function (Move $move) use ($chess): void {
-            $chess->moveToSANPublic($move);
-        });
-        $sans = \array_map(static function (Move $move): ?string {
-            return $move->san;
-        }, $moves);
+    public function testMovesHaveSAN(): void
+    {
+        $chess = new Chess('8/ppp2P2/pkp5/ppp5/5PPP/5PKP/5PPP/8 w - - 0 1');
+        $sans = \array_map(static fn (Move $move): ?string => $move->san, $chess->moves());
         self::assertContains('f8=Q', $sans);
         self::assertContains('f8=R', $sans);
         self::assertContains('f8=B', $sans);
@@ -445,7 +243,7 @@ class MoveTest extends TestCase
     public function testSANMove(): void
     {
         // Ruy Lopez (C70)
-        $chess = new ChessPublicator();
+        $chess = new Chess();
         $chess->move('e4');
         $chess->move('e5');
         $chess->move('Nf3');
@@ -460,7 +258,7 @@ class MoveTest extends TestCase
     public function testArrayMove(): void
     {
         // Ruy Lopez (C70)
-        $chess = new ChessPublicator();
+        $chess = new Chess();
         $chess->move(['from' => 'e2', 'to' => 'e4']);
         $chess->move(['from' => 'e7', 'to' => 'e5']);
         $chess->move(['from' => 'g1', 'to' => 'f3']);
@@ -475,7 +273,7 @@ class MoveTest extends TestCase
     #[DataProvider('gameProvider')]
     public static function testSANMoveFromRealGame(string $match, string $finalFen): void
     {
-        $chess = new ChessPublicator();
+        $chess = new Chess();
         $moves = \explode(' ', $match);
         foreach ($moves as $move) {
             self::assertNotNull($chess->move($move), $move);
@@ -525,8 +323,8 @@ class MoveTest extends TestCase
 
     public function testGenerateMovesForSquare(): void
     {
-        $chess = new ChessPublicator();
-        $moves = $chess->generateMovesPublic(Board::SQUARES['a2'], false);
+        $chess = new Chess();
+        $moves = $chess->moves(Board::SQUARES['a2']);
         self::assertCount(2, $moves);
     }
 
