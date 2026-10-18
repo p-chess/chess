@@ -46,7 +46,7 @@ final class Validation
         }
 
         // 4th criterion: 4th field is a valid e.p. string
-        if (!(\preg_match('/^(-|[a-h][3|6])$/', $tokens[3]) === 1)) {
+        if (!(\preg_match('/^(-|[a-h][36])$/', $tokens[3]) === 1)) {
             return 4;
         }
 

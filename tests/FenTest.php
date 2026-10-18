@@ -50,6 +50,7 @@ final class FenTest extends TestCase
             '4th criterion 7' => ['8/8/8/8/8/8/8/8 w - e5 0 1', 4],
             '4th criterion 8' => ['8/8/8/8/8/8/8/8 w - e51 0 1', 4],
             '4th criterion 9' => ['8/8/8/8/8/8/8/8 w - ea351 0 1', 4],
+            '4th criterion 10 (pipe is not a square)' => ['8/8/8/8/8/8/8/8 b - a| 0 1', 4],
             '5th criterion 1' => ['8/8/8/8/8/8/8/8 w KQkq - 0 1', 0],
             '5th criterion 2' => ['8/8/8/8/8/8/8/8 w KQk - 0 1', 0],
             '5th criterion 3' => ['8/8/8/8/8/8/8/8 w KQq - 0 1', 0],
