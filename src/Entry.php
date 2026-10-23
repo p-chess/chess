@@ -6,24 +6,17 @@ namespace PChess\Chess;
 
 class Entry implements \Stringable
 {
-    public string $turn;
-    public ?string $previousPosition;
-
     /**
-     * @param array<string, ?int> $kings
-     * @param array<string, int>  $castling
+     * @param Position $before       state before the move (the board is shared, not copied)
+     * @param ?string  $previousHash board hash before the move
+     * @param ?string  $hash         board hash after the move
      */
     public function __construct(
         public Move $move,
-        public ?string $position,
-        public array $kings,
-        public array $castling,
-        public ?int $epSquare,
-        public int $halfMoves,
-        public int $moveNumber,
+        public Position $before,
+        public ?string $previousHash = null,
+        public ?string $hash = null,
     ) {
-        $this->turn = $move->turn;
-        $this->previousPosition = $position;
     }
 
     public function __toString(): string
