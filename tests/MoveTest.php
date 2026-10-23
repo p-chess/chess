@@ -66,14 +66,14 @@ class MoveTest extends TestCase
         $history = $chess->getHistory();
         $lastHistory = $history->get(\count($history->getEntries()) - 1);
         self::assertSame($lastHistory->move, $move);
-        self::assertSame($lastHistory->turn, Piece::WHITE);
-        self::assertSame($lastHistory->kings[Piece::WHITE], Board::SQUARES['e7']);
-        self::assertSame($lastHistory->kings[Piece::BLACK], Board::SQUARES['a7']);
-        self::assertEquals(0, $lastHistory->castling[Piece::WHITE]);
-        self::assertEquals(0, $lastHistory->castling[Piece::BLACK]);
-        self::assertNull($lastHistory->epSquare);
-        self::assertSame($lastHistory->halfMoves, 0);
-        self::assertSame($lastHistory->moveNumber, 1);
+        self::assertSame($lastHistory->before->turn, Piece::WHITE);
+        self::assertSame($lastHistory->before->kings[Piece::WHITE], Board::SQUARES['e7']);
+        self::assertSame($lastHistory->before->kings[Piece::BLACK], Board::SQUARES['a7']);
+        self::assertEquals(0, $lastHistory->before->castling[Piece::WHITE]);
+        self::assertEquals(0, $lastHistory->before->castling[Piece::BLACK]);
+        self::assertNull($lastHistory->before->epSquare);
+        self::assertSame($lastHistory->before->halfMoves, 0);
+        self::assertSame($lastHistory->before->moveNumber, 1);
 
         // promotions (a8-h1 diagonal is open, so the queen gives check)
         $chess = new Chess('8/P7/8/8/8/8/8/K6k w - - 0 1');

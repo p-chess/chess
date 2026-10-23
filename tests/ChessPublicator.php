@@ -39,7 +39,7 @@ final class ChessPublicator extends Chess
         $checkmates = 0;
 
         $moves = $this->generateMoves(null, false);
-        $color = $this->turn;
+        $color = $this->position->turn;
         foreach ($moves as $move) {
             $this->makeMove($move);
 
