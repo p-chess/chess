@@ -6,12 +6,14 @@ namespace PChess\Chess\Test;
 
 use Imagine\Image\AbstractImagine;
 use Imagine\Image\ImagineInterface;
+use PChess\Chess\Board;
 use PChess\Chess\Chess;
 use PChess\Chess\Entry;
 use PChess\Chess\History;
 use PChess\Chess\Move;
 use PChess\Chess\Output;
 use PChess\Chess\Piece;
+use PChess\Chess\Position;
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
@@ -36,10 +38,21 @@ final class ConstructorTest extends TestCase
     {
         $move = new Move('w', 0, new Piece('p', 'w'), 100, 68);
         $history = new History();
-        $entry = new Entry($move, null, ['w' => 116, 'b' => 4], ['w' => 96, 'b' => 96], null, 0, 1);
+        $entry = new Entry($move, new Position(new Board(), 'w', ['w' => 116, 'b' => 4], ['w' => 96, 'b' => 96]));
         $history->add($entry);
         $chess = new Chess('rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1', $history);
         self::assertCount(1, $chess->getHistory()->getEntries());
+    }
+
+    public function testUndoWithHistoryKeepsLiveBoard(): void
+    {
+        $move = new Move('w', 0, new Piece('p', 'w'), 100, 68);
+        $history = new History();
+        $history->add(new Entry($move, new Position(new Board(), 'w', ['w' => 116, 'b' => 4], ['w' => 96, 'b' => 96])));
+        $chess = new Chess('rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1', $history);
+        self::assertNotNull($chess->undo());
+        self::assertNotNull($chess->move('e4'));
+        self::assertSame($chess->board, $chess->getHistory()->get(0)->before->board);
     }
 
     public function testUnicodeOutput(): void

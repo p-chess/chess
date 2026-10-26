@@ -4,21 +4,14 @@ declare(strict_types=1);
 
 namespace PChess\Chess;
 
+/**
+ * @property-read string $turn
+ */
 class Chess
 {
     /** @var Board&\ArrayAccess<int, ?Piece> */
     public Board $board;
-    /** @var array<string, ?int> */
-    protected array $kings = [Piece::WHITE => null, Piece::BLACK => null];
-
-    public string $turn = Piece::WHITE;
-    /** @var array<string, int> */
-    protected array $castling = [Piece::WHITE => 0, Piece::BLACK => 0];
-
-    protected ?int $epSquare;
-
-    protected int $halfMoves = 0;
-    protected int $moveNumber = 1;
+    protected Position $position;
 
     protected History $history;
     /** @var array<string, array<int, Move>> */
@@ -42,20 +35,25 @@ class Chess
         $this->history = $history ?? new History();
     }
 
+    public function __get(string $name): mixed
+    {
+        if ($name === 'turn') {
+            return $this->position->turn;
+        }
+
+        throw new \LogicException(\sprintf('Undefined property: %s::$%s', self::class, $name));
+    }
+
+    public function __isset(string $name): bool
+    {
+        return $name === 'turn';
+    }
+
     protected function clear(): void
     {
-        $this->kings = [Piece::WHITE => null, Piece::BLACK => null];
-        $this->turn = Piece::WHITE;
-        $this->castling = [Piece::WHITE => 0, Piece::BLACK => 0];
-        $this->epSquare = null;
-        $this->halfMoves = 0;
-        $this->moveNumber = 1;
+        $this->position = Position::empty($this->board);
         $this->generateMovesCache = [];
         $this->sanMoveCache = [];
-
-        foreach (Board::SQUARES as $square) {
-            $this->board[$square] = null;
-        }
 
         $this->refreshBoardHash();
     }
@@ -102,30 +100,30 @@ class Chess
         }
 
         // turn
-        $this->turn = $tokens[1];
+        $this->position->turn = $tokens[1];
 
         // castling options
         if (\str_contains($tokens[2], 'K')) {
-            $this->castling[Piece::WHITE] |= Move::BITS['KSIDE_CASTLE'];
+            $this->position->castling[Piece::WHITE] |= Move::BITS['KSIDE_CASTLE'];
         }
         if (\str_contains($tokens[2], 'Q')) {
-            $this->castling[Piece::WHITE] |= Move::BITS['QSIDE_CASTLE'];
+            $this->position->castling[Piece::WHITE] |= Move::BITS['QSIDE_CASTLE'];
         }
         if (\str_contains($tokens[2], 'k')) {
-            $this->castling[Piece::BLACK] |= Move::BITS['KSIDE_CASTLE'];
+            $this->position->castling[Piece::BLACK] |= Move::BITS['KSIDE_CASTLE'];
         }
         if (\str_contains($tokens[2], 'q')) {
-            $this->castling[Piece::BLACK] |= Move::BITS['QSIDE_CASTLE'];
+            $this->position->castling[Piece::BLACK] |= Move::BITS['QSIDE_CASTLE'];
         }
 
         // ep square
-        $this->epSquare = ($tokens[3] === '-') ? null : Board::SQUARES[$tokens[3]];
+        $this->position->epSquare = ($tokens[3] === '-') ? null : Board::SQUARES[$tokens[3]];
 
         // half moves
-        $this->halfMoves = (int) $tokens[4];
+        $this->position->halfMoves = (int) $tokens[4];
 
         // move number
-        $this->moveNumber = (int) $tokens[5];
+        $this->position->moveNumber = (int) $tokens[5];
 
         $this->refreshBoardHash();
 
@@ -160,25 +158,25 @@ class Chess
         }
 
         $cFlags = '';
-        if (($this->castling[Piece::WHITE] & Move::BITS['KSIDE_CASTLE']) > 0) {
+        if (($this->position->castling[Piece::WHITE] & Move::BITS['KSIDE_CASTLE']) > 0) {
             $cFlags .= 'K';
         }
-        if (($this->castling[Piece::WHITE] & Move::BITS['QSIDE_CASTLE']) > 0) {
+        if (($this->position->castling[Piece::WHITE] & Move::BITS['QSIDE_CASTLE']) > 0) {
             $cFlags .= 'Q';
         }
-        if (($this->castling[Piece::BLACK] & Move::BITS['KSIDE_CASTLE']) > 0) {
+        if (($this->position->castling[Piece::BLACK] & Move::BITS['KSIDE_CASTLE']) > 0) {
             $cFlags .= 'k';
         }
-        if (($this->castling[Piece::BLACK] & Move::BITS['QSIDE_CASTLE']) > 0) {
+        if (($this->position->castling[Piece::BLACK] & Move::BITS['QSIDE_CASTLE']) > 0) {
             $cFlags .= 'q';
         }
         if ($cFlags === '') {
             $cFlags = '-';
         }
 
-        $epFlags = $this->epSquare === null ? '-' : Board::algebraic($this->epSquare);
+        $epFlags = $this->position->epSquare === null ? '-' : Board::algebraic($this->position->epSquare);
 
-        return \implode(' ', [$fen, $this->turn, $cFlags, $epFlags, $this->halfMoves, $this->moveNumber]);
+        return \implode(' ', [$fen, $this->position->turn, $cFlags, $epFlags, $this->position->halfMoves, $this->position->moveNumber]);
     }
 
     public function remove(string $square): bool
@@ -192,7 +190,7 @@ class Chess
         $this->board[Board::SQUARES[$square]] = null;
 
         if ($piece !== null && $piece->isKing()) {
-            $this->kings[$piece->getColor()] = null;
+            $this->position->kings[$piece->getColor()] = null;
         }
 
         return true;
@@ -218,13 +216,13 @@ class Chess
         $sq = Board::SQUARES[$square];
 
         // don't let the use place more than one king
-        if ($piece->isKing() && !($this->kings[$piece->getColor()] === null || $this->kings[$piece->getColor()] === $sq)) {
+        if ($piece->isKing() && !($this->position->kings[$piece->getColor()] === null || $this->position->kings[$piece->getColor()] === $sq)) {
             return false;
         }
 
         $this->board[$sq] = $piece;
         if ($piece->isKing()) {
-            $this->kings[$piece->getColor()] = $sq;
+            $this->position->kings[$piece->getColor()] = $sq;
         }
 
         return true;
@@ -232,12 +230,12 @@ class Chess
 
     protected function makeMove(Move $move): void
     {
-        $us = $this->turn;
+        $us = $this->position->turn;
         $them = self::swapColor($us);
         $historyKey = $this->recordMove($move);
-        $previousEpSquare = $this->epSquare;
-        $previousUsCastling = $this->castling[$us];
-        $previousThemCastling = $this->castling[$them];
+        $previousEpSquare = $this->position->epSquare;
+        $previousUsCastling = $this->position->castling[$us];
+        $previousThemCastling = $this->position->castling[$them];
         $hashablePreviousEpSquare = $this->hashableEpSquare($previousEpSquare, $us);
 
         $this->board[$move->toSquare] = $this->board[$move->fromSquare];
@@ -256,23 +254,23 @@ class Chess
 
         // if big pawn move, update the en passant square
         if (($move->flags & Move::BITS['BIG_PAWN']) > 0) {
-            $this->epSquare = $move->toSquare + ($us === Piece::BLACK ? -16 : 16);
+            $this->position->epSquare = $move->toSquare + ($us === Piece::BLACK ? -16 : 16);
         } else {
-            $this->epSquare = null;
+            $this->position->epSquare = null;
         }
 
         // reset the 50 move counter if a pawn is moved or piece is captured
         if ($move->piece->isPawn()) {
-            $this->halfMoves = 0;
+            $this->position->halfMoves = 0;
         } elseif (($move->flags & (Move::BITS['CAPTURE'] | Move::BITS['EP_CAPTURE'])) > 0) {
-            $this->halfMoves = 0;
+            $this->position->halfMoves = 0;
         } else {
-            ++$this->halfMoves;
+            ++$this->position->halfMoves;
         }
 
         // if we moved the king
         if (null !== $this->board[$move->toSquare] && $this->board[$move->toSquare]->isKing()) {
-            $this->kings[$us] = $move->toSquare;
+            $this->position->kings[$us] = $move->toSquare;
 
             // if we castled, move the rook next to the king
             if (($move->flags & Move::BITS['KSIDE_CASTLE']) > 0) {
@@ -287,41 +285,41 @@ class Chess
                 $this->board[$castlingFrom] = null;
             }
 
-            $this->castling[$us] = 0; // or maybe ''
+            $this->position->castling[$us] = 0; // or maybe ''
         }
 
         // turn of castling of we move a rock
-        if ($this->castling[$us] > 0) {
+        if ($this->position->castling[$us] > 0) {
             for ($i = 0, $len = \count(Board::ROOKS[$us]); $i < $len; ++$i) {
                 if (
                     ($move->fromSquare === Board::ROOKS[$us][$i]['square']) > 0 &&
-                    ($this->castling[$us] & Board::ROOKS[$us][$i]['flag']) > 0
+                    ($this->position->castling[$us] & Board::ROOKS[$us][$i]['flag']) > 0
                 ) {
-                    $this->castling[$us] ^= Board::ROOKS[$us][$i]['flag'];
+                    $this->position->castling[$us] ^= Board::ROOKS[$us][$i]['flag'];
                     break;
                 }
             }
         }
 
         // turn of castling of we capture a rock
-        if ($this->castling[$them] > 0) {
+        if ($this->position->castling[$them] > 0) {
             for ($i = 0, $len = \count(Board::ROOKS[$them]); $i < $len; ++$i) {
                 if (
                     $move->toSquare === Board::ROOKS[$them][$i]['square'] &&
-                    ($this->castling[$them] & Board::ROOKS[$them][$i]['flag']) > 0
+                    ($this->position->castling[$them] & Board::ROOKS[$them][$i]['flag']) > 0
                 ) {
-                    $this->castling[$them] ^= Board::ROOKS[$them][$i]['flag'];
+                    $this->position->castling[$them] ^= Board::ROOKS[$them][$i]['flag'];
                     break;
                 }
             }
         }
 
         if ($us === Piece::BLACK) {
-            ++$this->moveNumber;
+            ++$this->position->moveNumber;
         }
-        $this->turn = $them;
+        $this->position->turn = $them;
 
-        $hashableCurrentEpSquare = $this->hashableEpSquare($this->epSquare, $this->turn);
+        $hashableCurrentEpSquare = $this->hashableEpSquare($this->position->epSquare, $this->position->turn);
 
         $this->boardHash = $this->zobristHasher->applyMove(
             $move,
@@ -330,24 +328,16 @@ class Chess
             $hashablePreviousEpSquare,
             $hashableCurrentEpSquare,
             $previousUsCastling,
-            $this->castling[$us],
+            $this->position->castling[$us],
             $previousThemCastling,
-            $this->castling[$them],
+            $this->position->castling[$them],
         );
-        $this->history->get($historyKey)->position = $this->boardHash;
+        $this->history->get($historyKey)->hash = $this->boardHash;
     }
 
     protected function recordMove(Move $move): int
     {
-        $this->history->add(new Entry(
-            $move,
-            $this->boardHash,
-            $this->kings,
-            $this->castling,
-            $this->epSquare,
-            $this->halfMoves,
-            $this->moveNumber,
-        ));
+        $this->history->add(new Entry($move, clone $this->position, $this->boardHash));
 
         return \count($this->history->getEntries()) - 1;
     }
@@ -360,14 +350,11 @@ class Chess
         }
 
         $move = $old->move;
-        $this->kings = $old->kings;
-        $this->turn = $old->turn;
-        $this->castling = $old->castling;
-        $this->epSquare = $old->epSquare;
-        $this->halfMoves = $old->halfMoves;
-        $this->moveNumber = $old->moveNumber;
+        $this->position = clone $old->before;
+        // a History given to the constructor may carry a different Board
+        $this->position->board = $this->board;
 
-        $us = $this->turn;
+        $us = $this->position->turn;
         $them = self::swapColor($us);
 
         $this->board[$move->fromSquare] = $this->board[$move->toSquare];
@@ -401,10 +388,10 @@ class Chess
             $this->board[$castlingFrom] = null;
         }
 
-        if ($old->previousPosition === null) {
+        if ($old->previousHash === null) {
             $this->refreshBoardHash();
         } else {
-            $this->boardHash = $this->zobristHasher->restore($old->previousPosition);
+            $this->boardHash = $this->zobristHasher->restore($old->previousHash);
         }
 
         return $move;
@@ -433,7 +420,7 @@ class Chess
         }
 
         $moves = [];
-        $us = $this->turn;
+        $us = $this->position->turn;
         $them = self::swapColor($us);
         $secondRank = [Piece::BLACK => Board::RANK_7, Piece::WHITE => Board::RANK_2];
 
@@ -481,8 +468,8 @@ class Chess
                         if ($this->board[$square]->getColor() === $them) {
                             self::addMove($us, $this->board, $moves, $i, $square, Move::BITS['CAPTURE']);
                         }
-                    } elseif ($square === $this->epSquare) { // get epSquare from enemy
-                        self::addMove($us, $this->board, $moves, $i, $this->epSquare, Move::BITS['EP_CAPTURE']);
+                    } elseif ($square === $this->position->epSquare) { // get epSquare from enemy
+                        self::addMove($us, $this->board, $moves, $i, $this->position->epSquare, Move::BITS['EP_CAPTURE']);
                     }
                 }
             } else {
@@ -517,37 +504,37 @@ class Chess
         // castling
         // a) we're generating all moves
         // b) we're doing single square move generation on king's square
-        if (!$singleSquare || $lastSquare === $this->kings[$us]) {
-            if (($this->castling[$us] & Move::BITS['KSIDE_CASTLE']) > 0) {
-                \assert(null !== $this->kings[$us]);
-                $castlingFrom = $this->kings[$us];
+        if (!$singleSquare || $lastSquare === $this->position->kings[$us]) {
+            if (($this->position->castling[$us] & Move::BITS['KSIDE_CASTLE']) > 0) {
+                \assert(null !== $this->position->kings[$us]);
+                $castlingFrom = $this->position->kings[$us];
                 $castlingTo = $castlingFrom + 2;
 
                 if (
                     $this->board[$castlingFrom + 1] === null &&
                     $this->board[$castlingTo] === null &&
-                    !$this->board->isAttacked($them, $this->kings[$us]) &&
+                    !$this->board->isAttacked($them, $this->position->kings[$us]) &&
                     !$this->board->isAttacked($them, $castlingFrom + 1) &&
                     !$this->board->isAttacked($them, $castlingTo)
                 ) {
-                    self::addMove($us, $this->board, $moves, $this->kings[$us], $castlingTo, Move::BITS['KSIDE_CASTLE']);
+                    self::addMove($us, $this->board, $moves, $this->position->kings[$us], $castlingTo, Move::BITS['KSIDE_CASTLE']);
                 }
             }
 
-            if (($this->castling[$us] & Move::BITS['QSIDE_CASTLE']) > 0) {
-                \assert(null !== $this->kings[$us]);
-                $castlingFrom = $this->kings[$us];
+            if (($this->position->castling[$us] & Move::BITS['QSIDE_CASTLE']) > 0) {
+                \assert(null !== $this->position->kings[$us]);
+                $castlingFrom = $this->position->kings[$us];
                 $castlingTo = $castlingFrom - 2;
 
                 if (
                     $this->board[$castlingFrom - 1] === null &&
                     $this->board[$castlingFrom - 2] === null && // $castlingTo
                     $this->board[$castlingFrom - 3] === null && // col "b", next to rock
-                    !$this->board->isAttacked($them, $this->kings[$us]) &&
+                    !$this->board->isAttacked($them, $this->position->kings[$us]) &&
                     !$this->board->isAttacked($them, $castlingFrom - 1) &&
                     !$this->board->isAttacked($them, $castlingTo)
                 ) {
-                    self::addMove($us, $this->board, $moves, $this->kings[$us], $castlingTo, Move::BITS['QSIDE_CASTLE']);
+                    self::addMove($us, $this->board, $moves, $this->position->kings[$us], $castlingTo, Move::BITS['QSIDE_CASTLE']);
                 }
             }
         }
@@ -643,12 +630,12 @@ class Chess
 
     protected function kingAttacked(string $color): bool
     {
-        return null !== $this->kings[$color] && $this->board->isAttacked(self::swapColor($color), $this->kings[$color]);
+        return null !== $this->position->kings[$color] && $this->board->isAttacked(self::swapColor($color), $this->position->kings[$color]);
     }
 
     public function inCheck(): bool
     {
-        return $this->kingAttacked($this->turn);
+        return $this->kingAttacked($this->position->turn);
     }
 
     public function inCheckmate(): bool
@@ -675,17 +662,17 @@ class Chess
     {
         $hash = [];
         foreach ($this->history->getEntries() as $entry) {
-            if ($entry->position === null) {
+            if ($entry->hash === null) {
                 continue;
             }
 
-            if (isset($hash[$entry->position])) {
-                ++$hash[$entry->position];
+            if (isset($hash[$entry->hash])) {
+                ++$hash[$entry->hash];
             } else {
-                $hash[$entry->position] = 1;
+                $hash[$entry->hash] = 1;
             }
 
-            if ($hash[$entry->position] >= 3) {
+            if ($hash[$entry->hash] >= 3) {
                 return true;
             }
         }
@@ -695,7 +682,7 @@ class Chess
 
     public function halfMovesExceeded(): bool
     {
-        return $this->halfMoves >= 100;
+        return $this->position->halfMoves >= 100;
     }
 
     public function inDraw(): bool
@@ -835,9 +822,9 @@ class Chess
     {
         $this->boardHash = $this->zobristHasher->rebuild(
             $this->board,
-            $this->turn,
-            $this->castling,
-            $this->hashableEpSquare($this->epSquare, $this->turn),
+            $this->position->turn,
+            $this->position->castling,
+            $this->hashableEpSquare($this->position->epSquare, $this->position->turn),
         );
     }
 
