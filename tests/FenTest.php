@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace PChess\Chess\Test;
 
 use PChess\Chess\Board;
+use PChess\Chess\Fen;
+use PChess\Chess\Move;
+use PChess\Chess\Piece;
 use PChess\Chess\Validation;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -21,6 +24,51 @@ final class FenTest extends TestCase
     {
         self::assertEquals('FEN string must contain six space-delimited fields.', Validation::getError(1));
         self::assertEquals('Invalid code.', Validation::getError(42));
+    }
+
+    #[DataProvider('provider')]
+    public function testParseAndSerializeRoundTrip(string $fen, int $code): void
+    {
+        if ($code > 0) {
+            $this->expectException(\InvalidArgumentException::class);
+        }
+        self::assertSame($fen, Fen::serialize(Fen::parse($fen)));
+    }
+
+    public function testParse(): void
+    {
+        $position = Fen::parse('rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w Kq c6 0 2');
+        self::assertSame(Piece::WHITE, $position->turn);
+        self::assertSame([Piece::WHITE => Board::SQUARES['e1'], Piece::BLACK => Board::SQUARES['e8']], $position->kings);
+        self::assertSame([Piece::WHITE => Move::BITS['KSIDE_CASTLE'], Piece::BLACK => Move::BITS['QSIDE_CASTLE']], $position->castling);
+        self::assertSame(Board::SQUARES['c6'], $position->epSquare);
+        self::assertSame(0, $position->halfMoves);
+        self::assertSame(2, $position->moveNumber);
+        self::assertEquals(new Piece(Piece::PAWN, Piece::BLACK), $position->board[Board::SQUARES['c5']]);
+        self::assertNull($position->board[Board::SQUARES['c7']]);
+    }
+
+    public function testParseDropsExtraKings(): void
+    {
+        $position = Fen::parse('k6k/8/8/8/8/8/8/K6K w - - 0 1');
+        self::assertSame([Piece::WHITE => Board::SQUARES['a1'], Piece::BLACK => Board::SQUARES['a8']], $position->kings);
+        self::assertSame('k7/8/8/8/8/8/8/K7 w - - 0 1', Fen::serialize($position));
+    }
+
+    public function testParseReusesBoard(): void
+    {
+        $board = new Board();
+        $board[Board::SQUARES['d4']] = new Piece(Piece::QUEEN, Piece::WHITE);
+        $position = Fen::parse('4k3/8/8/8/8/8/8/4K3 w - - 0 1', $board);
+        self::assertSame($board, $position->board);
+        self::assertNull($board[Board::SQUARES['d4']]);
+    }
+
+    public function testParseInvalid(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid fen: 8/8/8/8/8/8/8/8 w 1. Error: FEN string must contain six space-delimited fields.');
+        Fen::parse('8/8/8/8/8/8/8/8 w 1');
     }
 
     /**

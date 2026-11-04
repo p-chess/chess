@@ -27,11 +27,10 @@ class Chess
         ?History $history = null,
         ?ZobristHasher $zobristHasher = null,
     ) {
-        $this->board = new Board();
         $this->zobristHasher = $zobristHasher ?? new ZobristHasher();
-        if (null !== $error = $this->load($fen ?? Board::DEFAULT_POSITION)) {
-            throw new \InvalidArgumentException(\sprintf('Invalid fen: %s. Error: %s', $fen, $error));
-        }
+        $this->position = Fen::parse($fen ?? Board::DEFAULT_POSITION);
+        $this->board = $this->position->board;
+        $this->refreshBoardHash();
         $this->history = $history ?? new History();
     }
 
@@ -47,15 +46,6 @@ class Chess
     public function __isset(string $name): bool
     {
         return $name === 'turn';
-    }
-
-    protected function clear(): void
-    {
-        $this->position = Position::empty($this->board);
-        $this->generateMovesCache = [];
-        $this->sanMoveCache = [];
-
-        $this->refreshBoardHash();
     }
 
     /**
@@ -74,109 +64,9 @@ class Chess
         }
     }
 
-    protected function load(string $fen): ?string
-    {
-        $result = Validation::validateFen($fen);
-        if ($result > 0) {
-            return Validation::getError($result);
-        }
-        $tokens = \explode(' ', $fen);
-        $this->clear();
-
-        // position
-        $position = $tokens[0];
-        $square = 0;
-        for ($i = 0, $iMax = \strlen($position); $i < $iMax; ++$i) {
-            $piece = $position[$i];
-            if ($piece === '/') {
-                $square += 8;
-            } elseif (\ctype_digit($piece)) {
-                $square += (int) $piece;
-            } else {
-                $color = (\ord($piece) < \ord('a')) ? Piece::WHITE : Piece::BLACK;
-                $this->put(new Piece(\strtolower($piece), $color), Board::algebraic($square));
-                ++$square;
-            }
-        }
-
-        // turn
-        $this->position->turn = $tokens[1];
-
-        // castling options
-        if (\str_contains($tokens[2], 'K')) {
-            $this->position->castling[Piece::WHITE] |= Move::BITS['KSIDE_CASTLE'];
-        }
-        if (\str_contains($tokens[2], 'Q')) {
-            $this->position->castling[Piece::WHITE] |= Move::BITS['QSIDE_CASTLE'];
-        }
-        if (\str_contains($tokens[2], 'k')) {
-            $this->position->castling[Piece::BLACK] |= Move::BITS['KSIDE_CASTLE'];
-        }
-        if (\str_contains($tokens[2], 'q')) {
-            $this->position->castling[Piece::BLACK] |= Move::BITS['QSIDE_CASTLE'];
-        }
-
-        // ep square
-        $this->position->epSquare = ($tokens[3] === '-') ? null : Board::SQUARES[$tokens[3]];
-
-        // half moves
-        $this->position->halfMoves = (int) $tokens[4];
-
-        // move number
-        $this->position->moveNumber = (int) $tokens[5];
-
-        $this->refreshBoardHash();
-
-        return null;
-    }
-
     public function fen(): string
     {
-        $empty = 0;
-        $fen = '';
-        for ($i = Board::SQUARES['a8']; $i <= Board::SQUARES['h1']; ++$i) {
-            if (null === $piece = $this->board[$i]) {
-                ++$empty;
-            } else {
-                if ($empty > 0) {
-                    $fen .= $empty;
-                    $empty = 0;
-                }
-                $fen .= $piece->toAscii();
-            }
-
-            if ((($i + 1) & 0x88) > 0) {
-                if ($empty > 0) {
-                    $fen .= $empty;
-                }
-                if ($i !== Board::SQUARES['h1']) {
-                    $fen .= '/';
-                }
-                $empty = 0;
-                $i += 8;
-            }
-        }
-
-        $cFlags = '';
-        if (($this->position->castling[Piece::WHITE] & Move::BITS['KSIDE_CASTLE']) > 0) {
-            $cFlags .= 'K';
-        }
-        if (($this->position->castling[Piece::WHITE] & Move::BITS['QSIDE_CASTLE']) > 0) {
-            $cFlags .= 'Q';
-        }
-        if (($this->position->castling[Piece::BLACK] & Move::BITS['KSIDE_CASTLE']) > 0) {
-            $cFlags .= 'k';
-        }
-        if (($this->position->castling[Piece::BLACK] & Move::BITS['QSIDE_CASTLE']) > 0) {
-            $cFlags .= 'q';
-        }
-        if ($cFlags === '') {
-            $cFlags = '-';
-        }
-
-        $epFlags = $this->position->epSquare === null ? '-' : Board::algebraic($this->position->epSquare);
-
-        return \implode(' ', [$fen, $this->position->turn, $cFlags, $epFlags, $this->position->halfMoves, $this->position->moveNumber]);
+        return Fen::serialize($this->position);
     }
 
     public function remove(string $square): bool
