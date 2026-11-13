@@ -14,12 +14,11 @@ class Chess
     protected Position $position;
 
     protected History $history;
-    /** @var array<string, array<int, Move>> */
-    protected array $generateMovesCache = [];
 
     protected string $boardHash = '';
     protected ZobristHasher $zobristHasher;
     protected SanEncoder $sanEncoder;
+    protected MoveGenerator $moveGenerator;
 
     public function __construct(
         ?string $fen = Board::DEFAULT_POSITION,
@@ -31,6 +30,7 @@ class Chess
         $this->board = $this->position->board;
         $this->refreshBoardHash();
         $this->history = $history ?? new History();
+        $this->moveGenerator = new MoveGenerator($this->makeMove(...), $this->undoMove(...));
         $this->sanEncoder = new SanEncoder(
             $this->generateMoves(...),
             $this->makeMove(...),
@@ -51,22 +51,6 @@ class Chess
     public function __isset(string $name): bool
     {
         return $name === 'turn';
-    }
-
-    /**
-     * @param array<Move> $moves
-     */
-    private static function addMove(string $turn, Board $board, array &$moves, int $from, int $to, int $flags): void
-    {
-        // if pawn promotion
-        if (isset($board[$from]) && $board[$from]->isPawn() && (Board::rank($to) === Board::RANK_8 || Board::rank($to) === Board::RANK_1)) {
-            $promotionPieces = [Piece::QUEEN, Piece::ROOK, Piece::BISHOP, Piece::KNIGHT];
-            foreach ($promotionPieces as $promotionPiece) {
-                $moves[] = Move::buildMove($turn, $board, $from, $to, $flags, $promotionPiece);
-            }
-        } else {
-            $moves[] = Move::buildMove($turn, $board, $from, $to, $flags);
-        }
     }
 
     public function fen(): string
@@ -307,153 +291,7 @@ class Chess
      */
     protected function generateMoves(?int $square = null, bool $legal = true): array
     {
-        $cacheKey = $this->boardHash.'|'.($square === null ? 'all' : (string) $square).'|'.($legal ? '1' : '0');
-
-        // check cache first
-        if (isset($this->generateMovesCache[$cacheKey])) {
-            return $this->generateMovesCache[$cacheKey];
-        }
-
-        $moves = [];
-        $us = $this->position->turn;
-        $them = self::swapColor($us);
-        $secondRank = [Piece::BLACK => Board::RANK_7, Piece::WHITE => Board::RANK_2];
-
-        if (null !== $square) {
-            $firstSquare = $lastSquare = $square;
-            $singleSquare = true;
-        } else {
-            $firstSquare = Board::SQUARES['a8'];
-            $lastSquare = Board::SQUARES['h1'];
-            $singleSquare = false;
-        }
-
-        // legal moves only?
-        for ($i = $firstSquare; $i <= $lastSquare; ++$i) {
-            if (($i & 0x88) > 0) {
-                $i += 7;
-                continue;
-            } // check edge of board
-
-            $piece = $this->board[$i];
-            if ($piece === null || $piece->getColor() !== $us) {
-                continue;
-            }
-
-            if ($piece->isPawn()) {
-                // single square, non-capturing
-                $square = $i + Piece::PAWN_OFFSETS[$us][0];
-                if ($this->board[$square] === null) {
-                    self::addMove($us, $this->board, $moves, $i, $square, Move::BITS['NORMAL']);
-
-                    // double square
-                    $square = $i + Piece::PAWN_OFFSETS[$us][1];
-                    if ($secondRank[$us] === Board::rank($i) && $this->board[$square] === null) {
-                        self::addMove($us, $this->board, $moves, $i, $square, Move::BITS['BIG_PAWN']);
-                    }
-                }
-
-                // pawn captures
-                for ($j = 2; $j < 4; ++$j) {
-                    $square = $i + Piece::PAWN_OFFSETS[$us][$j];
-                    if (($square & 0x88) > 0) {
-                        continue;
-                    }
-                    if ($this->board[$square] !== null) {
-                        if ($this->board[$square]->getColor() === $them) {
-                            self::addMove($us, $this->board, $moves, $i, $square, Move::BITS['CAPTURE']);
-                        }
-                    } elseif ($square === $this->position->epSquare) { // get epSquare from enemy
-                        self::addMove($us, $this->board, $moves, $i, $this->position->epSquare, Move::BITS['EP_CAPTURE']);
-                    }
-                }
-            } else {
-                foreach (Piece::OFFSETS[$piece->getType()] as $jValue) {
-                    $offset = $jValue;
-                    $square = $i;
-
-                    while (true) {
-                        $square += $offset;
-                        if (($square & 0x88) > 0) {
-                            break;
-                        }
-
-                        if ($this->board[$square] === null) {
-                            self::addMove($us, $this->board, $moves, $i, $square, Move::BITS['NORMAL']);
-                        } else {
-                            if ($this->board[$square]->getColor() === $us) {
-                                break;
-                            }
-                            self::addMove($us, $this->board, $moves, $i, $square, Move::BITS['CAPTURE']);
-                            break;
-                        }
-
-                        if ($piece->isKnight() || $piece->isKing()) {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        // castling
-        // a) we're generating all moves
-        // b) we're doing single square move generation on king's square
-        if (!$singleSquare || $lastSquare === $this->position->kings[$us]) {
-            if (($this->position->castling[$us] & Move::BITS['KSIDE_CASTLE']) > 0) {
-                \assert(null !== $this->position->kings[$us]);
-                $castlingFrom = $this->position->kings[$us];
-                $castlingTo = $castlingFrom + 2;
-
-                if (
-                    $this->board[$castlingFrom + 1] === null &&
-                    $this->board[$castlingTo] === null &&
-                    !$this->board->isAttacked($them, $this->position->kings[$us]) &&
-                    !$this->board->isAttacked($them, $castlingFrom + 1) &&
-                    !$this->board->isAttacked($them, $castlingTo)
-                ) {
-                    self::addMove($us, $this->board, $moves, $this->position->kings[$us], $castlingTo, Move::BITS['KSIDE_CASTLE']);
-                }
-            }
-
-            if (($this->position->castling[$us] & Move::BITS['QSIDE_CASTLE']) > 0) {
-                \assert(null !== $this->position->kings[$us]);
-                $castlingFrom = $this->position->kings[$us];
-                $castlingTo = $castlingFrom - 2;
-
-                if (
-                    $this->board[$castlingFrom - 1] === null &&
-                    $this->board[$castlingFrom - 2] === null && // $castlingTo
-                    $this->board[$castlingFrom - 3] === null && // col "b", next to rock
-                    !$this->board->isAttacked($them, $this->position->kings[$us]) &&
-                    !$this->board->isAttacked($them, $castlingFrom - 1) &&
-                    !$this->board->isAttacked($them, $castlingTo)
-                ) {
-                    self::addMove($us, $this->board, $moves, $this->position->kings[$us], $castlingTo, Move::BITS['QSIDE_CASTLE']);
-                }
-            }
-        }
-
-        // return all pseudo-legal moves (this includes moves that allow the king to be captured)
-        if (!$legal) {
-            $this->generateMovesCache[$cacheKey] = $moves;
-
-            return $moves;
-        }
-
-        // filter out illegal moves
-        $legalMoves = [];
-        foreach ($moves as $move) {
-            $this->makeMove($move);
-            if (!$this->kingAttacked($us)) {
-                $legalMoves[] = $move;
-            }
-            $this->undoMove();
-        }
-
-        $this->generateMovesCache[$cacheKey] = $legalMoves;
-
-        return $legalMoves;
+        return $this->moveGenerator->generate($this->position, $this->boardHash, $square, $legal);
     }
 
     /**
