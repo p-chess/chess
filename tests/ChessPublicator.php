@@ -12,7 +12,7 @@ final class ChessPublicator extends Chess
 {
     public function getBoardHash(): string
     {
-        return $this->boardHash;
+        return $this->position->hash();
     }
 
     /**
@@ -41,7 +41,7 @@ final class ChessPublicator extends Chess
         $moves = $this->generateMoves(null, false);
         $color = $this->position->turn;
         foreach ($moves as $move) {
-            $this->makeMove($move);
+            $this->position->make($move);
 
             if (!$this->kingAttacked($color)) {
                 if ($depth - 1 > 0) {
@@ -78,7 +78,7 @@ final class ChessPublicator extends Chess
                     }
                 }
             }
-            $this->undoMove();
+            $this->position->undo();
         }
 
         return \compact('nodes', 'captures', 'enPassants', 'castles', 'promotions', 'checks', 'checkmates');

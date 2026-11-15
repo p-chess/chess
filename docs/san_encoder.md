@@ -3,18 +3,14 @@
 Converts moves to [SAN](https://en.wikipedia.org/wiki/Algebraic_notation_(chess)) strings.
 `Chess` uses it internally to fill `Move::$san`.
 
-### `__construct(Closure $generateMoves, Closure $makeMove, Closure $undoMove, Closure $inCheck)`
+### `__construct(MoveGenerator $generator = new MoveGenerator())`
 
-The encoder holds no position. It gets what it needs through four callbacks:
+The generator gives the legal moves used for disambiguation and checkmate detection.
 
-* `$generateMoves(): array<Move>`: legal moves for the side to move
-* `$makeMove(Move $move): void`: plays a move
-* `$undoMove(): mixed`: takes back the last move
-* `$inCheck(): bool`: whether the side to move is in check
+### `encode(Move $move, Position $position): string`
 
-### `encode(Move $move, string $hash): string`
-
-Gets the SAN of a move, including the `+`/`#` suffix.
+Gets the SAN of a move played from `$position`, including the `+`/`#` suffix.
+The move is played and taken back on `$position` to find the suffix, so the position is left as it was.
 Results are cached by move and position hash.
 
 ### `disambiguator(Move $move, array $moves): string`
