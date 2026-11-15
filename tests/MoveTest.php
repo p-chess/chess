@@ -174,6 +174,30 @@ class MoveTest extends TestCase
         self::assertSame(1, $entry->before->moveNumber);
     }
 
+    public function testUndoAfterHistoryEditedFromOutside(): void
+    {
+        $chess = new Chess();
+        $chess->move('e4');
+        $chess->move('e5');
+        $chess->getHistory()->pop();
+        $undo = $chess->undo();
+        self::assertNotNull($undo);
+        self::assertSame('e4', $undo->san);
+        self::assertNull($chess->get('e4'));
+        self::assertNotNull($chess->get('e2'));
+        self::assertSame(Piece::WHITE, $chess->turn);
+        self::assertNull($chess->undo());
+    }
+
+    public function testLegalityProbesSkipHistory(): void
+    {
+        $chess = new Chess();
+        $chess->moves();
+        self::assertSame([], $chess->getHistory()->getEntries());
+        $chess->move('e4');
+        self::assertCount(1, $chess->getHistory()->getEntries());
+    }
+
     public function testUndoReturnsSan(): void
     {
         $chess = new Chess();

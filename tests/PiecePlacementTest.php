@@ -46,4 +46,24 @@ final class PiecePlacementTest extends TestCase
         $chess->move('e4');
         self::assertTrue($chess->remove('e2'));
     }
+
+    public function testPutRefreshesMoves(): void
+    {
+        $chess = new Chess('k7/8/8/8/8/8/8/7K w - - 0 1');
+        self::assertCount(3, $chess->moves());
+        $chess->put(new Piece(Piece::ROOK, Piece::WHITE), 'd4');
+        self::assertCount(17, $chess->moves());
+        $chess->remove('d4');
+        self::assertCount(3, $chess->moves());
+    }
+
+    public function testUndoAfterPutRefreshesMoves(): void
+    {
+        $chess = new Chess('k7/8/8/8/8/8/8/7K w - - 0 1');
+        self::assertCount(3, $chess->moves());
+        $chess->move('Kg1');
+        $chess->put(new Piece(Piece::ROOK, Piece::WHITE), 'd4');
+        $chess->undo();
+        self::assertCount(17, $chess->moves());
+    }
 }

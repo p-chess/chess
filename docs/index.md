@@ -4,6 +4,7 @@
 * [Board](board.md)
 * [Piece](piece.md)
 * [Move](move.md)
+* [Position](position.md)
 * [Fen](fen.md)
 * [SanEncoder](san_encoder.md)
 * [MoveGenerator](move_generator.md)
