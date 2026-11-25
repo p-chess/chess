@@ -7,35 +7,24 @@ namespace PChess\Chess;
 /**
  * Converts moves to Standard Algebraic Notation.
  *
- * It needs the legal moves of the current position (for disambiguation)
- * and a way to play a move and take it back (for the check suffix).
- * Both are injected, so the encoder holds no reference to Chess.
+ * It needs the legal moves of the position (for disambiguation)
+ * and plays the move and takes it back on it (for the check suffix).
  */
 final class SanEncoder
 {
     /** @var array<string, string> */
     private array $cache = [];
 
-    /**
-     * @param \Closure(): array<int, Move> $generateMoves legal moves for the side to move
-     * @param \Closure(Move): void         $makeMove      plays a move on the current position
-     * @param \Closure(): mixed            $undoMove      takes back the last move
-     * @param \Closure(): bool             $inCheck       whether the side to move is in check
-     */
-    public function __construct(
-        private readonly \Closure $generateMoves,
-        private readonly \Closure $makeMove,
-        private readonly \Closure $undoMove,
-        private readonly \Closure $inCheck,
-    ) {
+    public function __construct(private readonly MoveGenerator $generator = new MoveGenerator())
+    {
     }
 
     /**
-     * @param string $hash hash of the current position, used as cache key
+     * @param Position $position the position $move is played from
      */
-    public function encode(Move $move, string $hash): string
+    public function encode(Move $move, Position $position): string
     {
-        $cacheKey = \json_encode($move, JSON_THROW_ON_ERROR).$hash;
+        $cacheKey = \json_encode($move, JSON_THROW_ON_ERROR).$position->hash();
         if (isset($this->cache[$cacheKey])) {
             return $this->cache[$cacheKey];
         }
@@ -48,7 +37,7 @@ final class SanEncoder
         } else {
             // pawn e2->e4 is "e4", knight g8->f6 is "Nf6"
             if (!$move->piece->isPawn()) {
-                $output .= \strtoupper($move->piece->getType()).self::disambiguator($move, ($this->generateMoves)());
+                $output .= \strtoupper($move->piece->getType()).self::disambiguator($move, $this->generator->generate($position));
             }
 
             // x on capture
@@ -71,11 +60,11 @@ final class SanEncoder
         }
 
         // check / checkmate
-        ($this->makeMove)($move);
-        if (($this->inCheck)()) {
-            $output .= \count(($this->generateMoves)()) === 0 ? '#' : '+';
+        $position->make($move);
+        if ($position->inCheck()) {
+            $output .= \count($this->generator->generate($position)) === 0 ? '#' : '+';
         }
-        ($this->undoMove)();
+        $position->undo();
 
         return $this->cache[$cacheKey] = $output;
     }

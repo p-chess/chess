@@ -7,8 +7,8 @@ namespace PChess\Chess;
 /**
  * Generates moves for the side to move.
  *
- * Legality is checked by playing each pseudo-legal move and taking it back,
- * so make/undo are injected. The position is read, never copied:
+ * Legality is checked by playing each pseudo-legal move on the position
+ * and taking it back. The position is read, never copied:
  * in-place make/undo is what keeps generation fast.
  */
 final class MoveGenerator
@@ -19,30 +19,18 @@ final class MoveGenerator
     private array $cache = [];
 
     /**
-     * @param \Closure(Move): void $makeMove plays a move on the position passed to generate()
-     * @param \Closure(): mixed    $undoMove takes back the last move
-     */
-    public function __construct(
-        private readonly \Closure $makeMove,
-        private readonly \Closure $undoMove,
-    ) {
-    }
-
-    /**
-     * @param string $hash hash of the position, used as cache key
-     *
      * @return array<int, Move>
      */
-    public function generate(Position $position, string $hash, ?int $square = null, bool $legal = true): array
+    public function generate(Position $position, ?int $square = null, bool $legal = true): array
     {
-        $cacheKey = $hash.'|'.($square === null ? 'all' : (string) $square).'|'.($legal ? '1' : '0');
+        $cacheKey = $position->hash().'|'.($square === null ? 'all' : (string) $square).'|'.($legal ? '1' : '0');
         if (isset($this->cache[$cacheKey])) {
             return $this->cache[$cacheKey];
         }
 
         $moves = self::pseudoLegal($position, $square);
         if ($legal) {
-            $moves = $this->filterLegal($position, $moves);
+            $moves = self::filterLegal($position, $moves);
         }
 
         return $this->cache[$cacheKey] = $moves;
@@ -177,28 +165,22 @@ final class MoveGenerator
 
     /**
      * Drops moves that leave our king attacked.
-     * The board and king square are read up front: undo may swap the
-     * Position instance, but the Board is always the same object.
      *
      * @param array<int, Move> $moves
      *
      * @return array<int, Move>
      */
-    private function filterLegal(Position $position, array $moves): array
+    private static function filterLegal(Position $position, array $moves): array
     {
-        $board = $position->board;
         $us = $position->turn;
-        $them = $us === Piece::WHITE ? Piece::BLACK : Piece::WHITE;
-        $king = $position->kings[$us];
 
         $legalMoves = [];
         foreach ($moves as $move) {
-            ($this->makeMove)($move);
-            $kingSquare = $move->piece->isKing() ? $move->toSquare : $king;
-            if (null === $kingSquare || !$board->isAttacked($them, $kingSquare)) {
+            $position->make($move);
+            if (!$position->kingAttacked($us)) {
                 $legalMoves[] = $move;
             }
-            ($this->undoMove)();
+            $position->undo();
         }
 
         return $legalMoves;

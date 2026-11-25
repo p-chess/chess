@@ -6,7 +6,6 @@ namespace PChess\Chess\Test;
 
 use PChess\Chess\Board;
 use PChess\Chess\Fen;
-use PChess\Chess\Move;
 use PChess\Chess\MoveGenerator;
 use PChess\Chess\Piece;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -17,12 +16,8 @@ final class MoveGeneratorTest extends TestCase
     #[DataProvider('pseudoLegalProvider')]
     public function testPseudoLegal(string $fen, ?string $square, int $expected): void
     {
-        $generator = new MoveGenerator(
-            static fn (Move $move) => self::fail('make called'),
-            static fn () => self::fail('undo called'),
-        );
         $position = Fen::parse($fen);
-        $moves = $generator->generate($position, 'hash', null === $square ? null : Board::SQUARES[$square], false);
+        $moves = (new MoveGenerator())->generate($position, null === $square ? null : Board::SQUARES[$square], false);
 
         self::assertCount($expected, $moves);
     }
@@ -44,45 +39,27 @@ final class MoveGeneratorTest extends TestCase
         ];
     }
 
-    public function testLegalFiltersThroughInjectedMakeUndo(): void
+    public function testLegalFiltersAndRestoresPosition(): void
     {
-        $position = Fen::parse('4r2k/8/8/8/8/8/4R3/4K3 w - - 0 1');
-        $board = $position->board;
-        $calls = 0;
-        /** @var list<array{Move, ?Piece}> $captured */
-        $captured = [];
-        $generator = new MoveGenerator(
-            static function (Move $move) use ($board, &$captured, &$calls): void {
-                ++$calls;
-                $captured[] = [$move, $board[$move->toSquare]];
-                $board[$move->toSquare] = $board[$move->fromSquare];
-                $board[$move->fromSquare] = null;
-            },
-            static function () use ($board, &$captured): void {
-                $last = \array_pop($captured);
-                self::assertNotNull($last);
-                [$move, $piece] = $last;
-                $board[$move->fromSquare] = $board[$move->toSquare];
-                $board[$move->toSquare] = $piece;
-            },
-        );
+        $fen = '4r2k/8/8/8/8/8/4R3/4K3 w - - 0 1';
+        $position = Fen::parse($fen);
+        $generator = new MoveGenerator();
 
-        $moves = $generator->generate($position, 'hash');
+        $moves = $generator->generate($position);
 
         // rook stays on the e-file (6), king has 4 squares
         self::assertCount(10, $moves);
-        self::assertSame(17, $calls);
         foreach ($moves as $move) {
             if ($move->piece->getType() === Piece::ROOK) {
                 self::assertSame('e', $move->to[0]);
             }
         }
         // every make was undone
-        self::assertSame('4r2k/8/8/8/8/8/4R3/4K3 w - - 0 1', Fen::serialize($position));
+        self::assertSame($fen, Fen::serialize($position));
+        self::assertSame(Fen::parse($fen)->hash(), $position->hash());
+        self::assertNull($position->undo());
 
-        // same hash: served from cache
-        $calls = 0;
-        self::assertSame($moves, $generator->generate($position, 'hash'));
-        self::assertSame(0, $calls);
+        // same position: served from cache, same Move instances
+        self::assertSame($moves, $generator->generate($position));
     }
 }

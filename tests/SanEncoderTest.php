@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace PChess\Chess\Test;
 
 use PChess\Chess\Chess;
+use PChess\Chess\Fen;
 use PChess\Chess\Move;
+use PChess\Chess\MoveGenerator;
 use PChess\Chess\SanEncoder;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -32,39 +34,26 @@ final class SanEncoderTest extends TestCase
         ];
     }
 
-    public function testEncodeUsesInjectedCallbacks(): void
+    public function testEncodeTakesBackCheckProbe(): void
     {
         // white rook to f8 gives check: Rf8+
-        $chess = new Chess('3R4/2K5/8/5k2/8/8/8/8 w - - 0 1');
-        $move = self::find($chess->moves(), 'd8', 'f8');
+        $fen = '3R4/2K5/8/5k2/8/8/8/8 w - - 0 1';
+        $position = Fen::parse($fen);
+        $move = self::find((new MoveGenerator())->generate($position), 'd8', 'f8');
 
-        $calls = [];
-        $encoder = new SanEncoder(
-            static function () use (&$calls, $move): array {
-                $calls[] = 'generate';
+        $encoder = new SanEncoder();
+        self::assertSame('Rf8+', $encoder->encode($move, $position));
+        // the check probe is taken back
+        self::assertSame($fen, Fen::serialize($position));
+        self::assertSame(Fen::parse($fen)->hash(), $position->hash());
+    }
 
-                return [$move];
-            },
-            static function (Move $move) use (&$calls): void {
-                $calls[] = 'make';
-            },
-            static function () use (&$calls): void {
-                $calls[] = 'undo';
-            },
-            static function () use (&$calls): bool {
-                $calls[] = 'inCheck';
-
-                return true;
-            },
-        );
-
-        self::assertSame('Rf8+', $encoder->encode($move, 'hash'));
-        self::assertSame(['generate', 'make', 'inCheck', 'generate', 'undo'], $calls);
-
-        // same move and hash: served from cache, no callback invoked
-        $calls = [];
-        self::assertSame('Rf8+', $encoder->encode($move, 'hash'));
-        self::assertSame([], $calls);
+    public function testCheckmateSuffix(): void
+    {
+        // back-rank mate: Rd8#
+        $position = Fen::parse('6k1/5ppp/8/8/8/8/8/3R2K1 w - - 0 1');
+        $move = self::find((new MoveGenerator())->generate($position), 'd1', 'd8');
+        self::assertSame('Rd8#', (new SanEncoder())->encode($move, $position));
     }
 
     /**
